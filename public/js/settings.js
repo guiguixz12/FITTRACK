@@ -4,6 +4,21 @@
 let _calcValues = null;
 
 function initSettings(state) {
+  // ── Tema ──────────────────────────────────────────────────────────────────
+  document.querySelectorAll('[data-theme-val]').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const theme = btn.dataset.themeVal;
+      applyTheme(theme);
+      document.querySelectorAll('[data-theme-val]').forEach(b =>
+        b.classList.toggle('active', b.dataset.themeVal === theme)
+      );
+      try {
+        await api.patch('/api/users/me/theme', { theme });
+        state.user = { ...state.user, theme };
+      } catch { /* non-critical */ }
+    });
+  });
+
   // ── Registrar peso ────────────────────────────────────────────────────────
   document.getElementById('setWeightSaveBtn').addEventListener('click', async () => {
     const val = parseFloat(document.getElementById('setWeightValue').value);
@@ -103,6 +118,12 @@ async function loadSettings(state) {
   document.getElementById('setAge').value            = u.age             || '';
   document.getElementById('setSex').value            = u.sex             || '';
   document.getElementById('setTargetWeight').value   = u.target_weight   || '';
+
+  // Sync theme toggle with current user theme
+  const currentTheme = u.theme || 'dark';
+  document.querySelectorAll('[data-theme-val]').forEach(b =>
+    b.classList.toggle('active', b.dataset.themeVal === currentTheme)
+  );
 
   await loadWeightInfo();
 }

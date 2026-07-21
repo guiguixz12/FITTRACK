@@ -8,20 +8,27 @@ router.use(requireAuth);
 
 router.get('/me', (req, res) => {
   const user = getDB()
-    .prepare('SELECT id, name, target_calories, target_protein, target_carbs, target_fat, height_cm, age, sex, target_weight FROM users WHERE id=?')
+    .prepare('SELECT id, name, target_calories, target_protein, target_carbs, target_fat, height_cm, age, sex, target_weight, theme FROM users WHERE id=?')
     .get(req.user.id);
   res.json({ user });
 });
 
 router.put('/me', (req, res) => {
-  const { target_calories, target_protein, target_carbs, target_fat, height_cm, age, sex, target_weight } = req.body;
+  const { target_calories, target_protein, target_carbs, target_fat, height_cm, age, sex, target_weight, theme } = req.body;
   getDB().prepare(`
     UPDATE users SET
       target_calories=?, target_protein=?, target_carbs=?, target_fat=?,
-      height_cm=?, age=?, sex=?, target_weight=?
+      height_cm=?, age=?, sex=?, target_weight=?, theme=?
     WHERE id=?
   `).run(target_calories, target_protein, target_carbs, target_fat, height_cm, age, sex,
-         target_weight || null, req.user.id);
+         target_weight || null, theme || 'dark', req.user.id);
+  res.json({ success: true });
+});
+
+router.patch('/me/theme', (req, res) => {
+  const { theme } = req.body;
+  if (!['dark', 'light'].includes(theme)) return res.status(400).json({ error: 'Tema inválido' });
+  getDB().prepare('UPDATE users SET theme=? WHERE id=?').run(theme, req.user.id);
   res.json({ success: true });
 });
 

@@ -17,8 +17,9 @@ const api = {
 
   get: (url) => api.request('GET', url),
   post: (url, body) => api.request('POST', url, body),
-  put: (url, body) => api.request('PUT', url, body),
-  del: (url) => api.request('DELETE', url),
+  put:   (url, body) => api.request('PUT',   url, body),
+  patch: (url, body) => api.request('PATCH', url, body),
+  del:   (url)       => api.request('DELETE', url),
 
   async upload(url, formData) {
     const res = await fetch(url, { method: 'POST', credentials: 'same-origin', body: formData });

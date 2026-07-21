@@ -201,6 +201,7 @@ function initDB() {
     "ALTER TABLE diet_template_foods ADD COLUMN sodium REAL DEFAULT 0",
     "ALTER TABLE diet_template_foods ADD COLUMN sugar REAL DEFAULT 0",
     "ALTER TABLE users ADD COLUMN water_goal_ml INTEGER DEFAULT 2000",
+    "ALTER TABLE users ADD COLUMN theme TEXT DEFAULT 'dark'",
   ];
   for (const sql of migrations) {
     try { database.exec(sql); } catch (_) { /* column already exists */ }
