@@ -27,18 +27,22 @@ let activeMg     = null;   // active muscle group in manual session
 let currentWkId  = null;   // current manual session workout id
 
 // Active workout mode
-let waExercises   = [];     // [{name, sets, reps, weight_kg, setsCompleted, done}]
-let waChecked     = 0;
-let waTimerInt    = null;
-let waStartTime   = null;
-let waWorkoutDow  = null;
-let waCurrentExIdx = 0;    // which exercise is currently active
-let waPhase       = 'working'; // 'working' | 'resting'
-let waNextLabel   = 'Próxima série'; // label for proceed button
+let waExercises    = [];
+let waChecked      = 0;
+let waTimerInt     = null;
+let waStartTime    = null;
+let waWorkoutDow   = null;
+let waCurrentExIdx = 0;
+let waPhase        = 'working'; // 'working' | 'resting'
+let waNextLabel    = 'Próxima série';
 
 // Rest timer
-let restTimerInt  = null;
-let restTimerSecs = 0;
+let restTimerInt   = null;
+let restTimerSecs  = 0;
+let waRestTotalSecs = 90;
+
+const WA_RING_R    = 86;
+const WA_RING_CIRC = +(2 * Math.PI * WA_RING_R).toFixed(2); // 540.35
 
 // PR cache for current session [{exercise_name, volume}]
 let sessionPRs = [];
@@ -433,15 +437,14 @@ function resetTplExForm() {
 // ══════════════════════════════════════════
 function startActiveWorkout(dow) {
   const tpl = wkTemplates[dow];
-  waWorkoutDow   = dow;
-  waExercises    = (tpl?.exercises || []).map(ex => ({ ...ex, setsCompleted: 0, done: false }));
-  waChecked      = 0;
-  waCurrentExIdx = 0;
-  waPhase        = 'working';
+  waWorkoutDow    = dow;
+  waExercises     = (tpl?.exercises || []).map(ex => ({ ...ex, setsCompleted: 0, done: false }));
+  waChecked       = 0;
+  waCurrentExIdx  = 0;
+  waPhase         = 'working';
+  waRestTotalSecs = 90;
 
   clearInterval(restTimerInt);
-  const timerEl = document.getElementById('waRestTimer');
-  if (timerEl) timerEl.style.display = 'none';
   sessionPRs = [];
 
   document.getElementById('waTitle').textContent      = tpl?.name || DAYS_FULL[dow];
@@ -460,46 +463,27 @@ window.startActiveWorkout = startActiveWorkout;
 function renderWaFocus() {
   const body = document.getElementById('waBody');
   if (!waExercises.length) {
-    body.innerHTML = '<p class="empty-state">Nenhum exercício. Use "+ Extra" para adicionar.</p>';
+    body.innerHTML = '<p class="empty-state" style="margin:24px 18px">Nenhum exercício. Use "+ Extra" para adicionar.</p>';
     return;
   }
 
-  // All exercises done
   if (waCurrentExIdx >= waExercises.length) {
     body.innerHTML = `
       <div class="wa-done-all">
         <div class="wa-done-all-icon">🏆</div>
         <div class="wa-done-all-title">Treino concluído!</div>
-        <div class="wa-done-all-sub">Todos os exercícios finalizados. Toque em Finalizar para salvar.</div>
+        <div class="wa-done-all-sub">Todos os exercícios finalizados.<br>Toque em Finalizar para salvar.</div>
       </div>`;
     return;
   }
 
-  const ex         = waExercises[waCurrentExIdx];
-  const totalSets  = ex.sets || 3;
-  const done       = ex.setsCompleted;
+  const ex        = waExercises[waCurrentExIdx];
+  const totalSets = ex.sets || 3;
+  const doneSets  = ex.setsCompleted;
 
-  // Set dots
   const dots = Array.from({ length: totalSets }, (_, i) => {
-    const cls = i < done ? 'done' : i === done ? 'active' : 'pending';
-    return `<div class="wa-set-dot ${cls}">${i < done ? '✓' : i + 1}</div>`;
-  }).join('');
-
-  // Mini exercise list
-  const miniList = waExercises.map((e, idx) => {
-    const cls  = e.done ? 'done' : idx === waCurrentExIdx ? 'active' : 'pending';
-    const icon = e.done ? '✓' : idx === waCurrentExIdx ? '▶' : idx + 1;
-    const setsLabel = e.done
-      ? `${e.sets || 0}/${e.sets || 0}`
-      : idx === waCurrentExIdx
-        ? `${e.setsCompleted}/${e.sets || 0}`
-        : `0/${e.sets || 0}`;
-    return `
-      <div class="wa-mini-ex ${cls}">
-        <div class="wa-mini-icon">${icon}</div>
-        <div class="wa-ex-name-mini">${escHtml(e.name)}</div>
-        <div class="wa-mini-sets">${setsLabel} séries</div>
-      </div>`;
+    const cls = i < doneSets ? 'done' : i === doneSets ? 'active' : 'pending';
+    return `<div class="wa-set-dot ${cls}">${i < doneSets ? '✓' : i + 1}</div>`;
   }).join('');
 
   const prescription = [
@@ -508,18 +492,37 @@ function renderWaFocus() {
     ex.weight_kg ? ex.weight_kg + ' kg' : null
   ].filter(Boolean).join(' × ');
 
+  const miniList = waExercises.map((e, idx) => {
+    const cls       = e.done ? 'done' : idx === waCurrentExIdx ? 'active' : 'pending';
+    const icon      = e.done ? '✓' : idx === waCurrentExIdx ? '▶' : idx + 1;
+    const setsLabel = e.done
+      ? `${e.sets}/${e.sets} ✓`
+      : idx === waCurrentExIdx
+        ? `${e.setsCompleted}/${e.sets || 3}`
+        : `0/${e.sets || 3}`;
+    return `
+      <div class="wa-mini-ex ${cls}">
+        <div class="wa-mini-icon">${icon}</div>
+        <div class="wa-ex-name-mini">${escHtml(e.name)}</div>
+        <div class="wa-mini-sets">${setsLabel}</div>
+      </div>`;
+  }).join('');
+
   body.innerHTML = `
-    <div class="wa-focus-card">
-      <div class="wa-focus-meta-top">Exercício ${waCurrentExIdx + 1} de ${waExercises.length}</div>
-      <div class="wa-focus-name">${escHtml(ex.name)}</div>
-      <div class="wa-focus-prescription">${prescription}</div>
-      <div class="wa-set-dots">${dots}</div>
-      <div class="wa-set-label">Série ${done + 1} de ${totalSets}</div>
-    </div>
-    <button class="btn btn-primary wa-complete-set-btn" onclick="completeSet()">
-      ✓ &nbsp;Concluí a Série ${done + 1}
-    </button>
-    <div class="wa-mini-ex-list">${miniList}</div>`;
+    <div class="wa-focus-view">
+      <div class="wa-ex-hero">
+        <div class="wa-focus-meta-top">Exercício ${waCurrentExIdx + 1} de ${waExercises.length}</div>
+        <div class="wa-focus-name">${escHtml(ex.name)}</div>
+        <div class="wa-focus-prescription">${prescription}</div>
+        <div class="wa-set-dots">${dots}</div>
+        <div class="wa-set-label">Série ${doneSets + 1} de ${totalSets}</div>
+      </div>
+      <button class="btn btn-primary wa-complete-set-btn" onclick="completeSet()">
+        ✓ &nbsp;Concluí a Série ${doneSets + 1}
+      </button>
+      <div class="wa-mini-section-label">Todos os exercícios</div>
+      <div class="wa-mini-ex-list">${miniList}</div>
+    </div>`;
 }
 
 function completeSet() {
@@ -555,15 +558,11 @@ window.completeSet = completeSet;
 
 function proceedFromRest() {
   clearInterval(restTimerInt);
-  const el = document.getElementById('waRestTimer');
-  if (el) el.style.display = 'none';
 
   const ex          = waExercises[waCurrentExIdx];
   const allSetsDone = ex && ex.setsCompleted >= (ex.sets || 3);
 
-  if (allSetsDone) {
-    waCurrentExIdx++;
-  }
+  if (allSetsDone) waCurrentExIdx++;
 
   waPhase = 'working';
   renderWaFocus();
@@ -582,40 +581,78 @@ function updateWaProgress() {
 
   document.getElementById('waProgBar').style.width   = pct + '%';
   document.getElementById('waProgLabel').textContent =
-    `${doneSets}/${totalSets} séries · ${exDone}/${waExercises.length} exercícios${volume > 0 ? ' · ' + Math.round(volume).toLocaleString('pt-BR') + ' kg vol.' : ''}`;
+    `${doneSets}/${totalSets} séries · ${exDone}/${waExercises.length} ex${volume > 0 ? ' · ' + Math.round(volume).toLocaleString('pt-BR') + ' kg' : ''}`;
 }
 
-// ── Rest Timer ────────────────────────────────────────────────────────────────
-function startRestTimer(secs) {
-  clearInterval(restTimerInt);
-  restTimerSecs = secs;
+// ── Rest Timer — circular ring ────────────────────────────────────────────────
+function renderRestScreen() {
+  const ex          = waExercises[waCurrentExIdx];
+  const allSetsDone = ex && ex.setsCompleted >= (ex.sets || 3);
 
-  const el        = document.getElementById('waRestTimer');
-  const countEl   = document.getElementById('waRestTimerCount');
-  const readyEl   = document.getElementById('waRestReadyMsg');
-  const proceedBtn = document.getElementById('waProceedBtn');
-
-  if (el)        el.style.display = '';
-  if (countEl)   { countEl.style.display = ''; countEl.style.color = 'var(--orange)'; }
-  if (readyEl)   readyEl.style.display = 'none';
-  if (proceedBtn) {
-    proceedBtn.textContent = 'Pular descanso';
-    proceedBtn.classList.remove('ready');
+  let nextLabel, nextName;
+  if (allSetsDone) {
+    const nextEx = waExercises[waCurrentExIdx + 1];
+    if (nextEx) { nextLabel = 'Próximo exercício'; nextName = nextEx.name; }
+    else        { nextLabel = 'Último concluído!'; nextName = 'Toque para finalizar'; }
+  } else {
+    nextLabel = `Série ${(ex?.setsCompleted || 0) + 1} de ${ex?.sets || 3}`;
+    nextName  = ex?.name || '';
   }
 
+  document.getElementById('waBody').innerHTML = `
+    <div class="wa-rest-screen">
+      <div class="wa-rest-label">Descansando</div>
+      <div class="wa-ring-wrap">
+        <svg class="wa-ring-svg" viewBox="0 0 200 200">
+          <circle class="wa-ring-track" cx="100" cy="100" r="${WA_RING_R}"/>
+          <circle class="wa-ring-arc"   cx="100" cy="100" r="${WA_RING_R}"
+            id="waRingArc"
+            stroke-dasharray="${WA_RING_CIRC}"
+            stroke-dashoffset="0"/>
+        </svg>
+        <div class="wa-ring-center">
+          <div class="wa-ring-time"  id="waRestTimerCount">--</div>
+          <div class="wa-ring-ready" id="waRingReady" style="display:none">Pronto!</div>
+        </div>
+      </div>
+      <div class="wa-rest-next-info">
+        <div class="wa-rest-next-label">${escHtml(nextLabel)}</div>
+        <div class="wa-rest-next-name">${escHtml(nextName)}</div>
+      </div>
+      <div class="wa-rest-adjust">
+        <button class="btn btn-ghost btn-sm" onclick="adjustRestTimer(-15)">-15s</button>
+        <button id="waSkipBtn" class="btn btn-ghost btn-sm wa-skip-btn" onclick="proceedFromRest()">Pular descanso</button>
+        <button class="btn btn-ghost btn-sm" onclick="adjustRestTimer(+15)">+15s</button>
+      </div>
+    </div>`;
+
   updateRestTimerDisplay();
+}
+
+function startRestTimer(secs) {
+  clearInterval(restTimerInt);
+  restTimerSecs   = secs;
+  waRestTotalSecs = secs;
+
+  renderRestScreen();
 
   restTimerInt = setInterval(() => {
     restTimerSecs--;
     if (restTimerSecs <= 0) {
+      restTimerSecs = 0;
       clearInterval(restTimerInt);
       if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
-      if (countEl)   countEl.style.display = 'none';
-      if (readyEl)   { readyEl.textContent = 'Pronto!'; readyEl.style.display = ''; }
-      if (proceedBtn) {
-        proceedBtn.textContent = waNextLabel;
-        proceedBtn.classList.add('ready');
-      }
+      updateRestTimerDisplay();
+
+      const arcEl   = document.getElementById('waRingArc');
+      const countEl = document.getElementById('waRestTimerCount');
+      const readyEl = document.getElementById('waRingReady');
+      const skipBtn = document.getElementById('waSkipBtn');
+
+      if (arcEl)   arcEl.classList.add('complete');
+      if (countEl) countEl.style.display = 'none';
+      if (readyEl) readyEl.style.display = '';
+      if (skipBtn) { skipBtn.textContent = waNextLabel; skipBtn.classList.add('ready'); }
     } else {
       updateRestTimerDisplay();
     }
@@ -623,12 +660,19 @@ function startRestTimer(secs) {
 }
 
 function updateRestTimerDisplay() {
-  const el = document.getElementById('waRestTimerCount');
-  if (!el) return;
-  const m = Math.floor(Math.max(restTimerSecs, 0) / 60);
-  const s = String(Math.max(restTimerSecs, 0) % 60).padStart(2, '0');
-  el.textContent = `${m}:${s}`;
-  el.style.color = restTimerSecs <= 10 ? 'var(--red)' : 'var(--orange)';
+  const secs    = Math.max(restTimerSecs, 0);
+  const countEl = document.getElementById('waRestTimerCount');
+  const arcEl   = document.getElementById('waRingArc');
+
+  if (countEl) {
+    const m = Math.floor(secs / 60);
+    const s = String(secs % 60).padStart(2, '0');
+    countEl.textContent = `${m}:${s}`;
+  }
+  if (arcEl && waRestTotalSecs > 0) {
+    const offset = (WA_RING_CIRC * (1 - secs / waRestTotalSecs)).toFixed(2);
+    arcEl.style.strokeDashoffset = offset;
+  }
 }
 
 function adjustRestTimer(delta) {

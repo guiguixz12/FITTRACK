@@ -964,6 +964,13 @@ input[type="file"] {
 .exercise-item-actions { display: flex; gap: 4px; }
 
 /* Active Workout Overlay */
+/* ═══════════════════════════════════════════
+   ACTIVE WORKOUT — full-screen slide-up
+   ═══════════════════════════════════════════ */
+@keyframes waSlideUp {
+  from { transform: translateX(-50%) translateY(56px); opacity: 0; }
+  to   { transform: translateX(-50%) translateY(0);    opacity: 1; }
+}
 .wa-overlay {
   position: fixed;
   inset: 0;
@@ -972,201 +979,119 @@ input[type="file"] {
   display: flex;
   flex-direction: column;
   max-width: 520px;
-  margin: 0 auto;
   left: 50%;
   transform: translateX(-50%);
+  animation: waSlideUp .32s cubic-bezier(.32,.72,0,1);
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 .wa-header {
   background: var(--surface);
   border-bottom: 1px solid var(--border);
-  padding: 14px 16px 12px;
+  padding: 10px 16px 0;
   flex-shrink: 0;
 }
 .wa-top-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 .wa-cancel-btn {
-  background: none;
-  border: none;
-  color: var(--text-3);
-  font-size: .8rem;
-  font-weight: 600;
-  cursor: pointer;
-  font-family: inherit;
-  padding: 4px 0;
+  background: none; border: none;
+  color: var(--text-3); font-size: .8rem; font-weight: 600;
+  cursor: pointer; font-family: inherit; padding: 4px 0;
 }
 .wa-cancel-btn:hover { color: var(--red); }
 .wa-timer {
   font-family: 'JetBrains Mono', monospace;
-  font-size: 1.2rem;
-  font-weight: 700;
-  color: var(--orange);
+  font-size: 1.05rem; font-weight: 700; color: var(--text-2);
 }
 .wa-title {
-  font-size: 1rem;
-  font-weight: 800;
-  color: var(--text);
-  letter-spacing: .06em;
-  text-transform: uppercase;
-  margin-bottom: 10px;
+  font-size: .72rem; font-weight: 700; color: var(--text-3);
+  letter-spacing: .06em; text-transform: uppercase; margin-bottom: 8px;
 }
 .wa-prog-wrap {
-  height: 4px;
-  background: rgba(0,0,0,0.06);
-  border-radius: 99px;
-  overflow: hidden;
+  height: 3px; background: rgba(0,0,0,0.07);
+  border-radius: 99px; overflow: hidden;
 }
 .wa-prog-bar {
   height: 100%;
   background: linear-gradient(90deg, var(--orange), var(--orange-hi));
-  border-radius: 99px;
-  transition: width .4s ease;
+  border-radius: 99px; transition: width .5s ease;
 }
 .wa-prog-label {
-  font-size: .72rem;
-  color: var(--text-3);
-  margin-top: 6px;
+  font-size: .67rem; color: var(--text-3); padding: 5px 0 10px;
 }
 .wa-body {
-  flex: 1;
-  overflow-y: auto;
-  padding: 10px 14px;
+  flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch;
 }
 .wa-footer {
-  background: var(--surface);
-  border-top: 1px solid var(--border);
-  padding: 12px 14px 16px;
-  flex-shrink: 0;
+  background: var(--surface); border-top: 1px solid var(--border);
+  padding: 10px 14px 12px; flex-shrink: 0;
 }
 .wa-extra-input {
-  flex: 1;
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  color: var(--text);
-  padding: 9px 12px;
-  font-family: inherit;
-  font-size: .88rem;
-}
-.wa-ex-card {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 12px 14px;
-  margin-bottom: 8px;
-  cursor: pointer;
-  transition: all .15s;
-}
-.wa-ex-card:hover { border-color: var(--border-hi); }
-.wa-ex-card.done { opacity: .5; background: var(--surface); }
-.wa-check-btn {
-  width: 28px; height: 28px;
-  border-radius: 50%;
-  border: 1.5px solid var(--border-hi);
-  display: flex; align-items: center; justify-content: center;
-  font-size: .9rem;
-  color: var(--green);
-  flex-shrink: 0;
-  transition: all .15s;
-}
-.wa-ex-card.done .wa-check-btn {
-  background: var(--green);
-  border-color: var(--green);
-  color: #fff;
-}
-.wa-ex-info { flex: 1; min-width: 0; }
-.wa-ex-name {
-  font-size: .88rem;
-  font-weight: 600;
-  color: var(--text);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.wa-ex-meta { font-size: .72rem; color: var(--text-3); margin-top: 2px; }
-.wa-section-label {
-  font-size: .68rem;
-  font-weight: 700;
-  color: var(--text-3);
-  text-transform: uppercase;
-  letter-spacing: .08em;
-  padding: 8px 0 4px;
+  flex: 1; background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); color: var(--text);
+  padding: 9px 12px; font-family: inherit; font-size: .88rem;
 }
 
-/* ── Set-by-set focus card ── */
-.wa-focus-card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 22px 18px 20px;
-  margin-bottom: 14px;
-  text-align: center;
+/* ── Working phase: exercise focus ── */
+.wa-focus-view {
+  display: flex; flex-direction: column;
+  min-height: 100%; padding: 0 18px;
+}
+.wa-ex-hero {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  text-align: center; padding: 28px 0 18px;
 }
 .wa-focus-meta-top {
-  font-size: .7rem;
-  font-weight: 700;
-  color: var(--orange);
-  text-transform: uppercase;
-  letter-spacing: .08em;
-  margin-bottom: 6px;
+  font-size: .67rem; font-weight: 700; color: var(--orange);
+  text-transform: uppercase; letter-spacing: .1em; margin-bottom: 10px;
 }
 .wa-focus-name {
-  font-size: 1.35rem;
-  font-weight: 800;
-  color: var(--text);
-  line-height: 1.2;
-  margin-bottom: 5px;
+  font-size: 1.8rem; font-weight: 800; color: var(--text);
+  line-height: 1.15; margin-bottom: 8px;
 }
 .wa-focus-prescription {
-  font-size: .8rem;
-  color: var(--text-3);
-  margin-bottom: 20px;
+  font-size: .85rem; color: var(--text-3); margin-bottom: 30px;
 }
 .wa-set-dots {
-  display: flex;
-  gap: 8px;
-  justify-content: center;
-  flex-wrap: wrap;
-  margin-bottom: 8px;
+  display: flex; gap: 10px; justify-content: center;
+  flex-wrap: wrap; margin-bottom: 10px;
 }
 .wa-set-dot {
-  width: 38px; height: 38px;
-  border-radius: 50%;
+  width: 46px; height: 46px; border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
-  font-size: .8rem;
-  font-weight: 700;
-  transition: all .2s;
+  font-size: .85rem; font-weight: 700; transition: all .25s;
 }
-.wa-set-dot.done { background: var(--green); color: #fff; border: 2px solid var(--green); }
-.wa-set-dot.active { background: var(--orange); color: #fff; border: 2px solid var(--orange); box-shadow: 0 0 0 4px rgba(255,107,53,.18); }
-.wa-set-dot.pending { background: transparent; color: var(--text-3); border: 2px solid var(--border-hi); }
-.wa-set-label { font-size: .76rem; color: var(--text-3); margin-top: 4px; }
+.wa-set-dot.done { background: var(--green); color: #fff; border: 2.5px solid var(--green); }
+.wa-set-dot.active {
+  background: var(--orange); color: #fff; border: 2.5px solid var(--orange);
+  box-shadow: 0 0 0 5px rgba(255,107,53,.2);
+}
+.wa-set-dot.pending { background: transparent; color: var(--text-3); border: 2.5px solid var(--border-hi); }
+.wa-set-label { font-size: .74rem; color: var(--text-3); margin-top: 4px; }
 .wa-complete-set-btn {
-  width: 100%;
-  padding: 17px;
-  font-size: 1rem;
-  font-weight: 700;
-  margin-bottom: 16px;
+  width: 100%; padding: 19px;
+  font-size: 1.08rem; font-weight: 800; letter-spacing: .02em;
+  margin-bottom: 20px; border-radius: var(--radius);
 }
-/* Mini exercise list under the focus card */
-.wa-mini-ex-list { display: flex; flex-direction: column; gap: 5px; }
+.wa-mini-section-label {
+  font-size: .64rem; font-weight: 700; color: var(--text-3);
+  text-transform: uppercase; letter-spacing: .1em; margin-bottom: 7px;
+}
+.wa-mini-ex-list { display: flex; flex-direction: column; gap: 4px; margin-bottom: 16px; }
 .wa-mini-ex {
   display: flex; align-items: center; gap: 9px;
-  font-size: .82rem; padding: 9px 11px;
-  border-radius: var(--radius-sm);
-  border: 1px solid transparent;
-  transition: all .15s;
+  font-size: .8rem; padding: 8px 10px;
+  border-radius: var(--radius-sm); border: 1px solid transparent; transition: all .15s;
 }
 .wa-mini-icon {
   width: 20px; height: 20px; border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
-  font-size: .62rem; font-weight: 700; flex-shrink: 0;
+  font-size: .6rem; font-weight: 700; flex-shrink: 0;
 }
 .wa-mini-ex.done { color: var(--text-3); }
 .wa-mini-ex.done .wa-ex-name-mini { text-decoration: line-through; }
@@ -1175,15 +1100,79 @@ input[type="file"] {
 .wa-mini-ex.active .wa-mini-icon { background: var(--orange); color: #fff; }
 .wa-mini-ex.pending { color: var(--text-2); }
 .wa-mini-ex.pending .wa-mini-icon { border: 1.5px solid var(--border-hi); color: var(--text-3); }
-.wa-mini-sets { font-size: .7rem; color: var(--text-3); margin-left: auto; white-space: nowrap; }
+.wa-mini-sets { font-size: .68rem; color: var(--text-3); margin-left: auto; white-space: nowrap; }
 .wa-mini-ex.active .wa-mini-sets { color: var(--orange); font-weight: 700; }
-/* All exercises done state */
-.wa-done-all { text-align: center; padding: 48px 20px 24px; }
-.wa-done-all-icon { font-size: 3.2rem; margin-bottom: 14px; }
-.wa-done-all-title { font-size: 1.6rem; font-weight: 800; color: var(--text); margin-bottom: 8px; }
-.wa-done-all-sub { font-size: .88rem; color: var(--text-3); margin-bottom: 24px; }
-/* Rest timer proceed button (primary when ready) */
-#waProceedBtn.ready { background: var(--green); color: #fff; border-color: var(--green); font-weight: 700; }
+
+/* ── Rest phase: circular ring ── */
+.wa-rest-screen {
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  min-height: 100%; padding: 20px 20px 24px; text-align: center;
+}
+.wa-rest-label {
+  font-size: .68rem; font-weight: 700; color: var(--text-3);
+  text-transform: uppercase; letter-spacing: .14em; margin-bottom: 32px;
+}
+.wa-ring-wrap {
+  position: relative; width: 210px; height: 210px; margin-bottom: 32px;
+}
+.wa-ring-svg { width: 210px; height: 210px; transform: rotate(-90deg); }
+.wa-ring-track { fill: none; stroke: rgba(0,0,0,0.08); stroke-width: 12; }
+.wa-ring-arc {
+  fill: none; stroke: var(--orange); stroke-width: 12; stroke-linecap: round;
+  transition: stroke-dashoffset .95s linear, stroke .4s;
+}
+.wa-ring-arc.complete { stroke: var(--green); }
+.wa-ring-center {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+}
+.wa-ring-time {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 2.8rem; font-weight: 700; color: var(--text); line-height: 1;
+}
+.wa-ring-ready {
+  font-size: .82rem; font-weight: 700; color: var(--green); margin-top: 4px;
+}
+.wa-rest-next-info { margin-bottom: 4px; }
+.wa-rest-next-label {
+  font-size: .68rem; font-weight: 700; color: var(--text-3);
+  text-transform: uppercase; letter-spacing: .07em; margin-bottom: 3px;
+}
+.wa-rest-next-name { font-size: 1rem; font-weight: 700; color: var(--text); }
+.wa-rest-adjust {
+  display: flex; gap: 10px; align-items: center; margin-top: 24px;
+}
+.wa-skip-btn { min-width: 136px; font-weight: 700; }
+.wa-skip-btn.ready { background: var(--green); color: #fff; border-color: var(--green); }
+
+/* ── All-done celebration ── */
+.wa-done-all { text-align: center; padding: 60px 20px 24px; }
+.wa-done-all-icon { font-size: 4rem; margin-bottom: 16px; }
+.wa-done-all-title { font-size: 1.8rem; font-weight: 800; color: var(--text); margin-bottom: 8px; }
+.wa-done-all-sub { font-size: .9rem; color: var(--text-3); line-height: 1.5; }
+
+/* ── Legacy card styles (manual session) ── */
+.wa-ex-card {
+  display: flex; align-items: center; gap: 12px;
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 12px 14px;
+  margin-bottom: 8px; cursor: pointer; transition: all .15s;
+}
+.wa-ex-card:hover { border-color: var(--border-hi); }
+.wa-ex-card.done { opacity: .5; background: var(--surface); }
+.wa-check-btn {
+  width: 28px; height: 28px; border-radius: 50%;
+  border: 1.5px solid var(--border-hi);
+  display: flex; align-items: center; justify-content: center;
+  font-size: .9rem; color: var(--green); flex-shrink: 0; transition: all .15s;
+}
+.wa-ex-card.done .wa-check-btn { background: var(--green); border-color: var(--green); color: #fff; }
+.wa-ex-info { flex: 1; min-width: 0; }
+.wa-ex-name { font-size: .88rem; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.wa-ex-meta { font-size: .72rem; color: var(--text-3); margin-top: 2px; }
+.wa-section-label { font-size: .68rem; font-weight: 700; color: var(--text-3); text-transform: uppercase; letter-spacing: .08em; padding: 8px 0 4px; }
 
 /* ═══════════════════════════════════════════
    HISTORY CARDS (Treinos)
