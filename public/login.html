@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FitTracker — Login</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .login-page { background: var(--bg); }
+
+    .login-container {
+      width: 100%;
+      max-width: 340px;
+    }
+
+    .login-logo {
+      text-align: center;
+      margin-bottom: 36px;
+    }
+
+    .login-mark {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 56px;
+      height: 56px;
+      border-radius: 14px;
+      background: rgba(249,115,22,.1);
+      border: 1.5px solid rgba(249,115,22,.3);
+      margin-bottom: 18px;
+      color: var(--orange);
+    }
+
+    .login-logo h1 {
+      font-size: 2rem;
+      font-weight: 800;
+      letter-spacing: 0.2em;
+      color: var(--text);
+      line-height: 1;
+    }
+
+    .login-logo h1 span { color: var(--orange); }
+
+    .login-tagline {
+      font-size: .75rem;
+      color: var(--text-faint);
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      margin-top: 8px;
+      font-weight: 600;
+    }
+
+    .login-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-top: 2px solid var(--orange);
+      border-radius: var(--radius-lg);
+      padding: 28px 24px;
+    }
+
+    .login-card .form-group { margin-bottom: 16px; }
+    .login-card .form-group:last-of-type { margin-bottom: 20px; }
+
+    .login-error {
+      color: var(--red);
+      font-size: .82rem;
+      font-weight: 600;
+      text-align: center;
+      margin-top: 12px;
+      padding: 10px;
+      background: rgba(224,82,82,.08);
+      border-radius: var(--radius-sm);
+      border: 1px solid rgba(224,82,82,.2);
+    }
+  </style>
+</head>
+<body class="login-page">
+  <div class="login-container">
+
+    <div class="login-logo">
+      <div class="login-mark">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M6 4v16M18 4v16M3 8h3M3 16h3M21 8h-3M21 16h-3M9 12h6"/>
+        </svg>
+      </div>
+      <h1>FIT<span>TRACKER</span></h1>
+      <p class="login-tagline">Seu progresso. Seus resultados.</p>
+    </div>
+
+    <div class="login-card">
+      <form id="loginForm" novalidate>
+        <div class="form-group">
+          <label for="name">Usuário</label>
+          <input type="text" id="name" name="name" placeholder="Usuário" required autocomplete="username" spellcheck="false" autocapitalize="none">
+        </div>
+
+        <div class="form-group">
+          <label for="password">Senha</label>
+          <input type="password" id="password" name="password" placeholder="••••••••" required autocomplete="current-password">
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-full" id="loginBtn">Entrar</button>
+
+        <p class="login-error" id="loginError" style="display:none"></p>
+      </form>
+    </div>
+
+  </div>
+
+  <script>
+    fetch('/api/auth/me').then(r => { if (r.ok) location.href = '/app'; }).catch(() => {});
+
+    document.getElementById('loginForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      const btn    = document.getElementById('loginBtn');
+      const errEl  = document.getElementById('loginError');
+      errEl.style.display = 'none';
+      btn.textContent = '...';
+      btn.disabled = true;
+
+      try {
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name:     document.getElementById('name').value.trim(),
+            password: document.getElementById('password').value
+          })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Usuário ou senha inválidos');
+        location.href = '/app';
+      } catch (err) {
+        errEl.textContent = err.message;
+        errEl.style.display = 'block';
+        btn.textContent = 'Entrar';
+        btn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>

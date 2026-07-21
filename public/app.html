@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FitTracker</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+
+  <!-- SVG gradient for the calorie ring (must be in DOM) -->
+  <svg width="0" height="0" style="position:absolute">
+    <defs>
+      <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%"   stop-color="#E85520"/>
+        <stop offset="100%" stop-color="#FF8A60"/>
+      </linearGradient>
+    </defs>
+  </svg>
+</head>
+<body>
+<div id="app">
+
+  <!-- ── Header ────────────────────────── -->
+  <header class="app-header">
+    <div class="header-brand">
+      <span class="header-title">FIT<span>TRACKER</span></span>
+    </div>
+    <div class="header-user">
+      <span class="header-user-name" id="headerUserName"></span>
+      <button class="btn-logout" id="logoutBtn">Sair</button>
+    </div>
+  </header>
+
+  <main class="app-main">
+
+    <!-- ════════════ DASHBOARD ════════════ -->
+    <section class="tab-section active" id="tab-dashboard">
+      <div class="date-nav">
+        <button class="date-arrow" id="dashPrevDay">‹</button>
+        <input type="date" id="dashDate">
+        <button class="date-arrow" id="dashNextDay">›</button>
+      </div>
+
+      <!-- Calories ring -->
+      <div class="card card-orange">
+        <div class="card-label">Calorias do dia</div>
+        <div class="cal-ring-wrap">
+          <div class="cal-ring">
+            <svg viewBox="0 0 160 160">
+              <circle class="ring-bg"   cx="80" cy="80" r="69.4"/>
+              <circle class="ring-fill" cx="80" cy="80" r="69.4" id="calRing"/>
+            </svg>
+            <div class="ring-content">
+              <div class="ring-calories" id="dashCalories">0</div>
+              <div class="ring-target">/ <span id="dashCalTarget">—</span></div>
+              <div class="ring-unit">kcal</div>
+            </div>
+          </div>
+          <div class="cal-remain" id="dashCalRemain"></div>
+        </div>
+      </div>
+
+      <!-- Macros -->
+      <div class="card card-green">
+        <div class="card-label">Macronutrientes</div>
+        <div class="macro-row">
+          <span class="macro-name" style="color:var(--green)">Proteína</span>
+          <div class="macro-bar-track">
+            <div class="macro-bar-fill fill-green" id="barProt" style="width:0%"></div>
+          </div>
+          <span class="macro-val" id="valProt"><strong>0</strong>/—g</span>
+        </div>
+        <div class="macro-row">
+          <span class="macro-name" style="color:var(--blue)">Carbo</span>
+          <div class="macro-bar-track">
+            <div class="macro-bar-fill fill-blue" id="barCarb" style="width:0%"></div>
+          </div>
+          <span class="macro-val" id="valCarb"><strong>0</strong>/—g</span>
+        </div>
+        <div class="macro-row">
+          <span class="macro-name" style="color:var(--yellow)">Gordura</span>
+          <div class="macro-bar-track">
+            <div class="macro-bar-fill fill-yellow" id="barFat" style="width:0%"></div>
+          </div>
+          <span class="macro-val" id="valFat"><strong>0</strong>/—g</span>
+        </div>
+      </div>
+
+      <!-- Weight -->
+      <div class="card">
+        <div class="card-label">Peso Corporal</div>
+        <div class="weight-main-row">
+          <span class="weight-value mono" id="dashWeight">—</span>
+          <span class="weight-unit" id="dashWeightUnit">kg</span>
+        </div>
+        <div id="dashWeightNoData" class="weight-no-data" style="display:none"></div>
+        <div class="weight-change-row" id="dashWeightChangeRow" style="display:none">
+          <span class="weight-change" id="dashWeightChange"></span>
+          <span class="weight-change-vs" id="dashWeightVs"></span>
+        </div>
+        <div class="weight-sparkline" id="dashWeightSparkline" style="display:none"></div>
+        <div class="weight-range-row" id="dashWeightRangeRow" style="display:none">
+          <div class="weight-range-chip">
+            <span class="weight-range-val" id="dashWeightMin">—</span>
+            <span class="weight-range-label">Mínimo</span>
+          </div>
+          <div class="weight-range-chip">
+            <span class="weight-range-val" id="dashWeightMax">—</span>
+            <span class="weight-range-label">Máximo</span>
+          </div>
+          <div class="weight-range-chip">
+            <span class="weight-range-val" id="dashWeightCount">—</span>
+            <span class="weight-range-label">Registros</span>
+          </div>
+        </div>
+        <div class="weight-hint" id="dashWeightHint" style="display:none">
+          📝 Para registrar seu peso: vá em <strong>Dieta → Registrar</strong> e preencha o campo "Peso (kg)"
+        </div>
+      </div>
+
+      <!-- Workout summary -->
+      <div class="card">
+        <div class="card-label">Treino do dia</div>
+        <div id="dashWorkout" class="empty-state" style="padding:10px 0">Nenhum treino registrado</div>
+      </div>
+    </section>
+
+    <!-- ════════════ DIETA ════════════ -->
+    <section class="tab-section" id="tab-diet">
+
+      <!-- Sub-tabs -->
+      <div class="sub-tabs">
+        <button class="sub-tab active" data-dtview="programa">Programa</button>
+        <button class="sub-tab" data-dtview="registrar">Registrar</button>
+      </div>
+
+      <!-- ── VIEW: Programa Semanal ── -->
+      <div id="dtViewPrograma">
+        <div class="plan-suggest-bar">
+          <div class="plan-suggest-bar-text">
+            <strong>Não sabe por onde começar?</strong>
+            Gere um plano de dieta personalizado em segundos.
+          </div>
+          <button class="btn btn-secondary btn-sm" onclick="openPlanWizard('diet', AppState)">Sugerir plano</button>
+        </div>
+        <div id="dietWeekGrid"></div>
+      </div>
+
+      <!-- ── VIEW: Editar dia ── -->
+      <div id="dtViewEditDay" style="display:none">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+          <button class="btn btn-ghost btn-sm" id="dtBackBtn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg> Voltar</button>
+          <span id="dtEditDayTitle" style="font-size:1.15rem;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:.06em"></span>
+        </div>
+
+        <div class="card">
+          <div class="card-label">Nome da dieta</div>
+          <div class="form-group" style="margin-bottom:0">
+            <input type="text" id="dtplName" placeholder="Ex: Low Carb, Bulking, Refeed...">
+          </div>
+        </div>
+
+        <!-- 4 meal sections rendered by JS -->
+        <div id="dtplMealSections"></div>
+
+        <!-- Shared food calculator (shown when + Add is clicked on a meal) -->
+        <div class="card" id="dtFoodCalcCard" style="display:none">
+          <div class="card-label">
+            Adicionando em: <span id="dtFoodCalcMealLabel" style="color:var(--orange);font-weight:700"></span>
+          </div>
+          <div class="muscle-groups" id="dtFoodCats">
+            <button class="mg-btn" data-cat="proteinas">🥩 Proteínas</button>
+            <button class="mg-btn" data-cat="carboidratos">🌾 Carboidratos</button>
+            <button class="mg-btn" data-cat="ovos">🥚 Ovos</button>
+            <button class="mg-btn" data-cat="laticinios">🥛 Laticínios</button>
+            <button class="mg-btn" data-cat="vegetais">🥦 Vegetais</button>
+            <button class="mg-btn" data-cat="frutas">🍎 Frutas</button>
+            <button class="mg-btn" data-cat="gorduras">🥑 Gorduras</button>
+            <button class="mg-btn" data-cat="leguminosas">🫘 Leguminosas</button>
+            <button class="mg-btn" data-cat="suplementos">💊 Suplementos</button>
+            <button class="mg-btn" data-cat="fastfood">🍔 Fast Food</button>
+          </div>
+          <div class="ex-chips-wrap" id="dtFoodChipsWrap" style="display:none">
+            <div class="food-chips" id="dtFoodChips"></div>
+          </div>
+          <div id="dtFoodQtyRow" style="display:none;margin-top:14px">
+            <div id="dtFoodQtyInfo" class="food-qty-info"></div>
+            <div style="display:flex;gap:8px;align-items:center;margin-top:10px;flex-wrap:wrap">
+              <input type="number" id="dtFoodQty" min="1" placeholder="100" style="width:90px;flex-shrink:0">
+              <span style="color:var(--text-muted);font-size:.9rem">g</span>
+              <button class="btn btn-primary btn-sm" id="dtFoodAddBtn">+ Adicionar</button>
+              <button class="btn btn-ghost btn-sm" id="dtFoodCancelBtn">✕</button>
+            </div>
+            <div id="dtFoodQtyPreview" class="food-qty-preview"></div>
+          </div>
+        </div>
+
+        <!-- Overall totals -->
+        <div id="dtplTotals" style="display:none;margin-bottom:14px"></div>
+
+        <div style="display:flex;gap:8px;margin-bottom:8px">
+          <button class="btn btn-primary" style="flex:1" id="dtplSaveBtn">Salvar programa</button>
+          <button class="btn btn-ghost btn-sm" id="dtplFreeDayBtn">Dia livre</button>
+        </div>
+      </div>
+
+      <!-- ── VIEW: Acompanhar dia ── -->
+      <div id="dtViewTrack" style="display:none">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+          <button class="btn btn-ghost btn-sm" id="dtTrackBackBtn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg> Voltar</button>
+          <div style="flex:1;min-width:0">
+            <div id="dtTrackTitle" style="font-size:1.1rem;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:.05em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>
+            <div id="dtTrackDate" style="font-size:.78rem;color:var(--text-muted);margin-top:1px"></div>
+          </div>
+        </div>
+
+        <!-- Progress summary card -->
+        <div class="card card-orange" style="margin-bottom:12px">
+          <div style="display:flex;align-items:baseline;gap:6px;margin-bottom:8px">
+            <span id="dtTrackCalEaten" style="font-family:'JetBrains Mono',monospace;font-size:2.4rem;font-weight:700;color:var(--orange);line-height:1">0</span>
+            <span style="color:var(--text-muted);font-size:1rem">/ <span id="dtTrackCalTotal">0</span> kcal</span>
+          </div>
+          <div class="wa-prog-wrap">
+            <div class="wa-prog-bar" id="dtTrackBar" style="width:0%"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;font-size:.78rem;color:var(--text-muted)">
+            <span id="dtTrackFoodCount">0 / 0 alimentos</span>
+            <span id="dtTrackMacros"></span>
+          </div>
+        </div>
+
+        <!-- Meal sections rendered by JS -->
+        <div id="dtTrackMeals"></div>
+
+        <!-- Add extra food panel -->
+        <div class="card" id="dtTrackAddPanel" style="display:none;margin-bottom:12px">
+          <div class="card-label" style="color:var(--yellow)">+ Alimento extra (fora do plano)</div>
+          <div class="form-group" style="margin-bottom:10px">
+            <label>Refeição</label>
+            <select id="dtTrackExtraMeal" style="width:100%">
+              <option value="cafe_manha">🌅 Café da Manhã</option>
+              <option value="almoco" selected>🍽️ Almoço</option>
+              <option value="cafe_tarde">☕ Café da Tarde</option>
+              <option value="janta">🌙 Jantar</option>
+            </select>
+          </div>
+          <div class="muscle-groups" id="dtTrackExtraCats">
+            <button class="mg-btn" data-ecat="proteinas">🥩 Proteínas</button>
+            <button class="mg-btn" data-ecat="carboidratos">🌾 Carboidratos</button>
+            <button class="mg-btn" data-ecat="ovos">🥚 Ovos</button>
+            <button class="mg-btn" data-ecat="laticinios">🥛 Laticínios</button>
+            <button class="mg-btn" data-ecat="vegetais">🥦 Vegetais</button>
+            <button class="mg-btn" data-ecat="frutas">🍎 Frutas</button>
+            <button class="mg-btn" data-ecat="gorduras">🥑 Gorduras</button>
+            <button class="mg-btn" data-ecat="leguminosas">🫘 Leguminosas</button>
+            <button class="mg-btn" data-ecat="suplementos">💊 Suplementos</button>
+            <button class="mg-btn" data-ecat="fastfood">🍔 Fast Food</button>
+          </div>
+          <div class="ex-chips-wrap" id="dtTrackExtraChipsWrap" style="display:none">
+            <div class="food-chips" id="dtTrackExtraChips"></div>
+          </div>
+          <div id="dtTrackExtraQtyRow" style="display:none;margin-top:14px">
+            <div id="dtTrackExtraQtyInfo" class="food-qty-info"></div>
+            <div style="display:flex;gap:8px;align-items:center;margin-top:10px;flex-wrap:wrap">
+              <input type="number" id="dtTrackExtraQty" min="1" placeholder="100" style="width:90px;flex-shrink:0">
+              <span style="color:var(--text-muted);font-size:.9rem">g</span>
+              <button class="btn btn-primary btn-sm" id="dtTrackExtraAddBtn">+ Adicionar</button>
+              <button class="btn btn-ghost btn-sm" id="dtTrackExtraCancelBtn">✕</button>
+            </div>
+            <div id="dtTrackExtraQtyPreview" class="food-qty-preview"></div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:8px;margin-bottom:8px">
+          <button class="btn btn-ghost btn-sm" id="dtTrackAddExtraBtn" style="flex-shrink:0">+ Alimento extra</button>
+          <button class="btn btn-primary btn-full" id="dtTrackSaveBtn">Salvar no diário</button>
+        </div>
+      </div>
+
+      <!-- ── VIEW: Registrar ── -->
+      <div id="dtViewRegistrar" style="display:none">
+
+        <div class="card">
+          <div class="card-label">Registrar / Editar</div>
+          <form id="dietForm" novalidate>
+            <div class="form-group">
+              <label for="dietDate">Data</label>
+              <input type="date" id="dietDate" required>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="dietCalories">Calorias (kcal)</label>
+                <input type="number" id="dietCalories" min="0" placeholder="0">
+              </div>
+              <div class="form-group">
+                <label for="dietWeight">Peso (kg)</label>
+                <input type="number" id="dietWeight" step="0.1" min="0" placeholder="80.0">
+              </div>
+            </div>
+            <div class="form-row-3">
+              <div class="form-group">
+                <label for="dietProt">Proteína (g)</label>
+                <input type="number" id="dietProt" min="0" placeholder="0">
+              </div>
+              <div class="form-group">
+                <label for="dietCarb">Carbo (g)</label>
+                <input type="number" id="dietCarb" min="0" placeholder="0">
+              </div>
+              <div class="form-group">
+                <label for="dietFat">Gordura (g)</label>
+                <input type="number" id="dietFat" min="0" placeholder="0">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="dietNotes">Observações</label>
+              <textarea id="dietNotes" placeholder="Refeições, anotações..."></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary btn-full">Salvar</button>
+          </form>
+        </div>
+
+        <div class="card">
+          <div class="card-label">Adicionar alimento</div>
+          <div class="muscle-groups" id="foodCats">
+            <button class="mg-btn" data-cat="proteinas">🥩 Proteínas</button>
+            <button class="mg-btn" data-cat="carboidratos">🌾 Carboidratos</button>
+            <button class="mg-btn" data-cat="ovos">🥚 Ovos</button>
+            <button class="mg-btn" data-cat="laticinios">🥛 Laticínios</button>
+            <button class="mg-btn" data-cat="vegetais">🥦 Vegetais</button>
+            <button class="mg-btn" data-cat="frutas">🍎 Frutas</button>
+            <button class="mg-btn" data-cat="gorduras">🥑 Gorduras</button>
+            <button class="mg-btn" data-cat="leguminosas">🫘 Leguminosas</button>
+            <button class="mg-btn" data-cat="suplementos">💊 Suplementos</button>
+            <button class="mg-btn" data-cat="fastfood">🍔 Fast Food</button>
+          </div>
+          <div class="ex-chips-wrap" id="foodChipsWrap" style="display:none">
+            <div class="food-chips" id="foodChips"></div>
+          </div>
+          <div id="foodQtyRow" style="display:none;margin-top:14px">
+            <div id="foodQtyInfo" class="food-qty-info"></div>
+            <div style="display:flex;gap:8px;align-items:center;margin-top:10px;flex-wrap:wrap">
+              <input type="number" id="foodQty" min="1" placeholder="100" style="width:90px;flex-shrink:0">
+              <span id="foodQtyUnit" style="color:var(--text-muted);font-size:.9rem">g</span>
+              <button class="btn btn-primary btn-sm" id="foodAddBtn">+ Adicionar</button>
+              <button class="btn btn-ghost btn-sm" id="foodCancelBtn">✕</button>
+            </div>
+            <div id="foodQtyPreview" class="food-qty-preview"></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-label">Histórico</div>
+          <div class="history-table-wrap">
+            <table class="history-table">
+              <thead>
+                <tr>
+                  <th>Data</th><th>Cal</th><th>Prot</th><th>Carb</th><th>Gord</th><th>Peso</th><th></th>
+                </tr>
+              </thead>
+              <tbody id="dietHistoryBody">
+                <tr><td colspan="7" class="empty-state">Nenhum registro</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div><!-- /dtViewRegistrar -->
+
+    </section>
+
+    <!-- ════════════ TREINO ════════════ -->
+    <section class="tab-section" id="tab-workouts">
+
+      <!-- Sub-tabs -->
+      <div class="sub-tabs">
+        <button class="sub-tab active" data-view="programa">Programa</button>
+        <button class="sub-tab" data-view="registrar">Registrar</button>
+      </div>
+
+      <!-- ── VIEW: Programa Semanal ── -->
+      <div id="wkViewPrograma">
+        <div class="plan-suggest-bar">
+          <div class="plan-suggest-bar-text">
+            <strong>Não sabe montar seu treino?</strong>
+            Responda 4 perguntas e gere um plano personalizado.
+          </div>
+          <button class="btn btn-secondary btn-sm" onclick="openPlanWizard('workout', AppState)">Sugerir plano</button>
+        </div>
+        <div id="weekGrid"></div>
+      </div>
+
+      <!-- ── VIEW: Editar dia do programa ── -->
+      <div id="wkViewEditDay" style="display:none">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+          <button class="btn btn-ghost btn-sm" id="wkBackBtn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg> Voltar</button>
+          <span id="wkEditDayTitle" style="font-size:1.15rem;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:.06em"></span>
+        </div>
+
+        <div class="card">
+          <div class="card-label">Nome do Treino</div>
+          <div class="form-group" style="margin-bottom:0">
+            <input type="text" id="tplName" placeholder="Ex: Peito + Tríceps, Empurra, Leg Day...">
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-label" id="tplExFormLabel">Adicionar Exercício</div>
+          <div class="muscle-groups" id="tplMuscleGroups">
+            <button class="mg-btn" data-group="peito">🫁 Peito</button>
+            <button class="mg-btn" data-group="costas">🏋️ Costas</button>
+            <button class="mg-btn" data-group="ombros">💪 Ombros</button>
+            <button class="mg-btn" data-group="biceps">💪 Bíceps</button>
+            <button class="mg-btn" data-group="triceps">💪 Tríceps</button>
+            <button class="mg-btn" data-group="pernas">🦵 Pernas</button>
+            <button class="mg-btn" data-group="abdomen">🎯 Abdômen</button>
+            <button class="mg-btn" data-group="cardio">🏃 Cardio</button>
+          </div>
+          <div class="ex-chips-wrap" id="tplExChipsWrap" style="display:none">
+            <div class="ex-chips" id="tplExChips"></div>
+          </div>
+          <form id="tplExForm" novalidate style="margin-top:10px">
+            <input type="hidden" id="tplExEditIdx">
+            <div class="form-group">
+              <label for="tplExName">Exercício</label>
+              <input type="text" id="tplExName" placeholder="Nome do exercício..." required autocomplete="off">
+            </div>
+            <div class="form-row-3">
+              <div class="form-group">
+                <label for="tplExSets">Séries</label>
+                <input type="number" id="tplExSets" min="1" placeholder="4">
+              </div>
+              <div class="form-group">
+                <label for="tplExReps">Reps</label>
+                <input type="number" id="tplExReps" min="1" placeholder="10">
+              </div>
+              <div class="form-group">
+                <label for="tplExWeight">Carga (kg)</label>
+                <input type="number" id="tplExWeight" step="0.5" min="0" placeholder="80">
+              </div>
+            </div>
+            <div style="display:flex;gap:8px">
+              <button type="submit" class="btn btn-primary" style="flex:1" id="tplExSubmitBtn">Adicionar</button>
+              <button type="button" class="btn btn-ghost" id="tplExCancelEdit" style="display:none">Cancelar</button>
+            </div>
+          </form>
+        </div>
+
+        <div class="card">
+          <div class="card-label">Exercícios do dia</div>
+          <div class="exercise-list" id="tplExerciseList">
+            <div class="empty-state">Nenhum exercício</div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:8px;margin-bottom:8px">
+          <button class="btn btn-primary" style="flex:1" id="tplSaveBtn">Salvar programa</button>
+          <button class="btn btn-ghost btn-sm" id="tplRestDayBtn">Marcar descanso</button>
+        </div>
+      </div>
+
+      <!-- ── VIEW: Registrar sessão manual ── -->
+      <div id="wkViewRegistrar" style="display:none">
+        <div class="card">
+          <div class="card-label">Sessão manual</div>
+          <div class="form-group">
+            <label for="wkDate">Data</label>
+            <input type="date" id="wkDate">
+          </div>
+          <div class="form-group">
+            <label for="wkNotes">Notas da sessão</label>
+            <textarea id="wkNotes" placeholder="Aquecimento, volume, observações..."></textarea>
+          </div>
+          <button class="btn btn-secondary btn-sm" id="wkSaveNotes">Salvar notas</button>
+        </div>
+
+        <div class="card">
+          <div class="card-label" id="exFormLabel">Adicionar Exercício</div>
+          <div class="muscle-groups" id="muscleGroups">
+            <button class="mg-btn" data-group="peito">🫁 Peito</button>
+            <button class="mg-btn" data-group="costas">🏋️ Costas</button>
+            <button class="mg-btn" data-group="ombros">💪 Ombros</button>
+            <button class="mg-btn" data-group="biceps">💪 Bíceps</button>
+            <button class="mg-btn" data-group="triceps">💪 Tríceps</button>
+            <button class="mg-btn" data-group="pernas">🦵 Pernas</button>
+            <button class="mg-btn" data-group="abdomen">🎯 Abdômen</button>
+            <button class="mg-btn" data-group="cardio">🏃 Cardio</button>
+          </div>
+          <div class="ex-chips-wrap" id="exChipsWrap" style="display:none">
+            <div class="ex-chips" id="exChips"></div>
+          </div>
+          <form id="exerciseForm" novalidate style="margin-top:10px">
+            <input type="hidden" id="exEditId">
+            <div class="form-group">
+              <label for="exName">Nome do exercício</label>
+              <input type="text" id="exName" placeholder="Ou digite livremente..." required autocomplete="off">
+            </div>
+            <div class="form-row-3">
+              <div class="form-group">
+                <label for="exSets">Séries</label>
+                <input type="number" id="exSets" min="1" placeholder="4">
+              </div>
+              <div class="form-group">
+                <label for="exReps">Reps</label>
+                <input type="number" id="exReps" min="1" placeholder="10">
+              </div>
+              <div class="form-group">
+                <label for="exWeight">Carga (kg)</label>
+                <input type="number" id="exWeight" step="0.5" min="0" placeholder="80">
+              </div>
+            </div>
+            <div style="display:flex;gap:8px">
+              <button type="submit" class="btn btn-primary" style="flex:1" id="exSubmitBtn">Adicionar</button>
+              <button type="button" class="btn btn-ghost" id="exCancelEdit" style="display:none">Cancelar</button>
+            </div>
+          </form>
+        </div>
+
+        <div class="card">
+          <div class="card-label">Exercícios da sessão</div>
+          <div class="exercise-list" id="exerciseList">
+            <div class="empty-state">Nenhum exercício adicionado</div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ════════════ FOTOS ════════════ -->
+    <section class="tab-section" id="tab-photos">
+      <div class="section-header">
+        <span class="section-title">Fotos</span>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Enviar foto</div>
+        <form id="photoForm" enctype="multipart/form-data" novalidate>
+          <div class="form-group">
+            <label for="photoDate">Data</label>
+            <input type="date" id="photoDate" required>
+          </div>
+          <div class="form-group">
+            <label for="photoFile">Selecionar imagem</label>
+            <input type="file" id="photoFile" accept="image/*" required style="padding:8px;cursor:pointer">
+          </div>
+          <button type="submit" class="btn btn-primary btn-full" id="photoUploadBtn">Enviar foto</button>
+        </form>
+      </div>
+
+      <div id="photoGallery" class="photo-grid"></div>
+    </section>
+
+    <!-- ════════════ EVOLUÇÃO ════════════ -->
+    <section class="tab-section" id="tab-evolution">
+      <div class="section-header">
+        <span class="section-title">Evolução</span>
+      </div>
+
+      <div class="period-btns">
+        <button class="period-btn" data-days="7">7D</button>
+        <button class="period-btn active" data-days="30">30D</button>
+        <button class="period-btn" data-days="90">90D</button>
+        <button class="period-btn" data-days="all">Tudo</button>
+      </div>
+
+      <div class="chart-wrap">
+        <canvas id="weightChart" height="220"></canvas>
+      </div>
+
+      <div class="chart-stats">
+        <div class="stat-box">
+          <div class="stat-label">Atual</div>
+          <div class="stat-value mono" id="statCurrent">—</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">Mínimo</div>
+          <div class="stat-value mono" id="statMin">—</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">Máximo</div>
+          <div class="stat-value mono" id="statMax">—</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ════════════ CONFIGURAÇÕES ════════════ -->
+    <section class="tab-section" id="tab-settings">
+      <div class="section-header">
+        <span class="section-title">Configurações</span>
+      </div>
+
+      <!-- ── Peso de hoje ── -->
+      <div class="card card-orange">
+        <div class="settings-section-title">Registrar Peso</div>
+        <div style="font-size:.8rem;color:var(--text-muted);margin-bottom:12px" id="setWeightLastInfo">Carregando...</div>
+        <div style="display:flex;gap:10px;align-items:flex-end">
+          <div class="form-group" style="flex:1;margin-bottom:0">
+            <label for="setWeightValue">Peso hoje (kg)</label>
+            <input type="number" id="setWeightValue" step="0.1" min="30" placeholder="Ex: 80.5">
+          </div>
+          <button class="btn btn-primary" id="setWeightSaveBtn" style="flex-shrink:0;margin-bottom:0">Salvar</button>
+        </div>
+      </div>
+
+      <!-- ── Metas manuais ── -->
+      <div class="card">
+        <div class="settings-section-title">Perfil & Metas</div>
+        <form id="settingsForm" novalidate>
+          <div class="form-row-3">
+            <div class="form-group">
+              <label for="setHeight">Altura (cm)</label>
+              <input type="number" id="setHeight" min="0" placeholder="175">
+            </div>
+            <div class="form-group">
+              <label for="setAge">Idade</label>
+              <input type="number" id="setAge" min="1" placeholder="25">
+            </div>
+            <div class="form-group">
+              <label for="setSex">Sexo</label>
+              <select id="setSex">
+                <option value="">—</option>
+                <option value="M">M</option>
+                <option value="F">F</option>
+              </select>
+            </div>
+          </div>
+          <div class="divider"></div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="setCalories">Calorias (kcal)</label>
+              <input type="number" id="setCalories" min="0" placeholder="2500">
+            </div>
+            <div class="form-group">
+              <label for="setProt">Proteína (g)</label>
+              <input type="number" id="setProt" min="0" placeholder="180">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="setCarb">Carbo (g)</label>
+              <input type="number" id="setCarb" min="0" placeholder="250">
+            </div>
+            <div class="form-group">
+              <label for="setFat">Gordura (g)</label>
+              <input type="number" id="setFat" min="0" placeholder="70">
+            </div>
+          </div>
+          <div class="form-group" style="margin-top:4px">
+            <label for="setTargetWeight">Meta de peso (kg) <span style="color:var(--text-faint);font-size:.75rem">— aparece no gráfico de evolução</span></label>
+            <input type="number" id="setTargetWeight" min="0" step="0.1" placeholder="Ex: 78.0">
+          </div>
+          <button type="submit" class="btn btn-primary btn-full">Salvar metas</button>
+        </form>
+      </div>
+
+      <!-- ── Calculadora TDEE ── -->
+      <div class="card card-orange">
+        <div class="settings-section-title">Calculadora de Calorias (TDEE)</div>
+
+        <div class="form-group">
+          <label for="calcWeight">Peso atual (kg)</label>
+          <input type="number" id="calcWeight" step="0.1" min="30" placeholder="Ex: 80.5">
+        </div>
+        <div class="form-group">
+          <label for="calcActivity">Nível de atividade</label>
+          <select id="calcActivity">
+            <option value="1.2">Sedentário — pouco ou nenhum exercício</option>
+            <option value="1.375">Levemente ativo — exercício 1-3×/semana</option>
+            <option value="1.55" selected>Moderadamente ativo — 3-5×/semana</option>
+            <option value="1.725">Muito ativo — 6-7×/semana</option>
+            <option value="1.9">Extremamente ativo — trabalho físico intenso</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="calcGoal">Objetivo</label>
+          <select id="calcGoal">
+            <option value="-500">Déficit agressivo  —  -500 kcal  (≈ -0,5 kg/sem)</option>
+            <option value="-300" selected>Déficit moderado  —  -300 kcal  (≈ -0,3 kg/sem)</option>
+            <option value="0">Manutenção  —  manter o peso atual</option>
+            <option value="200">Superávit leve  —  +200 kcal  (ganho de massa)</option>
+            <option value="400">Superávit agressivo  —  +400 kcal  (bulk)</option>
+          </select>
+        </div>
+
+        <button class="btn btn-secondary btn-full" id="calcBtn">Calcular</button>
+
+        <!-- Results -->
+        <div id="calcResults" style="display:none">
+          <div class="divider"></div>
+
+          <div class="calc-result-grid">
+            <div class="calc-result-item">
+              <div class="calc-result-label">TMB</div>
+              <div class="calc-result-value mono" id="calcBMRVal">—</div>
+              <div class="calc-result-unit">kcal base</div>
+            </div>
+            <div class="calc-result-item">
+              <div class="calc-result-label">TDEE</div>
+              <div class="calc-result-value mono" id="calcTDEEVal">—</div>
+              <div class="calc-result-unit">kcal total</div>
+            </div>
+            <div class="calc-result-item">
+              <div class="calc-result-label">Meta</div>
+              <div class="calc-result-value mono" id="calcTargetVal">—</div>
+              <div class="calc-result-unit">kcal/dia</div>
+            </div>
+          </div>
+
+          <div class="calc-info-box" id="calcInfoBox"></div>
+
+          <div class="calc-macro-grid">
+            <div class="calc-macro-item green">
+              <div class="calc-macro-label">Proteína</div>
+              <div class="calc-macro-value mono" id="calcProtVal">—</div>
+              <div class="calc-macro-sub" id="calcProtSub"></div>
+            </div>
+            <div class="calc-macro-item blue">
+              <div class="calc-macro-label">Carbo</div>
+              <div class="calc-macro-value mono" id="calcCarbVal">—</div>
+              <div class="calc-macro-sub" id="calcCarbSub"></div>
+            </div>
+            <div class="calc-macro-item yellow">
+              <div class="calc-macro-label">Gordura</div>
+              <div class="calc-macro-value mono" id="calcFatVal">—</div>
+              <div class="calc-macro-sub" id="calcFatSub"></div>
+            </div>
+          </div>
+
+          <button class="btn btn-primary btn-full" id="calcApplyBtn">✓ Aplicar como minha meta</button>
+        </div>
+      </div>
+
+      <!-- ── Trocar senha ── -->
+      <div class="card">
+        <div class="settings-section-title">Trocar senha</div>
+        <form id="passwordForm" novalidate>
+          <div class="form-group">
+            <label for="pwCurrent">Senha atual</label>
+            <input type="password" id="pwCurrent" autocomplete="current-password" placeholder="••••••">
+          </div>
+          <div class="form-group">
+            <label for="pwNew">Nova senha</label>
+            <input type="password" id="pwNew" autocomplete="new-password" placeholder="Mín. 6 caracteres">
+          </div>
+          <div class="form-group">
+            <label for="pwConfirm">Confirmar senha</label>
+            <input type="password" id="pwConfirm" autocomplete="new-password" placeholder="Repetir senha">
+          </div>
+          <button type="submit" class="btn btn-secondary btn-full">Trocar senha</button>
+        </form>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ── Bottom Nav ─────────────────────── -->
+  <nav class="bottom-nav">
+    <button class="nav-btn active" data-tab="dashboard">
+      <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></span>
+      <span class="nav-label">Dashboard</span>
+    </button>
+    <button class="nav-btn" data-tab="diet">
+      <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3zm0 0v7"/></svg></span>
+      <span class="nav-label">Dieta</span>
+    </button>
+    <button class="nav-btn" data-tab="workouts">
+      <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4v6a6 6 0 0 0 12 0V4"/><line x1="4" y1="20" x2="20" y2="20"/></svg></span>
+      <span class="nav-label">Treino</span>
+    </button>
+    <button class="nav-btn" data-tab="photos">
+      <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></span>
+      <span class="nav-label">Fotos</span>
+    </button>
+    <button class="nav-btn" data-tab="evolution">
+      <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg></span>
+      <span class="nav-label">Evolução</span>
+    </button>
+    <button class="nav-btn" data-tab="settings">
+      <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>
+      <span class="nav-label">Config</span>
+    </button>
+  </nav>
+
+</div>
+
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox">
+  <button class="lightbox-close" id="lightboxClose">✕</button>
+  <img id="lightboxImg" src="" alt="">
+</div>
+
+<!-- ══ Active Workout Overlay ══ -->
+<div id="workoutActive" class="wa-overlay" style="display:none">
+  <div class="wa-header">
+    <div class="wa-top-row">
+      <button class="wa-cancel-btn" id="waCancelBtn">✕ Cancelar</button>
+      <div class="wa-timer mono" id="waTimer">00:00</div>
+    </div>
+    <div class="wa-title" id="waTitle">TREINO</div>
+    <div class="wa-prog-wrap">
+      <div class="wa-prog-bar" id="waProgBar" style="width:0%"></div>
+    </div>
+    <div class="wa-prog-label" id="waProgLabel">0 / 0 exercícios</div>
+  </div>
+
+  <div class="wa-body" id="waBody">
+    <!-- exercise cards rendered by JS -->
+  </div>
+
+  <div class="wa-footer">
+    <!-- Add extra exercise in active mode -->
+    <div id="waAddExtra" style="display:none;margin-bottom:10px">
+      <div style="display:flex;gap:8px">
+        <input type="text" id="waExtraName" class="wa-extra-input" placeholder="Exercício extra..." autocomplete="off">
+        <button class="btn btn-secondary btn-sm" id="waAddExtraBtn">+ Add</button>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-ghost btn-sm" id="waToggleExtra">+ Extra</button>
+      <button class="btn btn-primary" style="flex:1" id="waFinishBtn">🏁 Finalizar Treino</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="/js/api.js"></script>
+<script src="/js/dashboard.js"></script>
+<script src="/js/diet.js"></script>
+<script src="/js/workouts.js"></script>
+<script src="/js/photos.js"></script>
+<script src="/js/evolution.js"></script>
+<script src="/js/settings.js"></script>
+<script src="/js/app.js"></script>
+<script src="/js/plans.js"></script>
+</body>
+</html>
