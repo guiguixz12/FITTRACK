@@ -9,7 +9,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/style.css">
 
-  <!-- SVG gradient for the calorie ring (must be in DOM) -->
+  <!-- SVG gradient for calorie ring (must live in DOM) -->
   <svg width="0" height="0" style="position:absolute">
     <defs>
       <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -22,12 +22,10 @@
 <body>
 <div id="app">
 
-  <!-- ── Header ────────────────────────── -->
+  <!-- ── Header ──────────────────────────────────────────── -->
   <header class="app-header">
-    <div class="header-brand">
-      <span class="header-title">FIT<span>TRACKER</span></span>
-    </div>
-    <div class="header-user">
+    <span class="brand">FIT<em>TRACKER</em></span>
+    <div class="header-right">
       <span class="header-user-name" id="headerUserName"></span>
       <button class="btn-logout" id="logoutBtn">Sair</button>
     </div>
@@ -35,121 +33,84 @@
 
   <main class="app-main">
 
-    <!-- ════════════ DASHBOARD ════════════ -->
+    <!-- ════════════════ DASHBOARD ════════════════ -->
     <section class="tab-section active" id="tab-dashboard">
+
+      <!-- Date navigation -->
       <div class="date-nav">
-        <button class="date-arrow" id="dashPrevDay">‹</button>
-        <input type="date" id="dashDate">
-        <button class="date-arrow" id="dashNextDay">›</button>
+        <button class="date-btn" id="dashPrevDay">‹</button>
+        <input type="date" id="dashDate" class="date-input">
+        <button class="date-btn" id="dashNextDay">›</button>
       </div>
 
-      <!-- Calories ring -->
-      <div class="card card-orange">
-        <div class="card-label">Calorias do dia</div>
-        <div class="cal-ring-wrap">
-          <div class="cal-ring">
-            <svg viewBox="0 0 160 160">
-              <circle class="ring-bg"   cx="80" cy="80" r="69.4"/>
-              <circle class="ring-fill" cx="80" cy="80" r="69.4" id="calRing"/>
-            </svg>
-            <div class="ring-content">
-              <div class="ring-calories" id="dashCalories">0</div>
-              <div class="ring-target">/ <span id="dashCalTarget">—</span></div>
-              <div class="ring-unit">kcal</div>
+      <!-- Hero Card: Calorie Ring + Macros -->
+      <div class="hero-card">
+        <div class="hero-ring">
+          <svg viewBox="0 0 160 160">
+            <circle class="ring-track"    cx="80" cy="80" r="69.4"/>
+            <circle class="ring-progress" cx="80" cy="80" r="69.4" id="calRing"/>
+          </svg>
+          <div class="ring-center">
+            <div class="ring-cal" id="dashCalories">0</div>
+            <div class="ring-unit-sm">kcal</div>
+          </div>
+        </div>
+        <div class="hero-info">
+          <div class="hero-target">Meta: <strong id="dashCalTarget">—</strong> kcal</div>
+          <div class="hero-remain" id="dashCalRemain"></div>
+          <div class="macro-compact">
+            <div class="mcrow">
+              <div class="mcdot mcdot-g"></div>
+              <div class="mclabel">Prot</div>
+              <div class="mcbar-track"><div class="mcbar-fill fill-green" id="barProt" style="width:0%"></div></div>
+              <div class="mcval" id="valProt"><strong>0</strong>/—g</div>
+            </div>
+            <div class="mcrow">
+              <div class="mcdot mcdot-b"></div>
+              <div class="mclabel">Carbo</div>
+              <div class="mcbar-track"><div class="mcbar-fill fill-blue" id="barCarb" style="width:0%"></div></div>
+              <div class="mcval" id="valCarb"><strong>0</strong>/—g</div>
+            </div>
+            <div class="mcrow">
+              <div class="mcdot mcdot-y"></div>
+              <div class="mclabel">Gord</div>
+              <div class="mcbar-track"><div class="mcbar-fill fill-yellow" id="barFat" style="width:0%"></div></div>
+              <div class="mcval" id="valFat"><strong>0</strong>/—g</div>
             </div>
           </div>
-          <div class="cal-remain" id="dashCalRemain"></div>
         </div>
       </div>
 
-      <!-- Macros -->
-      <div class="card card-green">
-        <div class="card-label">Macronutrientes</div>
-        <div class="macro-row">
-          <span class="macro-name" style="color:var(--green)">Proteína</span>
-          <div class="macro-bar-track">
-            <div class="macro-bar-fill fill-green" id="barProt" style="width:0%"></div>
+      <!-- Quick Stats Row: Water | Streak | Weight -->
+      <div class="quick-stats">
+        <div class="qstat">
+          <div class="qstat-icon">💧</div>
+          <div class="qstat-val" id="dashWaterTotal">0ml</div>
+          <div class="qstat-mini-bar">
+            <div class="mcbar-fill fill-blue" id="dashWaterBar" style="width:0%;height:100%"></div>
           </div>
-          <span class="macro-val" id="valProt"><strong>0</strong>/—g</span>
+          <div class="qstat-label"><span id="dashWaterPct">0%</span> água</div>
         </div>
-        <div class="macro-row">
-          <span class="macro-name" style="color:var(--blue)">Carbo</span>
-          <div class="macro-bar-track">
-            <div class="macro-bar-fill fill-blue" id="barCarb" style="width:0%"></div>
-          </div>
-          <span class="macro-val" id="valCarb"><strong>0</strong>/—g</span>
+        <div class="qstat">
+          <div class="qstat-icon" id="dashStreakFlame">💧</div>
+          <div class="qstat-val" id="dashStreakVal">0</div>
+          <div class="qstat-label">dias seguidos</div>
         </div>
-        <div class="macro-row">
-          <span class="macro-name" style="color:var(--yellow)">Gordura</span>
-          <div class="macro-bar-track">
-            <div class="macro-bar-fill fill-yellow" id="barFat" style="width:0%"></div>
-          </div>
-          <span class="macro-val" id="valFat"><strong>0</strong>/—g</span>
+        <div class="qstat">
+          <div class="qstat-icon">⚖️</div>
+          <div class="qstat-val"><span id="dashWeight">—</span></div>
+          <div class="qstat-label"><span id="dashWeightUnit">kg</span></div>
         </div>
       </div>
 
-      <!-- Weight -->
+      <!-- Water Card -->
       <div class="card">
-        <div class="card-label">Peso Corporal</div>
-        <div class="weight-main-row">
-          <span class="weight-value mono" id="dashWeight">—</span>
-          <span class="weight-unit" id="dashWeightUnit">kg</span>
-        </div>
-        <div id="dashWeightNoData" class="weight-no-data" style="display:none"></div>
-        <div class="weight-change-row" id="dashWeightChangeRow" style="display:none">
-          <span class="weight-change" id="dashWeightChange"></span>
-          <span class="weight-change-vs" id="dashWeightVs"></span>
-        </div>
-        <div class="weight-sparkline" id="dashWeightSparkline" style="display:none"></div>
-        <div class="weight-range-row" id="dashWeightRangeRow" style="display:none">
-          <div class="weight-range-chip">
-            <span class="weight-range-val" id="dashWeightMin">—</span>
-            <span class="weight-range-label">Mínimo</span>
-          </div>
-          <div class="weight-range-chip">
-            <span class="weight-range-val" id="dashWeightMax">—</span>
-            <span class="weight-range-label">Máximo</span>
-          </div>
-          <div class="weight-range-chip">
-            <span class="weight-range-val" id="dashWeightCount">—</span>
-            <span class="weight-range-label">Registros</span>
-          </div>
-        </div>
-        <div class="weight-hint" id="dashWeightHint" style="display:none">
-          📝 Para registrar seu peso: vá em <strong>Dieta → Registrar</strong> e preencha o campo "Peso (kg)"
-        </div>
-      </div>
-
-      <!-- Streak + Weekly Report row -->
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
-        <div class="card" style="margin-bottom:0;text-align:center;padding:16px 12px">
-          <div class="card-label" style="text-align:left">Sequência</div>
-          <div id="dashStreakFlame" style="font-size:1.4rem;margin-bottom:2px">💧</div>
-          <div id="dashStreakVal" style="font-family:'JetBrains Mono',monospace;font-size:2rem;font-weight:700;color:var(--orange);line-height:1">0</div>
-          <div style="font-size:.7rem;color:var(--text-faint);margin-top:2px">dias seguidos</div>
-          <div id="dashStreakLongest" style="font-size:.7rem;color:var(--text-faint);margin-top:4px"></div>
-        </div>
-        <div class="card" style="margin-bottom:0;padding:16px 12px">
-          <div class="card-label">Esta semana</div>
-          <div id="dashWeeklyReport"></div>
-        </div>
-      </div>
-
-      <!-- Water Tracking -->
-      <div class="card">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <div class="water-card-head">
           <div class="card-label" style="margin-bottom:0">Hidratação</div>
-          <div style="display:flex;align-items:baseline;gap:4px">
-            <span id="dashWaterTotal" style="font-weight:700;font-size:1rem;color:var(--blue)">0 ml</span>
-            <span style="font-size:.75rem;color:var(--text-faint)">/ <span id="dashWaterGoal">2 L</span></span>
-            <span id="dashWaterPct" style="font-size:.72rem;color:var(--text-muted);margin-left:4px">0%</span>
-          </div>
+          <span class="water-goal-txt">Meta: <span id="dashWaterGoal">2 L</span></span>
         </div>
-        <div style="height:6px;background:rgba(255,255,255,.06);border-radius:99px;overflow:hidden;margin-bottom:10px">
-          <div id="dashWaterBar" style="height:100%;background:linear-gradient(90deg,#2563EB,var(--blue));border-radius:99px;width:0%;transition:width .5s"></div>
-        </div>
-        <div id="dashWaterLogs" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;min-height:22px"></div>
-        <div id="dashWaterGrid" style="display:flex;gap:6px;flex-wrap:wrap">
+        <div class="water-logs" id="dashWaterLogs"></div>
+        <div class="water-grid" id="dashWaterGrid">
           <button class="water-btn" data-ml="150">150ml</button>
           <button class="water-btn" data-ml="200">200ml</button>
           <button class="water-btn" data-ml="250">250ml</button>
@@ -159,23 +120,40 @@
         </div>
       </div>
 
-      <!-- Workout summary -->
+      <!-- Workout Summary -->
       <div class="card">
-        <div class="card-label">Treino do dia</div>
-        <div id="dashWorkout" class="empty-state" style="padding:10px 0">Nenhum treino registrado</div>
+        <div class="card-label">Treino de hoje</div>
+        <div id="dashWorkout" class="empty-state">Nenhum treino registrado</div>
+      </div>
+
+      <!-- Hidden legacy elements (populated by dashboard.js but displayed in Progress tab) -->
+      <div style="display:none" aria-hidden="true">
+        <div id="dashWeightNoData"></div>
+        <div id="dashWeightChangeRow">
+          <span id="dashWeightChange"></span>
+          <span id="dashWeightVs"></span>
+        </div>
+        <div id="dashWeightSparkline"></div>
+        <div id="dashWeightRangeRow">
+          <span id="dashWeightMin"></span>
+          <span id="dashWeightMax"></span>
+          <span id="dashWeightCount"></span>
+        </div>
+        <div id="dashWeightHint"></div>
+        <div id="dashStreakLongest"></div>
+        <div id="dashWeeklyReport"></div>
       </div>
     </section>
 
-    <!-- ════════════ DIETA ════════════ -->
+    <!-- ════════════════ DIETA ════════════════ -->
     <section class="tab-section" id="tab-diet">
 
-      <!-- Sub-tabs -->
       <div class="sub-tabs">
         <button class="sub-tab active" data-dtview="programa">Programa</button>
         <button class="sub-tab" data-dtview="registrar">Registrar</button>
       </div>
 
-      <!-- ── VIEW: Programa Semanal ── -->
+      <!-- VIEW: Programa Semanal -->
       <div id="dtViewPrograma">
         <div class="plan-suggest-bar">
           <div class="plan-suggest-bar-text">
@@ -187,7 +165,7 @@
         <div id="dietWeekGrid"></div>
       </div>
 
-      <!-- ── VIEW: Editar dia ── -->
+      <!-- VIEW: Editar dia -->
       <div id="dtViewEditDay" style="display:none">
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
           <button class="btn btn-ghost btn-sm" id="dtBackBtn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg> Voltar</button>
@@ -201,10 +179,8 @@
           </div>
         </div>
 
-        <!-- 4 meal sections rendered by JS -->
         <div id="dtplMealSections"></div>
 
-        <!-- Shared food calculator (shown when + Add is clicked on a meal) -->
         <div class="card" id="dtFoodCalcCard" style="display:none">
           <div class="card-label">
             Adicionando em: <span id="dtFoodCalcMealLabel" style="color:var(--orange);font-weight:700"></span>
@@ -232,7 +208,7 @@
             <div id="dtFoodQtyInfo" class="food-qty-info"></div>
             <div style="display:flex;gap:8px;align-items:center;margin-top:10px;flex-wrap:wrap">
               <input type="number" id="dtFoodQty" min="1" placeholder="100" style="width:90px;flex-shrink:0">
-              <span style="color:var(--text-muted);font-size:.9rem">g</span>
+              <span style="color:var(--text-2);font-size:.9rem">g</span>
               <button class="btn btn-primary btn-sm" id="dtFoodAddBtn">+ Adicionar</button>
               <button class="btn btn-ghost btn-sm" id="dtFoodCancelBtn">✕</button>
             </div>
@@ -240,7 +216,6 @@
           </div>
         </div>
 
-        <!-- Overall totals -->
         <div id="dtplTotals" style="display:none;margin-bottom:14px"></div>
 
         <div style="display:flex;gap:8px;margin-bottom:8px">
@@ -249,35 +224,32 @@
         </div>
       </div>
 
-      <!-- ── VIEW: Acompanhar dia ── -->
+      <!-- VIEW: Acompanhar dia -->
       <div id="dtViewTrack" style="display:none">
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
           <button class="btn btn-ghost btn-sm" id="dtTrackBackBtn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg> Voltar</button>
           <div style="flex:1;min-width:0">
             <div id="dtTrackTitle" style="font-size:1.1rem;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:.05em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>
-            <div id="dtTrackDate" style="font-size:.78rem;color:var(--text-muted);margin-top:1px"></div>
+            <div id="dtTrackDate" style="font-size:.78rem;color:var(--text-2);margin-top:1px"></div>
           </div>
         </div>
 
-        <!-- Progress summary card -->
         <div class="card card-orange" style="margin-bottom:12px">
           <div style="display:flex;align-items:baseline;gap:6px;margin-bottom:8px">
             <span id="dtTrackCalEaten" style="font-family:'JetBrains Mono',monospace;font-size:2.4rem;font-weight:700;color:var(--orange);line-height:1">0</span>
-            <span style="color:var(--text-muted);font-size:1rem">/ <span id="dtTrackCalTotal">0</span> kcal</span>
+            <span style="color:var(--text-2);font-size:1rem">/ <span id="dtTrackCalTotal">0</span> kcal</span>
           </div>
           <div class="wa-prog-wrap">
             <div class="wa-prog-bar" id="dtTrackBar" style="width:0%"></div>
           </div>
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;font-size:.78rem;color:var(--text-muted)">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;font-size:.78rem;color:var(--text-2)">
             <span id="dtTrackFoodCount">0 / 0 alimentos</span>
             <span id="dtTrackMacros"></span>
           </div>
         </div>
 
-        <!-- Meal sections rendered by JS -->
         <div id="dtTrackMeals"></div>
 
-        <!-- Add extra food panel -->
         <div class="card" id="dtTrackAddPanel" style="display:none;margin-bottom:12px">
           <div class="card-label" style="color:var(--yellow)">+ Alimento extra (fora do plano)</div>
           <div class="form-group" style="margin-bottom:10px">
@@ -308,7 +280,7 @@
             <div id="dtTrackExtraQtyInfo" class="food-qty-info"></div>
             <div style="display:flex;gap:8px;align-items:center;margin-top:10px;flex-wrap:wrap">
               <input type="number" id="dtTrackExtraQty" min="1" placeholder="100" style="width:90px;flex-shrink:0">
-              <span style="color:var(--text-muted);font-size:.9rem">g</span>
+              <span style="color:var(--text-2);font-size:.9rem">g</span>
               <button class="btn btn-primary btn-sm" id="dtTrackExtraAddBtn">+ Adicionar</button>
               <button class="btn btn-ghost btn-sm" id="dtTrackExtraCancelBtn">✕</button>
             </div>
@@ -322,9 +294,8 @@
         </div>
       </div>
 
-      <!-- ── VIEW: Registrar ── -->
+      <!-- VIEW: Registrar -->
       <div id="dtViewRegistrar" style="display:none">
-
         <div class="card">
           <div class="card-label">Registrar / Editar</div>
           <form id="dietForm" novalidate>
@@ -385,7 +356,7 @@
             <div id="foodQtyInfo" class="food-qty-info"></div>
             <div style="display:flex;gap:8px;align-items:center;margin-top:10px;flex-wrap:wrap">
               <input type="number" id="foodQty" min="1" placeholder="100" style="width:90px;flex-shrink:0">
-              <span id="foodQtyUnit" style="color:var(--text-muted);font-size:.9rem">g</span>
+              <span id="foodQtyUnit" style="color:var(--text-2);font-size:.9rem">g</span>
               <button class="btn btn-primary btn-sm" id="foodAddBtn">+ Adicionar</button>
               <button class="btn btn-ghost btn-sm" id="foodCancelBtn">✕</button>
             </div>
@@ -398,9 +369,7 @@
           <div class="history-table-wrap">
             <table class="history-table">
               <thead>
-                <tr>
-                  <th>Data</th><th>Cal</th><th>Prot</th><th>Carb</th><th>Gord</th><th>Peso</th><th></th>
-                </tr>
+                <tr><th>Data</th><th>Cal</th><th>Prot</th><th>Carb</th><th>Gord</th><th>Peso</th><th></th></tr>
               </thead>
               <tbody id="dietHistoryBody">
                 <tr><td colspan="7" class="empty-state">Nenhum registro</td></tr>
@@ -408,22 +377,20 @@
             </table>
           </div>
         </div>
-
-      </div><!-- /dtViewRegistrar -->
+      </div>
 
     </section>
 
-    <!-- ════════════ TREINO ════════════ -->
+    <!-- ════════════════ TREINO ════════════════ -->
     <section class="tab-section" id="tab-workouts">
 
-      <!-- Sub-tabs -->
       <div class="sub-tabs">
         <button class="sub-tab active" data-view="programa">Programa</button>
         <button class="sub-tab" data-view="registrar">Registrar</button>
         <button class="sub-tab" data-view="historico">Histórico</button>
       </div>
 
-      <!-- ── VIEW: Programa Semanal ── -->
+      <!-- VIEW: Programa Semanal -->
       <div id="wkViewPrograma">
         <div class="plan-suggest-bar">
           <div class="plan-suggest-bar-text">
@@ -435,7 +402,7 @@
         <div id="weekGrid"></div>
       </div>
 
-      <!-- ── VIEW: Editar dia do programa ── -->
+      <!-- VIEW: Editar dia do programa -->
       <div id="wkViewEditDay" style="display:none">
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
           <button class="btn btn-ghost btn-sm" id="wkBackBtn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg> Voltar</button>
@@ -504,7 +471,7 @@
         </div>
       </div>
 
-      <!-- ── VIEW: Registrar sessão manual ── -->
+      <!-- VIEW: Registrar sessão manual -->
       <div id="wkViewRegistrar" style="display:none">
         <div class="card">
           <div class="card-label">Sessão manual</div>
@@ -569,80 +536,101 @@
         </div>
       </div>
 
-      <!-- ── VIEW: Histórico de Treinos ── -->
+      <!-- VIEW: Histórico de Treinos -->
       <div id="wkViewHistorico" style="display:none">
         <div id="wkHistoricoList"></div>
       </div>
 
     </section>
 
-    <!-- ════════════ FOTOS ════════════ -->
-    <section class="tab-section" id="tab-photos">
-      <div class="section-header">
-        <span class="section-title">Fotos</span>
+    <!-- ════════════════ PROGRESSO ════════════════ -->
+    <section class="tab-section" id="tab-progress">
+
+      <div class="sub-tabs">
+        <button class="sub-tab active" data-pgview="peso">Peso</button>
+        <button class="sub-tab" data-pgview="semana">Semana</button>
+        <button class="sub-tab" data-pgview="records">Records</button>
+        <button class="sub-tab" data-pgview="fotos">Fotos</button>
       </div>
 
-      <div class="card">
-        <div class="card-label">Enviar foto</div>
-        <form id="photoForm" enctype="multipart/form-data" novalidate>
-          <div class="form-group">
-            <label for="photoDate">Data</label>
-            <input type="date" id="photoDate" required>
+      <!-- SUB-VIEW: Peso — weight evolution chart -->
+      <div id="pgViewPeso">
+        <div class="period-btns">
+          <button class="period-btn" data-days="7">7D</button>
+          <button class="period-btn active" data-days="30">30D</button>
+          <button class="period-btn" data-days="90">90D</button>
+          <button class="period-btn" data-days="all">Tudo</button>
+        </div>
+        <div class="chart-wrap" style="height:220px">
+          <canvas id="weightChart"></canvas>
+        </div>
+        <div class="chart-stats">
+          <div class="stat-box">
+            <div class="stat-label">Atual</div>
+            <div class="stat-value mono" id="statCurrent">—</div>
           </div>
-          <div class="form-group">
-            <label for="photoFile">Selecionar imagem</label>
-            <input type="file" id="photoFile" accept="image/*" required style="padding:8px;cursor:pointer">
+          <div class="stat-box">
+            <div class="stat-label">Mínimo</div>
+            <div class="stat-value mono" id="statMin">—</div>
           </div>
-          <button type="submit" class="btn btn-primary btn-full" id="photoUploadBtn">Enviar foto</button>
-        </form>
+          <div class="stat-box">
+            <div class="stat-label">Máximo</div>
+            <div class="stat-value mono" id="statMax">—</div>
+          </div>
+        </div>
       </div>
 
-      <div id="photoGallery" class="photo-grid"></div>
+      <!-- SUB-VIEW: Semana — weekly report -->
+      <div id="pgViewSemana" style="display:none">
+        <div class="card">
+          <div class="card-label">Esta semana</div>
+          <div id="progWeeklyReport" class="empty-state">Carregando...</div>
+        </div>
+      </div>
+
+      <!-- SUB-VIEW: Records — streak + PRs -->
+      <div id="pgViewRecords" style="display:none">
+        <div class="card" style="text-align:center;padding:20px 18px">
+          <div class="card-label" style="text-align:left">Sequência atual</div>
+          <div id="progStreakFlame" style="font-size:2.2rem;margin-bottom:6px">💧</div>
+          <div id="progStreakVal" style="font-family:'JetBrains Mono',monospace;font-size:3.5rem;font-weight:700;color:var(--orange);line-height:1">0</div>
+          <div style="font-size:.82rem;color:var(--text-2);margin-top:6px">dias seguidos</div>
+          <div id="progStreakLongest" style="font-size:.78rem;color:var(--text-3);margin-top:8px"></div>
+        </div>
+        <div class="card">
+          <div class="card-label">Records Pessoais</div>
+          <div id="progPRList" class="empty-state">Nenhum record registrado ainda. Complete treinos com cargas para criar seus PRs!</div>
+        </div>
+      </div>
+
+      <!-- SUB-VIEW: Fotos — progress photos -->
+      <div id="pgViewFotos" style="display:none">
+        <div class="card">
+          <div class="card-label">Enviar foto</div>
+          <form id="photoForm" enctype="multipart/form-data" novalidate>
+            <div class="form-group">
+              <label for="photoDate">Data</label>
+              <input type="date" id="photoDate" required>
+            </div>
+            <div class="form-group">
+              <label for="photoFile">Selecionar imagem</label>
+              <input type="file" id="photoFile" accept="image/*" required style="padding:8px;cursor:pointer">
+            </div>
+            <button type="submit" class="btn btn-primary btn-full" id="photoUploadBtn">Enviar foto</button>
+          </form>
+        </div>
+        <div id="photoGallery" class="photo-grid"></div>
+      </div>
+
     </section>
 
-    <!-- ════════════ EVOLUÇÃO ════════════ -->
-    <section class="tab-section" id="tab-evolution">
-      <div class="section-header">
-        <span class="section-title">Evolução</span>
-      </div>
-
-      <div class="period-btns">
-        <button class="period-btn" data-days="7">7D</button>
-        <button class="period-btn active" data-days="30">30D</button>
-        <button class="period-btn" data-days="90">90D</button>
-        <button class="period-btn" data-days="all">Tudo</button>
-      </div>
-
-      <div class="chart-wrap">
-        <canvas id="weightChart" height="220"></canvas>
-      </div>
-
-      <div class="chart-stats">
-        <div class="stat-box">
-          <div class="stat-label">Atual</div>
-          <div class="stat-value mono" id="statCurrent">—</div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-label">Mínimo</div>
-          <div class="stat-value mono" id="statMin">—</div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-label">Máximo</div>
-          <div class="stat-value mono" id="statMax">—</div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ════════════ CONFIGURAÇÕES ════════════ -->
+    <!-- ════════════════ CONFIGURAÇÕES ════════════════ -->
     <section class="tab-section" id="tab-settings">
-      <div class="section-header">
-        <span class="section-title">Configurações</span>
-      </div>
 
-      <!-- ── Peso de hoje ── -->
+      <!-- Registrar Peso -->
       <div class="card card-orange">
         <div class="settings-section-title">Registrar Peso</div>
-        <div style="font-size:.8rem;color:var(--text-muted);margin-bottom:12px" id="setWeightLastInfo">Carregando...</div>
+        <div style="font-size:.8rem;color:var(--text-2);margin-bottom:12px" id="setWeightLastInfo">Carregando...</div>
         <div style="display:flex;gap:10px;align-items:flex-end">
           <div class="form-group" style="flex:1;margin-bottom:0">
             <label for="setWeightValue">Peso hoje (kg)</label>
@@ -652,7 +640,7 @@
         </div>
       </div>
 
-      <!-- ── Metas manuais ── -->
+      <!-- Perfil & Metas -->
       <div class="card">
         <div class="settings-section-title">Perfil & Metas</div>
         <form id="settingsForm" novalidate>
@@ -696,17 +684,16 @@
             </div>
           </div>
           <div class="form-group" style="margin-top:4px">
-            <label for="setTargetWeight">Meta de peso (kg) <span style="color:var(--text-faint);font-size:.75rem">— aparece no gráfico de evolução</span></label>
+            <label for="setTargetWeight">Meta de peso (kg) <span style="color:var(--text-3);font-size:.75rem">— aparece no gráfico</span></label>
             <input type="number" id="setTargetWeight" min="0" step="0.1" placeholder="Ex: 78.0">
           </div>
           <button type="submit" class="btn btn-primary btn-full">Salvar metas</button>
         </form>
       </div>
 
-      <!-- ── Calculadora TDEE ── -->
+      <!-- Calculadora TDEE -->
       <div class="card card-orange">
         <div class="settings-section-title">Calculadora de Calorias (TDEE)</div>
-
         <div class="form-group">
           <label for="calcWeight">Peso atual (kg)</label>
           <input type="number" id="calcWeight" step="0.1" min="30" placeholder="Ex: 80.5">
@@ -731,13 +718,9 @@
             <option value="400">Superávit agressivo  —  +400 kcal  (bulk)</option>
           </select>
         </div>
-
         <button class="btn btn-secondary btn-full" id="calcBtn">Calcular</button>
-
-        <!-- Results -->
         <div id="calcResults" style="display:none">
           <div class="divider"></div>
-
           <div class="calc-result-grid">
             <div class="calc-result-item">
               <div class="calc-result-label">TMB</div>
@@ -755,9 +738,7 @@
               <div class="calc-result-unit">kcal/dia</div>
             </div>
           </div>
-
           <div class="calc-info-box" id="calcInfoBox"></div>
-
           <div class="calc-macro-grid">
             <div class="calc-macro-item green">
               <div class="calc-macro-label">Proteína</div>
@@ -775,12 +756,11 @@
               <div class="calc-macro-sub" id="calcFatSub"></div>
             </div>
           </div>
-
           <button class="btn btn-primary btn-full" id="calcApplyBtn">✓ Aplicar como minha meta</button>
         </div>
       </div>
 
-      <!-- ── Trocar senha ── -->
+      <!-- Trocar senha -->
       <div class="card">
         <div class="settings-section-title">Trocar senha</div>
         <form id="passwordForm" novalidate>
@@ -799,34 +779,57 @@
           <button type="submit" class="btn btn-secondary btn-full">Trocar senha</button>
         </form>
       </div>
+
     </section>
 
   </main>
 
-  <!-- ── Bottom Nav ─────────────────────── -->
+  <!-- ── Bottom Nav (5 tabs) ─────────────────────────────── -->
   <nav class="bottom-nav">
     <button class="nav-btn active" data-tab="dashboard">
-      <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></span>
-      <span class="nav-label">Dashboard</span>
+      <span class="nav-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+          <polyline points="9 22 9 12 15 12 15 22"/>
+        </svg>
+      </span>
+      <span class="nav-label">Início</span>
     </button>
     <button class="nav-btn" data-tab="diet">
-      <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3zm0 0v7"/></svg></span>
+      <span class="nav-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/>
+          <path d="M7 2v20"/>
+          <path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3zm0 0v7"/>
+        </svg>
+      </span>
       <span class="nav-label">Dieta</span>
     </button>
     <button class="nav-btn" data-tab="workouts">
-      <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4v6a6 6 0 0 0 12 0V4"/><line x1="4" y1="20" x2="20" y2="20"/></svg></span>
+      <span class="nav-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M6 4v6a6 6 0 0 0 12 0V4"/>
+          <line x1="4" y1="20" x2="20" y2="20"/>
+        </svg>
+      </span>
       <span class="nav-label">Treino</span>
     </button>
-    <button class="nav-btn" data-tab="photos">
-      <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></span>
-      <span class="nav-label">Fotos</span>
-    </button>
-    <button class="nav-btn" data-tab="evolution">
-      <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg></span>
-      <span class="nav-label">Evolução</span>
+    <button class="nav-btn" data-tab="progress">
+      <span class="nav-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/>
+          <polyline points="16 7 22 7 22 13"/>
+        </svg>
+      </span>
+      <span class="nav-label">Progresso</span>
     </button>
     <button class="nav-btn" data-tab="settings">
-      <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>
+      <span class="nav-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+        </svg>
+      </span>
       <span class="nav-label">Config</span>
     </button>
   </nav>
@@ -839,7 +842,7 @@
   <img id="lightboxImg" src="" alt="">
 </div>
 
-<!-- ══ Active Workout Overlay ══ -->
+<!-- Active Workout Overlay -->
 <div id="workoutActive" class="wa-overlay" style="display:none">
   <div class="wa-header">
     <div class="wa-top-row">
@@ -853,13 +856,11 @@
     <div class="wa-prog-label" id="waProgLabel">0 / 0 exercícios</div>
   </div>
 
-  <div class="wa-body" id="waBody">
-    <!-- exercise cards rendered by JS -->
-  </div>
+  <div class="wa-body" id="waBody"></div>
 
   <!-- Rest Timer -->
   <div id="waRestTimer" style="display:none;background:var(--surface);border-top:1px solid var(--border);padding:10px 18px;text-align:center">
-    <div style="font-size:.72rem;color:var(--text-faint);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Descanso</div>
+    <div style="font-size:.72rem;color:var(--text-3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Descanso</div>
     <div id="waRestTimerCount" style="font-family:'JetBrains Mono',monospace;font-size:2rem;font-weight:700;color:var(--orange);line-height:1">1:30</div>
     <div style="display:flex;gap:8px;justify-content:center;margin-top:8px">
       <button class="btn btn-ghost btn-sm" onclick="adjustRestTimer(-15)">-15s</button>
@@ -869,7 +870,6 @@
   </div>
 
   <div class="wa-footer">
-    <!-- Add extra exercise in active mode -->
     <div id="waAddExtra" style="display:none;margin-bottom:10px">
       <div style="display:flex;gap:8px">
         <input type="text" id="waExtraName" class="wa-extra-input" placeholder="Exercício extra..." autocomplete="off">
@@ -893,8 +893,9 @@
 <script src="/js/dashboard.js"></script>
 <script src="/js/diet.js"></script>
 <script src="/js/workouts.js"></script>
-<script src="/js/photos.js"></script>
 <script src="/js/evolution.js"></script>
+<script src="/js/photos.js"></script>
+<script src="/js/progress.js"></script>
 <script src="/js/settings.js"></script>
 <script src="/js/app.js"></script>
 <script src="/js/plans.js"></script>

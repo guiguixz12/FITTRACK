@@ -22,11 +22,10 @@ function switchTab(tab) {
 
   const loaders = {
     dashboard: () => loadDashboard(AppState),
-    diet: () => { if (!AppState.tabInited.diet) { initDiet(AppState); AppState.tabInited.diet = true; } loadDiet(AppState); },
-    workouts: () => { if (!AppState.tabInited.workouts) { initWorkouts(AppState); AppState.tabInited.workouts = true; } loadWorkouts(AppState); },
-    photos: () => { if (!AppState.tabInited.photos) { initPhotos(AppState); AppState.tabInited.photos = true; } loadPhotos(AppState); },
-    evolution: () => { if (!AppState.tabInited.evolution) { initEvolution(AppState); AppState.tabInited.evolution = true; } loadEvolution(AppState); },
-    settings: () => { if (!AppState.tabInited.settings) { initSettings(AppState); AppState.tabInited.settings = true; } loadSettings(AppState); }
+    diet:      () => { if (!AppState.tabInited.diet)     { initDiet(AppState);     AppState.tabInited.diet     = true; } loadDiet(AppState); },
+    workouts:  () => { if (!AppState.tabInited.workouts) { initWorkouts(AppState); AppState.tabInited.workouts = true; } loadWorkouts(AppState); },
+    progress:  () => { if (!AppState.tabInited.progress) { initProgress(AppState); AppState.tabInited.progress = true; } loadProgress(AppState); },
+    settings:  () => { if (!AppState.tabInited.settings) { initSettings(AppState); AppState.tabInited.settings = true; } loadSettings(AppState); }
   };
   loaders[tab]?.();
 }
