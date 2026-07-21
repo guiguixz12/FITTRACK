@@ -22,7 +22,7 @@ function switchTab(tab) {
   document.querySelectorAll('.tab-section').forEach(s => s.classList.toggle('active', s.id === `tab-${tab}`));
 
   const loaders = {
-    dashboard: () => loadDashboard(AppState),
+    dashboard: () => { AppState.date = new Date().toISOString().slice(0, 10); loadDashboard(AppState); },
     diet:      () => { if (!AppState.tabInited.diet)     { initDiet(AppState);     AppState.tabInited.diet     = true; } loadDiet(AppState); },
     workouts:  () => { if (!AppState.tabInited.workouts) { initWorkouts(AppState); AppState.tabInited.workouts = true; } loadWorkouts(AppState); },
     progress:  () => { if (!AppState.tabInited.progress) { initProgress(AppState); AppState.tabInited.progress = true; } loadProgress(AppState); },
