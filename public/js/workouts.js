@@ -33,6 +33,13 @@ let waTimerInt   = null;
 let waStartTime  = null;
 let waWorkoutDow = null;
 
+// Rest timer
+let restTimerInt  = null;
+let restTimerSecs = 0;
+
+// PR cache for current session [{exercise_name, volume}]
+let sessionPRs = [];
+
 // ── Init ──────────────────────────────────────────────────────────────────────
 function initWorkouts(state) {
   wkState = state;
@@ -50,9 +57,10 @@ function initWorkouts(state) {
 }
 
 function switchWkView(view) {
-  document.getElementById('wkViewPrograma').style.display  = view === 'programa'  ? '' : 'none';
-  document.getElementById('wkViewEditDay').style.display   = view === 'editDay'   ? '' : 'none';
-  document.getElementById('wkViewRegistrar').style.display = view === 'registrar' ? '' : 'none';
+  document.getElementById('wkViewPrograma').style.display   = view === 'programa'   ? '' : 'none';
+  document.getElementById('wkViewEditDay').style.display    = view === 'editDay'    ? '' : 'none';
+  document.getElementById('wkViewRegistrar').style.display  = view === 'registrar'  ? '' : 'none';
+  document.getElementById('wkViewHistorico').style.display  = view === 'historico'  ? '' : 'none';
 
   document.querySelectorAll('#tab-workouts .sub-tab').forEach(b => {
     b.classList.toggle('active',
@@ -60,6 +68,8 @@ function switchWkView(view) {
       (view === 'editDay' && b.dataset.view === 'programa')
     );
   });
+
+  if (view === 'historico') loadWorkoutHistory();
 }
 
 // ══════════════════════════════════════════
@@ -159,6 +169,59 @@ function toggleWkCard(dow) {
   chevron.textContent = opening ? '▲' : '▼';
 }
 window.toggleWkCard = toggleWkCard;
+
+// ══════════════════════════════════════════
+//  HISTÓRICO DE TREINOS
+// ══════════════════════════════════════════
+async function loadWorkoutHistory() {
+  const el = document.getElementById('wkHistoricoList');
+  el.innerHTML = '<p style="color:var(--text-faint);font-size:.85rem;padding:12px 0">Carregando...</p>';
+  try {
+    const { workouts } = await api.get('/api/workouts');
+    renderWorkoutHistory(workouts || []);
+  } catch (err) {
+    el.innerHTML = `<p style="color:var(--red);font-size:.85rem">${err.message}</p>`;
+  }
+}
+
+function renderWorkoutHistory(workouts) {
+  const el = document.getElementById('wkHistoricoList');
+  if (!workouts.length) {
+    el.innerHTML = '<p class="empty-state">Nenhum treino registrado ainda.</p>';
+    return;
+  }
+
+  el.innerHTML = workouts.map(w => {
+    const d       = w.date.split('-');
+    const dateStr = `${d[2]}/${d[1]}/${d[0]}`;
+    const exs     = w.exercises || [];
+    const volume  = exs.reduce((s, e) => s + (e.sets || 0) * (e.reps || 0) * (e.weight_kg || 0), 0);
+
+    const chipsHtml = exs.slice(0, 5).map(ex => {
+      const meta = [
+        ex.sets && ex.reps ? `${ex.sets}×${ex.reps}` : '',
+        ex.weight_kg       ? `${ex.weight_kg}kg`      : ''
+      ].filter(Boolean).join('@');
+      return `<span class="hist-chip">${escHtml(ex.name)}${meta ? ' · ' + meta : ''}</span>`;
+    }).join('');
+    const more = exs.length > 5 ? `<span class="hist-chip hist-more">+${exs.length - 5}</span>` : '';
+
+    return `
+      <div class="hist-card">
+        <div class="hist-card-head">
+          <div>
+            <div class="hist-date">${dateStr}</div>
+            ${w.notes ? `<div class="hist-notes">${escHtml(w.notes)}</div>` : ''}
+          </div>
+          <div class="hist-stats">
+            <span class="hist-stat">${exs.length} ex.</span>
+            ${volume > 0 ? `<span class="hist-stat vol">${Math.round(volume).toLocaleString('pt-BR')} kg</span>` : ''}
+          </div>
+        </div>
+        ${exs.length ? `<div class="hist-chips">${chipsHtml}${more}</div>` : ''}
+      </div>`;
+  }).join('');
+}
 
 async function copyWkTemplate(fromDow) {
   const src = wkTemplates[fromDow];
@@ -370,6 +433,10 @@ function startActiveWorkout(dow) {
   waWorkoutDow = dow;
   waExercises  = (tpl?.exercises || []).map(ex => ({ ...ex, done: false }));
   waChecked    = 0;
+  clearInterval(restTimerInt);
+  const timerEl = document.getElementById('waRestTimer');
+  if (timerEl) timerEl.style.display = 'none';
+  sessionPRs = [];
 
   document.getElementById('waTitle').textContent    = tpl?.name || DAYS_FULL[dow];
   document.getElementById('waAddExtra').style.display = 'none';
@@ -429,19 +496,64 @@ function waExCard(ex, i) {
 }
 
 function toggleWaEx(i) {
-  waExercises[i].done = !waExercises[i].done;
+  const wasDone = waExercises[i].done;
+  waExercises[i].done = !wasDone;
   waChecked = waExercises.filter(e => e.done).length;
   renderWaExercises();
   updateWaProgress();
+  if (!wasDone) startRestTimer(90); // start 90s rest when marking done
 }
 window.toggleWaEx = toggleWaEx;
 
 function updateWaProgress() {
-  const total = waExercises.length;
-  const pct   = total > 0 ? (waChecked / total) * 100 : 0;
+  const total  = waExercises.length;
+  const pct    = total > 0 ? (waChecked / total) * 100 : 0;
+  const done   = waExercises.filter(e => e.done);
+  const volume = done.reduce((s, e) => s + (e.sets || 0) * (e.reps || 0) * (e.weight_kg || 0), 0);
   document.getElementById('waProgBar').style.width   = pct + '%';
-  document.getElementById('waProgLabel').textContent = `${waChecked} / ${total} exercícios`;
+  document.getElementById('waProgLabel').textContent = `${waChecked} / ${total} exercícios${volume > 0 ? ' · ' + Math.round(volume).toLocaleString('pt-BR') + ' kg vol.' : ''}`;
 }
+
+// ── Rest Timer ────────────────────────────────────────────────────────────────
+function startRestTimer(secs) {
+  clearInterval(restTimerInt);
+  restTimerSecs = secs;
+  const el = document.getElementById('waRestTimer');
+  if (el) el.style.display = '';
+  updateRestTimerDisplay();
+  restTimerInt = setInterval(() => {
+    restTimerSecs--;
+    if (restTimerSecs <= 0) {
+      skipRestTimer();
+      // vibrate if supported
+      if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+    } else {
+      updateRestTimerDisplay();
+    }
+  }, 1000);
+}
+
+function updateRestTimerDisplay() {
+  const el = document.getElementById('waRestTimerCount');
+  if (!el) return;
+  const m  = Math.floor(Math.max(restTimerSecs, 0) / 60);
+  const s  = String(Math.max(restTimerSecs, 0) % 60).padStart(2, '0');
+  el.textContent = `${m}:${s}`;
+  el.style.color = restTimerSecs <= 10 ? 'var(--red)' : 'var(--orange)';
+}
+
+function skipRestTimer() {
+  clearInterval(restTimerInt);
+  const el = document.getElementById('waRestTimer');
+  if (el) el.style.display = 'none';
+}
+window.skipRestTimer = skipRestTimer;
+
+function adjustRestTimer(delta) {
+  restTimerSecs = Math.max(restTimerSecs + delta, 5);
+  updateRestTimerDisplay();
+}
+window.adjustRestTimer = adjustRestTimer;
 
 function startWaTimer() {
   clearInterval(waTimerInt);
@@ -515,8 +627,23 @@ async function finishActiveWorkout(state) {
       });
     }
 
+    // Check PRs for done exercises that have weight
+    const prResults = await Promise.all(
+      done
+        .filter(ex => ex.weight_kg && ex.sets && ex.reps)
+        .map(ex => api.post('/api/stats/prs/check', {
+          exercise_name: ex.name,
+          sets:          ex.sets,
+          reps:          ex.reps,
+          weight_kg:     ex.weight_kg,
+          date:          today,
+        }))
+    );
+    const newPRs = prResults.filter(r => r.is_pr).length;
+
     closeActiveMode();
-    toast(`Treino salvo! ${mm}m${ss}s · ${done.length}/${waExercises.length} exercícios`);
+    const prMsg = newPRs > 0 ? ` 🏆 ${newPRs} PR${newPRs > 1 ? 's' : ''} novo${newPRs > 1 ? 's' : ''}!` : '';
+    toast(`Treino salvo! ${mm}m${ss}s · ${done.length}/${waExercises.length} exercícios${prMsg}`);
 
     // Refresh dashboard if it's today
     if (state.date === today) loadDashboard(state);
@@ -526,10 +653,11 @@ async function finishActiveWorkout(state) {
 
 function closeActiveMode() {
   clearInterval(waTimerInt);
-  document.getElementById('workoutActive').style.display = '';
+  clearInterval(restTimerInt);
   document.body.style.overflow = '';
   document.getElementById('workoutActive').style.display = 'none';
   document.getElementById('waTimer').textContent = '00:00';
+  sessionPRs = [];
 }
 
 // ══════════════════════════════════════════

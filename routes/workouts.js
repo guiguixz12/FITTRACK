@@ -18,8 +18,12 @@ router.get('/', (req, res) => {
     return res.json({ workout: { ...workout, exercises } });
   }
 
-  const workouts = db.prepare('SELECT * FROM workouts WHERE user_id=? ORDER BY date DESC LIMIT 20').all(req.user.id);
-  res.json({ workouts });
+  const workouts = db.prepare('SELECT * FROM workouts WHERE user_id=? ORDER BY date DESC LIMIT 30').all(req.user.id);
+  const withExercises = workouts.map(w => ({
+    ...w,
+    exercises: db.prepare('SELECT * FROM workout_exercises WHERE workout_id=? ORDER BY exercise_order').all(w.id)
+  }));
+  res.json({ workouts: withExercises });
 });
 
 router.post('/', (req, res) => {

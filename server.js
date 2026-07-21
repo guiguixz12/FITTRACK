@@ -27,6 +27,8 @@ app.use('/api/workout-templates', require('./routes/workout-templates'));
 app.use('/api/diet-templates',   require('./routes/diet-templates'));
 app.use('/api/photos', require('./routes/photos'));
 app.use('/api/users', require('./routes/users'));
+app.use('/api/water', require('./routes/water'));
+app.use('/api/stats', require('./routes/stats'));
 
 app.get('/login', (req, res) => res.sendFile(path.join(__dirname, 'public', 'login.html')));
 app.get('/app', (req, res) => res.sendFile(path.join(__dirname, 'public', 'app.html')));

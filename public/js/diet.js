@@ -889,6 +889,46 @@ function dtplRemoveFood(gi) {
 }
 window.dtplRemoveFood = dtplRemoveFood;
 
+// Called by barcode scanner button in diet template editor
+function addScannedToDietTemplate(product) {
+  // Show meal picker, then quantity modal
+  const mealPickerModal = document.createElement('div');
+  mealPickerModal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:2100;display:flex;align-items:center;justify-content:center;padding:20px';
+  mealPickerModal.innerHTML = `
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;width:100%;max-width:340px;box-shadow:var(--shadow-lg)">
+      <div style="font-weight:700;font-size:.95rem;margin-bottom:4px">Adicionar produto</div>
+      <div style="font-size:.8rem;color:var(--text-muted);margin-bottom:16px">${escDiet(product.name)}</div>
+      <div style="font-weight:600;font-size:.78rem;color:var(--text-muted);text-transform:uppercase;margin-bottom:10px">Qual refeição?</div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        ${MEALS.map(m => `<button class="btn btn-ghost" style="justify-content:flex-start;gap:8px" onclick="_pickMealAndScan('${m.id}',this.closest('[style*=fixed]'))">${m.icon} ${m.label}</button>`).join('')}
+      </div>
+      <button class="btn btn-ghost btn-sm" style="margin-top:12px" onclick="this.closest('[style*=fixed]').remove()">Cancelar</button>
+    </div>
+  `;
+  document.body.appendChild(mealPickerModal);
+
+  window._pickMealAndScan = (mealId, overlay) => {
+    overlay.remove();
+    showScannedProductModal(product, scaled => {
+      dtplFoods.push({
+        meal:       mealId,
+        name:       scaled.name,
+        quantity_g: scaled.quantity_g,
+        calories:   scaled.calories,
+        protein:    scaled.protein,
+        carbs:      scaled.carbs,
+        fat:        scaled.fat,
+        fiber:      scaled.fiber,
+        sodium:     scaled.sodium,
+        sugar:      scaled.sugar,
+      });
+      renderDtplMealSections();
+      toast(`${product.name.split('(')[0].trim()} adicionado!`);
+    });
+  };
+}
+window.addScannedToDietTemplate = addScannedToDietTemplate;
+
 // ══════════════════════════════════════════
 //  REGISTRAR (manual)
 // ══════════════════════════════════════════

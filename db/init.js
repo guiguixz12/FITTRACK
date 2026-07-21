@@ -122,8 +122,33 @@ function initDB() {
       protein REAL DEFAULT 0,
       carbs REAL DEFAULT 0,
       fat REAL DEFAULT 0,
+      fiber REAL DEFAULT 0,
+      sodium REAL DEFAULT 0,
+      sugar REAL DEFAULT 0,
       food_order INTEGER DEFAULT 0,
       FOREIGN KEY (template_id) REFERENCES diet_templates(id) ON DELETE CASCADE
+    );
+
+    CREATE TABLE IF NOT EXISTS water_logs (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER NOT NULL,
+      date TEXT NOT NULL,
+      amount_ml INTEGER NOT NULL,
+      created_at TEXT DEFAULT (datetime('now')),
+      FOREIGN KEY (user_id) REFERENCES users(id)
+    );
+
+    CREATE TABLE IF NOT EXISTS exercise_prs (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER NOT NULL,
+      exercise_name TEXT NOT NULL,
+      weight_kg REAL,
+      reps INTEGER,
+      sets INTEGER,
+      volume REAL,
+      date TEXT NOT NULL,
+      FOREIGN KEY (user_id) REFERENCES users(id),
+      UNIQUE(user_id, exercise_name)
     );
   `);
 
@@ -169,6 +194,13 @@ function initDB() {
     "ALTER TABLE diet_logs ADD COLUMN created_at TEXT DEFAULT (datetime('now'))",
     "ALTER TABLE diet_logs ADD COLUMN updated_at TEXT DEFAULT (datetime('now'))",
     "ALTER TABLE users ADD COLUMN target_weight REAL",
+    "ALTER TABLE diet_logs ADD COLUMN fiber REAL DEFAULT 0",
+    "ALTER TABLE diet_logs ADD COLUMN sodium REAL DEFAULT 0",
+    "ALTER TABLE diet_logs ADD COLUMN sugar REAL DEFAULT 0",
+    "ALTER TABLE diet_template_foods ADD COLUMN fiber REAL DEFAULT 0",
+    "ALTER TABLE diet_template_foods ADD COLUMN sodium REAL DEFAULT 0",
+    "ALTER TABLE diet_template_foods ADD COLUMN sugar REAL DEFAULT 0",
+    "ALTER TABLE users ADD COLUMN water_goal_ml INTEGER DEFAULT 2000",
   ];
   for (const sql of migrations) {
     try { database.exec(sql); } catch (_) { /* column already exists */ }
