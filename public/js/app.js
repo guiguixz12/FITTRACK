@@ -2,7 +2,7 @@
 
 // Apply theme — save=true when user explicitly picks (also updates localStorage)
 function applyTheme(theme, save = true) {
-  const t = theme || 'dark';
+  const t = theme || 'light';
   document.documentElement.setAttribute('data-theme', t);
   if (save) localStorage.setItem('ft_theme', t);
 }
@@ -66,7 +66,7 @@ async function initApp() {
   }
 
   document.getElementById('headerUserName').textContent = AppState.user.name;
-  applyTheme(AppState.user.theme || 'dark', true);
+  applyTheme(AppState.user.theme || 'light', true);
 
   document.getElementById('logoutBtn').addEventListener('click', async () => {
     await api.post('/api/auth/logout', {});

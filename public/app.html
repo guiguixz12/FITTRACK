@@ -23,7 +23,7 @@
   <link rel="stylesheet" href="/css/style.css">
 
   <!-- Apply saved theme instantly to avoid flash -->
-  <script>document.documentElement.setAttribute('data-theme', localStorage.getItem('ft_theme') || 'dark')</script>
+  <script>document.documentElement.setAttribute('data-theme', localStorage.getItem('ft_theme') || 'light')</script>
 
   <!-- SVG gradient for calorie ring (must live in DOM) -->
   <svg width="0" height="0" style="position:absolute">
@@ -647,8 +647,8 @@
       <div class="card">
         <div class="settings-section-title">Tema do aplicativo</div>
         <div class="sub-tabs" id="themeToggle">
-          <button class="sub-tab active" id="themeBtnDark"  onclick="switchTheme('dark')">🌑 Escuro</button>
-          <button class="sub-tab"        id="themeBtnLight" onclick="switchTheme('light')">☀️ Claro</button>
+          <button class="sub-tab"        id="themeBtnDark"  onclick="switchTheme('dark')">🌑 Escuro</button>
+          <button class="sub-tab active" id="themeBtnLight" onclick="switchTheme('light')">☀️ Claro</button>
         </div>
       </div>
 

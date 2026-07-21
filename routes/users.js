@@ -21,7 +21,7 @@ router.put('/me', (req, res) => {
       height_cm=?, age=?, sex=?, target_weight=?, theme=?
     WHERE id=?
   `).run(target_calories, target_protein, target_carbs, target_fat, height_cm, age, sex,
-         target_weight || null, theme || 'dark', req.user.id);
+         target_weight || null, theme || 'light', req.user.id);
   res.json({ success: true });
 });
 
