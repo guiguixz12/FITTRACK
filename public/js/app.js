@@ -1,9 +1,10 @@
 /* Main app controller */
 
-// Apply theme immediately (called at boot and on toggle)
-function applyTheme(theme) {
-  document.documentElement.setAttribute('data-theme', theme || 'dark');
-  localStorage.setItem('ft_theme', theme || 'dark');
+// Apply theme — save=true when user explicitly picks (also updates localStorage)
+function applyTheme(theme, save = true) {
+  const t = theme || 'dark';
+  document.documentElement.setAttribute('data-theme', t);
+  if (save) localStorage.setItem('ft_theme', t);
 }
 window.applyTheme = applyTheme;
 
@@ -48,7 +49,7 @@ async function initApp() {
   }
 
   document.getElementById('headerUserName').textContent = AppState.user.name;
-  applyTheme(AppState.user.theme || 'dark');
+  applyTheme(AppState.user.theme || 'dark', true);
 
   document.getElementById('logoutBtn').addEventListener('click', async () => {
     await api.post('/api/auth/logout', {});

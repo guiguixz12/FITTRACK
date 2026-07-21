@@ -8,7 +8,7 @@ function initSettings(state) {
   document.querySelectorAll('[data-theme-val]').forEach(btn => {
     btn.addEventListener('click', async () => {
       const theme = btn.dataset.themeVal;
-      applyTheme(theme);
+      applyTheme(theme, true);
       document.querySelectorAll('[data-theme-val]').forEach(b =>
         b.classList.toggle('active', b.dataset.themeVal === theme)
       );
