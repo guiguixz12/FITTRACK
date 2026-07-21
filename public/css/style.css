@@ -56,10 +56,6 @@ body {
   line-height: 1.5;
   min-height: 100dvh;
   overflow-x: hidden;
-  /* push content below iOS status bar in standalone mode */
-  padding-top: env(safe-area-inset-top, 0px);
-  padding-left: env(safe-area-inset-left, 0px);
-  padding-right: env(safe-area-inset-right, 0px);
 }
 .mono { font-family: 'JetBrains Mono', monospace !important; }
 
@@ -81,7 +77,9 @@ body {
   top: 0; left: 50%;
   transform: translateX(-50%);
   width: 100%; max-width: 520px;
-  height: var(--header-h);
+  /* grow to cover Dynamic Island / notch area */
+  height: calc(var(--header-h) + env(safe-area-inset-top, 0px));
+  padding-top: env(safe-area-inset-top, 0px);
   background: rgba(242,242,247,0.92);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
@@ -119,14 +117,14 @@ body {
 
 /* ── Main ──────────────────────────────── */
 .app-main {
-  margin-top: var(--header-h);
+  margin-top: calc(var(--header-h) + env(safe-area-inset-top, 0px));
   margin-bottom: calc(var(--nav-h) + env(safe-area-inset-bottom, 0px));
   flex: 1;
 }
 .tab-section {
   display: none;
   padding: 16px 14px 20px;
-  min-height: calc(100dvh - var(--header-h) - var(--nav-h) - env(safe-area-inset-bottom, 0px));
+  min-height: calc(100dvh - var(--header-h) - var(--nav-h) - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
   animation: fadeUp .2s ease;
 }
 .tab-section.active { display: block; }
