@@ -27,11 +27,14 @@ let activeMg     = null;   // active muscle group in manual session
 let currentWkId  = null;   // current manual session workout id
 
 // Active workout mode
-let waExercises  = [];     // [{name, sets, reps, weight_kg, done}]
-let waChecked    = 0;
-let waTimerInt   = null;
-let waStartTime  = null;
-let waWorkoutDow = null;
+let waExercises   = [];     // [{name, sets, reps, weight_kg, setsCompleted, done}]
+let waChecked     = 0;
+let waTimerInt    = null;
+let waStartTime   = null;
+let waWorkoutDow  = null;
+let waCurrentExIdx = 0;    // which exercise is currently active
+let waPhase       = 'working'; // 'working' | 'resting'
+let waNextLabel   = 'Próxima série'; // label for proceed button
 
 // Rest timer
 let restTimerInt  = null;
@@ -430,19 +433,22 @@ function resetTplExForm() {
 // ══════════════════════════════════════════
 function startActiveWorkout(dow) {
   const tpl = wkTemplates[dow];
-  waWorkoutDow = dow;
-  waExercises  = (tpl?.exercises || []).map(ex => ({ ...ex, done: false }));
-  waChecked    = 0;
+  waWorkoutDow   = dow;
+  waExercises    = (tpl?.exercises || []).map(ex => ({ ...ex, setsCompleted: 0, done: false }));
+  waChecked      = 0;
+  waCurrentExIdx = 0;
+  waPhase        = 'working';
+
   clearInterval(restTimerInt);
   const timerEl = document.getElementById('waRestTimer');
   if (timerEl) timerEl.style.display = 'none';
   sessionPRs = [];
 
-  document.getElementById('waTitle').textContent    = tpl?.name || DAYS_FULL[dow];
+  document.getElementById('waTitle').textContent      = tpl?.name || DAYS_FULL[dow];
   document.getElementById('waAddExtra').style.display = 'none';
-  document.getElementById('waExtraName').value = '';
+  document.getElementById('waExtraName').value        = '';
 
-  renderWaExercises();
+  renderWaFocus();
   updateWaProgress();
   startWaTimer();
 
@@ -451,82 +457,165 @@ function startActiveWorkout(dow) {
 }
 window.startActiveWorkout = startActiveWorkout;
 
-function renderWaExercises() {
+function renderWaFocus() {
   const body = document.getElementById('waBody');
   if (!waExercises.length) {
-    body.innerHTML = '<p class="empty-state">Nenhum exercício no programa. Use "+ Extra" para adicionar.</p>';
+    body.innerHTML = '<p class="empty-state">Nenhum exercício. Use "+ Extra" para adicionar.</p>';
     return;
   }
 
-  const pending = waExercises.filter(e => !e.done);
-  const done    = waExercises.filter(e =>  e.done);
-
-  let html = '';
-  if (pending.length) {
-    html += pending.map((ex, ri) => {
-      const i = waExercises.indexOf(ex);
-      return waExCard(ex, i);
-    }).join('');
-  }
-  if (done.length) {
-    html += `<div class="wa-section-label">✓ Concluídos (${done.length})</div>`;
-    html += done.map(ex => {
-      const i = waExercises.indexOf(ex);
-      return waExCard(ex, i);
-    }).join('');
+  // All exercises done
+  if (waCurrentExIdx >= waExercises.length) {
+    body.innerHTML = `
+      <div class="wa-done-all">
+        <div class="wa-done-all-icon">🏆</div>
+        <div class="wa-done-all-title">Treino concluído!</div>
+        <div class="wa-done-all-sub">Todos os exercícios finalizados. Toque em Finalizar para salvar.</div>
+      </div>`;
+    return;
   }
 
-  body.innerHTML = html;
+  const ex         = waExercises[waCurrentExIdx];
+  const totalSets  = ex.sets || 3;
+  const done       = ex.setsCompleted;
+
+  // Set dots
+  const dots = Array.from({ length: totalSets }, (_, i) => {
+    const cls = i < done ? 'done' : i === done ? 'active' : 'pending';
+    return `<div class="wa-set-dot ${cls}">${i < done ? '✓' : i + 1}</div>`;
+  }).join('');
+
+  // Mini exercise list
+  const miniList = waExercises.map((e, idx) => {
+    const cls  = e.done ? 'done' : idx === waCurrentExIdx ? 'active' : 'pending';
+    const icon = e.done ? '✓' : idx === waCurrentExIdx ? '▶' : idx + 1;
+    const setsLabel = e.done
+      ? `${e.sets || 0}/${e.sets || 0}`
+      : idx === waCurrentExIdx
+        ? `${e.setsCompleted}/${e.sets || 0}`
+        : `0/${e.sets || 0}`;
+    return `
+      <div class="wa-mini-ex ${cls}">
+        <div class="wa-mini-icon">${icon}</div>
+        <div class="wa-ex-name-mini">${escHtml(e.name)}</div>
+        <div class="wa-mini-sets">${setsLabel} séries</div>
+      </div>`;
+  }).join('');
+
+  const prescription = [
+    totalSets + ' séries',
+    ex.reps ? ex.reps + ' reps' : null,
+    ex.weight_kg ? ex.weight_kg + ' kg' : null
+  ].filter(Boolean).join(' × ');
+
+  body.innerHTML = `
+    <div class="wa-focus-card">
+      <div class="wa-focus-meta-top">Exercício ${waCurrentExIdx + 1} de ${waExercises.length}</div>
+      <div class="wa-focus-name">${escHtml(ex.name)}</div>
+      <div class="wa-focus-prescription">${prescription}</div>
+      <div class="wa-set-dots">${dots}</div>
+      <div class="wa-set-label">Série ${done + 1} de ${totalSets}</div>
+    </div>
+    <button class="btn btn-primary wa-complete-set-btn" onclick="completeSet()">
+      ✓ &nbsp;Concluí a Série ${done + 1}
+    </button>
+    <div class="wa-mini-ex-list">${miniList}</div>`;
 }
 
-function waExCard(ex, i) {
-  const parts = [];
-  if (ex.sets && ex.reps) parts.push(`${ex.sets} × ${ex.reps} reps`);
-  else if (ex.sets)       parts.push(`${ex.sets} séries`);
-  if (ex.weight_kg)       parts.push(`${ex.weight_kg} kg`);
+function completeSet() {
+  if (waPhase !== 'working') return;
+  const ex = waExercises[waCurrentExIdx];
+  if (!ex) return;
 
-  return `
-    <div class="wa-ex-card${ex.done ? ' done' : ''}" onclick="toggleWaEx(${i})">
-      <div class="wa-check-btn">${ex.done ? '✓' : '○'}</div>
-      <div class="wa-ex-info">
-        <div class="wa-ex-name">${escHtml(ex.name)}</div>
-        ${parts.length ? `<div class="wa-ex-meta">${parts.join(' @ ')}</div>` : ''}
-      </div>
-    </div>`;
-}
+  ex.setsCompleted++;
+  waPhase = 'resting';
 
-function toggleWaEx(i) {
-  const wasDone = waExercises[i].done;
-  waExercises[i].done = !wasDone;
-  waChecked = waExercises.filter(e => e.done).length;
-  renderWaExercises();
+  const allSetsDone    = ex.setsCompleted >= (ex.sets || 3);
+  const isLastExercise = waCurrentExIdx >= waExercises.length - 1;
+
+  if (allSetsDone) {
+    ex.done = true;
+    waChecked = waExercises.filter(e => e.done).length;
+  }
+
   updateWaProgress();
-  if (!wasDone) startRestTimer(90); // start 90s rest when marking done
+  renderWaFocus();
+
+  if (allSetsDone && isLastExercise) {
+    waNextLabel = 'Ver resultado';
+  } else if (allSetsDone) {
+    waNextLabel = 'Próximo exercício';
+  } else {
+    waNextLabel = `Próxima série (${ex.setsCompleted + 1}/${ex.sets || 3})`;
+  }
+
+  startRestTimer(90);
 }
-window.toggleWaEx = toggleWaEx;
+window.completeSet = completeSet;
+
+function proceedFromRest() {
+  clearInterval(restTimerInt);
+  const el = document.getElementById('waRestTimer');
+  if (el) el.style.display = 'none';
+
+  const ex          = waExercises[waCurrentExIdx];
+  const allSetsDone = ex && ex.setsCompleted >= (ex.sets || 3);
+
+  if (allSetsDone) {
+    waCurrentExIdx++;
+  }
+
+  waPhase = 'working';
+  renderWaFocus();
+  updateWaProgress();
+}
+window.proceedFromRest = proceedFromRest;
 
 function updateWaProgress() {
-  const total  = waExercises.length;
-  const pct    = total > 0 ? (waChecked / total) * 100 : 0;
-  const done   = waExercises.filter(e => e.done);
-  const volume = done.reduce((s, e) => s + (e.sets || 0) * (e.reps || 0) * (e.weight_kg || 0), 0);
+  const totalSets = waExercises.reduce((s, e) => s + (e.sets || 1), 0);
+  const doneSets  = waExercises.reduce((s, e) => s + e.setsCompleted, 0);
+  const pct       = totalSets > 0 ? (doneSets / totalSets) * 100 : 0;
+  const exDone    = waExercises.filter(e => e.done).length;
+  const volume    = waExercises
+    .filter(e => e.setsCompleted > 0)
+    .reduce((s, e) => s + e.setsCompleted * (e.reps || 0) * (e.weight_kg || 0), 0);
+
   document.getElementById('waProgBar').style.width   = pct + '%';
-  document.getElementById('waProgLabel').textContent = `${waChecked} / ${total} exercícios${volume > 0 ? ' · ' + Math.round(volume).toLocaleString('pt-BR') + ' kg vol.' : ''}`;
+  document.getElementById('waProgLabel').textContent =
+    `${doneSets}/${totalSets} séries · ${exDone}/${waExercises.length} exercícios${volume > 0 ? ' · ' + Math.round(volume).toLocaleString('pt-BR') + ' kg vol.' : ''}`;
 }
 
 // ── Rest Timer ────────────────────────────────────────────────────────────────
 function startRestTimer(secs) {
   clearInterval(restTimerInt);
   restTimerSecs = secs;
-  const el = document.getElementById('waRestTimer');
-  if (el) el.style.display = '';
+
+  const el        = document.getElementById('waRestTimer');
+  const countEl   = document.getElementById('waRestTimerCount');
+  const readyEl   = document.getElementById('waRestReadyMsg');
+  const proceedBtn = document.getElementById('waProceedBtn');
+
+  if (el)        el.style.display = '';
+  if (countEl)   { countEl.style.display = ''; countEl.style.color = 'var(--orange)'; }
+  if (readyEl)   readyEl.style.display = 'none';
+  if (proceedBtn) {
+    proceedBtn.textContent = 'Pular descanso';
+    proceedBtn.classList.remove('ready');
+  }
+
   updateRestTimerDisplay();
+
   restTimerInt = setInterval(() => {
     restTimerSecs--;
     if (restTimerSecs <= 0) {
-      skipRestTimer();
-      // vibrate if supported
+      clearInterval(restTimerInt);
       if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+      if (countEl)   countEl.style.display = 'none';
+      if (readyEl)   { readyEl.textContent = 'Pronto!'; readyEl.style.display = ''; }
+      if (proceedBtn) {
+        proceedBtn.textContent = waNextLabel;
+        proceedBtn.classList.add('ready');
+      }
     } else {
       updateRestTimerDisplay();
     }
@@ -536,18 +625,11 @@ function startRestTimer(secs) {
 function updateRestTimerDisplay() {
   const el = document.getElementById('waRestTimerCount');
   if (!el) return;
-  const m  = Math.floor(Math.max(restTimerSecs, 0) / 60);
-  const s  = String(Math.max(restTimerSecs, 0) % 60).padStart(2, '0');
+  const m = Math.floor(Math.max(restTimerSecs, 0) / 60);
+  const s = String(Math.max(restTimerSecs, 0) % 60).padStart(2, '0');
   el.textContent = `${m}:${s}`;
   el.style.color = restTimerSecs <= 10 ? 'var(--red)' : 'var(--orange)';
 }
-
-function skipRestTimer() {
-  clearInterval(restTimerInt);
-  const el = document.getElementById('waRestTimer');
-  if (el) el.style.display = 'none';
-}
-window.skipRestTimer = skipRestTimer;
 
 function adjustRestTimer(delta) {
   restTimerSecs = Math.max(restTimerSecs + delta, 5);
@@ -585,13 +667,11 @@ function setupActiveMode(state) {
   document.getElementById('waAddExtraBtn').addEventListener('click', () => {
     const name = document.getElementById('waExtraName').value.trim();
     if (!name) return;
-    waExercises.push({ name, sets: null, reps: null, weight_kg: null, done: false });
+    waExercises.push({ name, sets: 3, reps: null, weight_kg: null, setsCompleted: 0, done: false });
     document.getElementById('waExtraName').value = '';
     document.getElementById('waAddExtra').style.display = 'none';
     updateWaProgress();
-    renderWaExercises();
-    // Scroll to bottom to show new exercise
-    document.getElementById('waBody').scrollTo({ top: 999999, behavior: 'smooth' });
+    renderWaFocus();
   });
 
   // Finish
@@ -601,39 +681,40 @@ function setupActiveMode(state) {
 }
 
 async function finishActiveWorkout(state) {
-  const done = waExercises.filter(e => e.done);
-  if (done.length === 0 && !confirm('Nenhum exercício marcado como concluído. Salvar mesmo assim?')) return;
+  const doneEx    = waExercises.filter(e => e.done);
+  const partialEx = waExercises.filter(e => e.setsCompleted > 0 && !e.done);
+  const totalSets = waExercises.reduce((s, e) => s + e.setsCompleted, 0);
+
+  if (totalSets === 0 && !confirm('Nenhuma série concluída. Salvar mesmo assim?')) return;
 
   const today    = new Date().toISOString().slice(0, 10);
   const elapsed  = waStartTime ? Math.floor((Date.now() - waStartTime) / 1000) : 0;
   const mm       = Math.floor(elapsed / 60);
   const ss       = elapsed % 60;
-  const notesStr = `Duração: ${mm}m${ss}s | ${done.length}/${waExercises.length} exercícios concluídos`;
+  const notesStr = `Duração: ${mm}m${ss}s | ${doneEx.length}/${waExercises.length} exercícios concluídos · ${totalSets} séries totais`;
 
   try {
-    // Create or get workout session for today
-    const wkRes = await api.post('/api/workouts', { date: today, notes: notesStr });
+    const wkRes     = await api.post('/api/workouts', { date: today, notes: notesStr });
     const workoutId = wkRes.id;
 
-    // Save all exercises (done ones first, then pending)
-    const toSave = [
-      ...waExercises.filter(e =>  e.done),
-      ...waExercises.filter(e => !e.done)
-    ];
-
+    // Save exercises that had at least 1 set completed; use setsCompleted as actual sets done
+    const toSave = waExercises.filter(e => e.setsCompleted > 0);
     for (const ex of toSave) {
       await api.post(`/api/workouts/${workoutId}/exercises`, {
-        name: ex.name, sets: ex.sets, reps: ex.reps, weight_kg: ex.weight_kg
+        name: ex.name,
+        sets: ex.setsCompleted,
+        reps: ex.reps,
+        weight_kg: ex.weight_kg
       });
     }
 
-    // Check PRs for done exercises that have weight
+    // Check PRs for fully done exercises with weight
     const prResults = await Promise.all(
-      done
-        .filter(ex => ex.weight_kg && ex.sets && ex.reps)
+      doneEx
+        .filter(ex => ex.weight_kg && ex.reps)
         .map(ex => api.post('/api/stats/prs/check', {
           exercise_name: ex.name,
-          sets:          ex.sets,
+          sets:          ex.setsCompleted,
           reps:          ex.reps,
           weight_kg:     ex.weight_kg,
           date:          today,
@@ -642,10 +723,9 @@ async function finishActiveWorkout(state) {
     const newPRs = prResults.filter(r => r.is_pr).length;
 
     closeActiveMode();
-    const prMsg = newPRs > 0 ? ` 🏆 ${newPRs} PR${newPRs > 1 ? 's' : ''} novo${newPRs > 1 ? 's' : ''}!` : '';
-    toast(`Treino salvo! ${mm}m${ss}s · ${done.length}/${waExercises.length} exercícios${prMsg}`);
+    const prMsg = newPRs > 0 ? ` 🏆 ${newPRs} PR${newPRs > 1 ? 's' : ''}!` : '';
+    toast(`Treino salvo! ${mm}m${ss}s · ${doneEx.length}/${waExercises.length} exercícios · ${totalSets} séries${prMsg}`);
 
-    // Refresh dashboard if it's today
     if (state.date === today) loadDashboard(state);
 
   } catch (err) { toast(err.message, 'error'); }
