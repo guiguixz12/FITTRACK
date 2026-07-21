@@ -224,9 +224,6 @@ function seedDietTemplates(database) {
     const user = database.prepare('SELECT id FROM users WHERE name = ?').get(userName);
     if (!user) continue;
 
-    const existing = database.prepare('SELECT COUNT(*) as n FROM diet_templates WHERE user_id = ?').get(user.id);
-    if (existing.n > 0) continue; // already seeded
-
     const isAna = userName === 'Ana';
     const uid   = user.id;
 
@@ -239,7 +236,15 @@ function seedDietTemplates(database) {
       VALUES (?,?,?,?,?,?,?,?,?)
     `);
 
+    const delFoods = database.prepare(`
+      DELETE FROM diet_template_foods WHERE template_id IN
+        (SELECT id FROM diet_templates WHERE user_id = ?)
+    `);
+    const delTpls = database.prepare('DELETE FROM diet_templates WHERE user_id = ?');
+
     database.transaction(() => {
+      delFoods.run(uid);
+      delTpls.run(uid);
       for (const day of days) {
         const { lastInsertRowid: tplId } = insTpl.run(uid, day.dow, day.name);
         for (const food of day.foods) {
