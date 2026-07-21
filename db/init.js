@@ -217,14 +217,14 @@ function seedDietTemplates(database) {
   const f = (name, qty, cal, prot, carb, fat, meal, order) =>
     ({ name, quantity_g: qty, calories: cal, protein: prot, carbs: carb, fat, meal, food_order: order });
 
-  const NAMES = ['Guilherme', 'Ana'];
+  const NAMES = ['guixz', 'anabutti'];
 
   // For each named user, seed only if they have 0 templates
   for (const userName of NAMES) {
     const user = database.prepare('SELECT id FROM users WHERE name = ?').get(userName);
     if (!user) continue;
 
-    const isAna = userName === 'Ana';
+    const isAna = userName === 'anabutti';
     const uid   = user.id;
 
     const days = isAna ? getDiasAna(f, uid) : getDiasGuilherme(f, uid);
