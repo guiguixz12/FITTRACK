@@ -104,12 +104,6 @@ async function loadSettings(state) {
   document.getElementById('setSex').value            = u.sex             || '';
   document.getElementById('setTargetWeight').value   = u.target_weight   || '';
 
-  // Sync theme toggle with current user theme
-  const currentTheme = u.theme || 'dark';
-  document.querySelectorAll('[data-theme-val]').forEach(b =>
-    b.classList.toggle('active', b.dataset.themeVal === currentTheme)
-  );
-
   await loadWeightInfo();
 }
 

@@ -1,30 +1,5 @@
 /* Main app controller */
 
-// Apply theme — save=true when user explicitly picks (also updates localStorage)
-function applyTheme(theme, save = true) {
-  const t = theme || 'light';
-  document.documentElement.setAttribute('data-theme', t);
-  if (save) localStorage.setItem('ft_theme', t);
-}
-window.applyTheme = applyTheme;
-
-// Called by onclick on the theme buttons in settings
-function switchTheme(theme) {
-  applyTheme(theme, true);
-  document.querySelectorAll('[data-theme-val]').forEach(b =>
-    b.classList.toggle('active', b.dataset.themeVal === theme)
-  );
-  fetch('/api/users/me/theme', {
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json' },
-    credentials: 'same-origin',
-    body: JSON.stringify({ theme })
-  }).then(r => {
-    if (r.ok && AppState.user) AppState.user.theme = theme;
-  }).catch(() => {});
-}
-window.switchTheme = switchTheme;
-
 const AppState = {
   user: null,
   date: new Date().toISOString().slice(0, 10),
@@ -66,7 +41,6 @@ async function initApp() {
   }
 
   document.getElementById('headerUserName').textContent = AppState.user.name;
-  applyTheme(AppState.user.theme || 'light', true);
 
   document.getElementById('logoutBtn').addEventListener('click', async () => {
     await api.post('/api/auth/logout', {});

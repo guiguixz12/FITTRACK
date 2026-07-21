@@ -22,9 +22,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/style.css">
 
-  <!-- Apply saved theme instantly to avoid flash -->
-  <script>document.documentElement.setAttribute('data-theme', localStorage.getItem('ft_theme') || 'light')</script>
-
   <!-- SVG gradient for calorie ring (must live in DOM) -->
   <svg width="0" height="0" style="position:absolute">
     <defs>
@@ -642,15 +639,6 @@
 
     <!-- ════════════════ CONFIGURAÇÕES ════════════════ -->
     <section class="tab-section" id="tab-settings">
-
-      <!-- Tema -->
-      <div class="card">
-        <div class="settings-section-title">Tema do aplicativo</div>
-        <div class="sub-tabs" id="themeToggle">
-          <button class="sub-tab"        id="themeBtnDark"  onclick="switchTheme('dark')">🌑 Escuro</button>
-          <button class="sub-tab active" id="themeBtnLight" onclick="switchTheme('light')">☀️ Claro</button>
-        </div>
-      </div>
 
       <!-- Registrar Peso -->
       <div class="card card-orange">
