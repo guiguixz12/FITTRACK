@@ -8,6 +8,23 @@ function applyTheme(theme, save = true) {
 }
 window.applyTheme = applyTheme;
 
+// Called by onclick on the theme buttons in settings
+function switchTheme(theme) {
+  applyTheme(theme, true);
+  document.querySelectorAll('[data-theme-val]').forEach(b =>
+    b.classList.toggle('active', b.dataset.themeVal === theme)
+  );
+  fetch('/api/users/me/theme', {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'same-origin',
+    body: JSON.stringify({ theme })
+  }).then(r => {
+    if (r.ok && AppState.user) AppState.user.theme = theme;
+  }).catch(() => {});
+}
+window.switchTheme = switchTheme;
+
 const AppState = {
   user: null,
   date: new Date().toISOString().slice(0, 10),

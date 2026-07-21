@@ -4,21 +4,6 @@
 let _calcValues = null;
 
 function initSettings(state) {
-  // ── Tema ──────────────────────────────────────────────────────────────────
-  document.querySelectorAll('[data-theme-val]').forEach(btn => {
-    btn.addEventListener('click', async () => {
-      const theme = btn.dataset.themeVal;
-      applyTheme(theme, true);
-      document.querySelectorAll('[data-theme-val]').forEach(b =>
-        b.classList.toggle('active', b.dataset.themeVal === theme)
-      );
-      try {
-        await api.patch('/api/users/me/theme', { theme });
-        state.user = { ...state.user, theme };
-      } catch { /* non-critical */ }
-    });
-  });
-
   // ── Registrar peso ────────────────────────────────────────────────────────
   document.getElementById('setWeightSaveBtn').addEventListener('click', async () => {
     const val = parseFloat(document.getElementById('setWeightValue').value);
