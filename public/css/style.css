@@ -45,7 +45,10 @@
 
 /* ── Reset ─────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { -webkit-text-size-adjust: 100%; }
+html {
+  -webkit-text-size-adjust: 100%;
+  background: var(--bg); /* fills status-bar area on iOS PWA */
+}
 body {
   background: var(--bg);
   color: var(--text);
@@ -53,6 +56,10 @@ body {
   line-height: 1.5;
   min-height: 100dvh;
   overflow-x: hidden;
+  /* push content below iOS status bar in standalone mode */
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
 }
 .mono { font-family: 'JetBrains Mono', monospace !important; }
 
@@ -64,6 +71,8 @@ body {
   max-width: 520px;
   margin: 0 auto;
   position: relative;
+  /* undo body safe-area padding so the fixed header/nav can use their own */
+  margin-top: 0;
 }
 
 /* ── Header ─────────────────────────────── */
@@ -111,13 +120,13 @@ body {
 /* ── Main ──────────────────────────────── */
 .app-main {
   margin-top: var(--header-h);
-  margin-bottom: var(--nav-h);
+  margin-bottom: calc(var(--nav-h) + env(safe-area-inset-bottom, 0px));
   flex: 1;
 }
 .tab-section {
   display: none;
   padding: 16px 14px 20px;
-  min-height: calc(100dvh - var(--header-h) - var(--nav-h));
+  min-height: calc(100dvh - var(--header-h) - var(--nav-h) - env(safe-area-inset-bottom, 0px));
   animation: fadeUp .2s ease;
 }
 .tab-section.active { display: block; }
@@ -129,14 +138,14 @@ body {
   bottom: 0; left: 50%;
   transform: translateX(-50%);
   width: 100%; max-width: 520px;
-  height: var(--nav-h);
+  height: calc(var(--nav-h) + env(safe-area-inset-bottom, 0px));
   background: rgba(255,255,255,0.95);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-top: 1px solid var(--border);
   display: flex;
   z-index: 300;
-  padding-bottom: env(safe-area-inset-bottom, 0);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 .nav-btn {
   flex: 1;
