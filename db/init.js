@@ -207,8 +207,9 @@ function initDB() {
     try { database.exec(sql); } catch (_) { /* column already exists */ }
   }
 
-  // Seed diet templates for Guilherme and Ana if not yet present
+  // Seed diet and workout templates for guixz and anabutti
   seedDietTemplates(database);
+  seedWorkoutTemplates(database);
 
   console.log('Database ready at', DB_PATH);
 }
@@ -469,6 +470,113 @@ function getDiasAna(f, uid) {
       f('Pão integral (1 fatia)',    30,   69,  3.6, 12.0,  1.0, 'janta', 2),
     ]},
   ];
+}
+
+function seedWorkoutTemplates(database) {
+  const e = (name, sets, reps, order) =>
+    ({ name, sets, reps, weight_kg: 0, exercise_order: order });
+
+  const plans = {
+    guixz: [
+      { dow: 1, name: 'Upper A — Força', exercises: [
+        e('Supino reto',                       4,  8, 0),
+        e('Remada curvada',                    4,  8, 1),
+        e('Desenvolvimento militar halteres',  3, 10, 2),
+        e('Puxada na frente / barra fixa',     3, 10, 3),
+        e('Rosca direta',                      3, 12, 4),
+        e('Tríceps corda',                     3, 12, 5),
+      ]},
+      { dow: 2, name: 'Lower A — Força', exercises: [
+        e('Agachamento livre',                 4,  8, 0),
+        e('Terra romeno',                      3, 10, 1),
+        e('Leg press',                         3, 12, 2),
+        e('Cadeira flexora',                   3, 12, 3),
+        e('Panturrilha em pé',                 4, 15, 4),
+        e('Prancha (40s)',                      3, 40, 5),
+      ]},
+      { dow: 4, name: 'Upper B — Volume', exercises: [
+        e('Supino inclinado halteres',         4, 12, 0),
+        e('Remada baixa cabo',                 4, 12, 1),
+        e('Elevação lateral',                  4, 15, 2),
+        e('Puxada neutra / pull-over',         3, 12, 3),
+        e('Rosca martelo',                     3, 12, 4),
+        e('Tríceps francês',                   3, 12, 5),
+      ]},
+      { dow: 5, name: 'Lower B — Volume', exercises: [
+        e('Hip thrust / agachamento búlgaro',  4, 12, 0),
+        e('Cadeira extensora',                 3, 15, 1),
+        e('Stiff com halteres',                3, 12, 2),
+        e('Afundo caminhando (por perna)',      3, 10, 3),
+        e('Panturrilha sentado',               4, 15, 4),
+        e('Abdominal com carga',               3, 15, 5),
+      ]},
+    ],
+    anabutti: [
+      { dow: 1, name: 'Lower A — Glúteo/Força', exercises: [
+        e('Hip thrust',                                    4, 10, 0),
+        e('Agachamento livre / smith',                     4, 10, 1),
+        e('Terra romeno com halteres',                     3, 12, 2),
+        e('Cadeira abdutora',                              3, 15, 3),
+        e('Panturrilha em pé',                             3, 15, 4),
+        e('Prancha (35s)',                                  3, 35, 5),
+      ]},
+      { dow: 2, name: 'Upper A', exercises: [
+        e('Puxada na frente',                              4, 12, 0),
+        e('Supino com halteres',                           3, 12, 1),
+        e('Remada baixa',                                  3, 12, 2),
+        e('Desenvolvimento com halteres',                  3, 12, 3),
+        e('Elevação lateral',                              3, 15, 4),
+        e('Tríceps corda',                                 3, 15, 5),
+      ]},
+      { dow: 4, name: 'Lower B — Glúteo/Volume', exercises: [
+        e('Agachamento búlgaro (por perna)',                3, 10, 0),
+        e('Leg press (pés altos)',                          4, 12, 1),
+        e('Cadeira flexora',                               3, 15, 2),
+        e('Elevação pélvica unilateral / coice no cabo',   3, 15, 3),
+        e('Cadeira extensora',                             3, 15, 4),
+        e('Abdominal',                                     3, 15, 5),
+      ]},
+      { dow: 5, name: 'Upper B + Core', exercises: [
+        e('Remada curvada com halteres',                   4, 12, 0),
+        e('Supino inclinado halteres',                     3, 12, 1),
+        e('Puxada neutra',                                 3, 12, 2),
+        e('Elevação lateral',                              3, 15, 3),
+        e('Rosca direta',                                  3, 12, 4),
+        e('Abdominal com carga',                           3, 12, 5),
+        e('Prancha lateral (20s por lado)',                 3, 20, 6),
+      ]},
+    ],
+  };
+
+  const delEx  = database.prepare(`
+    DELETE FROM workout_template_exercises WHERE template_id IN
+      (SELECT id FROM workout_templates WHERE user_id = ?)
+  `);
+  const delTpl = database.prepare('DELETE FROM workout_templates WHERE user_id = ?');
+  const insTpl = database.prepare('INSERT INTO workout_templates (user_id, day_of_week, name) VALUES (?,?,?)');
+  const insEx  = database.prepare(`
+    INSERT INTO workout_template_exercises
+      (template_id, name, sets, reps, weight_kg, exercise_order)
+    VALUES (?,?,?,?,?,?)
+  `);
+
+  for (const [userName, days] of Object.entries(plans)) {
+    const user = database.prepare('SELECT id FROM users WHERE name = ?').get(userName);
+    if (!user) continue;
+
+    database.transaction(() => {
+      delEx.run(user.id);
+      delTpl.run(user.id);
+      for (const day of days) {
+        const { lastInsertRowid: tplId } = insTpl.run(user.id, day.dow, day.name);
+        for (const ex of day.exercises) {
+          insEx.run(tplId, ex.name, ex.sets, ex.reps, ex.weight_kg, ex.exercise_order);
+        }
+      }
+    })();
+
+    console.log(`Workout templates seeded for ${userName} (id:${user.id})`);
+  }
 }
 
 module.exports = { getDB, initDB };
