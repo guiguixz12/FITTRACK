@@ -1253,6 +1253,27 @@ h1, h2, h3, .label { text-transform: uppercase; letter-spacing: 0.05em; }
 }
 .day-card.is-today .day-name-text.rest { color: rgba(255,107,53,0.5); }
 
+.day-card--compact { margin-bottom: 4px; }
+.day-card--compact .day-header { padding: 9px 12px; }
+.day-card--compact .day-name-text {
+  font-size: .82rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 160px;
+}
+.compact-kcal {
+  font-size: .75rem;
+  font-weight: 700;
+  color: var(--orange);
+  white-space: nowrap;
+  margin-right: 4px;
+}
+
 .day-body {
   padding: 0 14px 13px;
 }

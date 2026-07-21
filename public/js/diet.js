@@ -222,11 +222,21 @@ function renderDietWeekGrid() {
         : '';
 
     if (!hasPlan) {
+      if (isToday) {
+        return `${sectionLabel}
+          <div class="day-card is-today">
+            <div class="day-header">
+              <span class="day-dow today">${DT_DAYS[dow]}</span>
+              <span class="day-name-text rest">Dia livre</span>
+              <button class="btn btn-ghost btn-sm" onclick="openDtEditDay(${dow})">Editar</button>
+            </div>
+          </div>`;
+      }
       return `${sectionLabel}
-        <div class="day-card${isToday ? ' is-today' : ''}">
+        <div class="day-card day-card--compact">
           <div class="day-header">
-            <span class="day-dow${isToday ? ' today' : ''}">${DT_DAYS[dow]}</span>
-            <span class="day-name-text rest">Dia livre</span>
+            <span class="day-dow">${DT_DAYS[dow]}</span>
+            <span class="day-name-text rest" style="flex:1">Dia livre</span>
             <button class="btn btn-ghost btn-sm" onclick="openDtEditDay(${dow})">Editar</button>
           </div>
         </div>`;
@@ -239,27 +249,41 @@ function renderDietWeekGrid() {
       return `<span class="dt-meal-pill">${m.icon} ${computeTotals(mf).cal} kcal</span>`;
     }).join('');
 
-    const trackBtn = isToday
-      ? `<button class="btn btn-primary" style="flex:1" onclick="openDtTrack(${dow})">Acompanhar hoje</button>`
-      : `<button class="btn btn-secondary btn-sm" onclick="openDtTrack(${dow})">Ver plano</button>`;
-
-    return `${sectionLabel}
-      <div class="day-card${isToday ? ' is-today' : ''}">
-        <div class="day-header">
-          <span class="day-dow${isToday ? ' today' : ''}">${DT_DAYS[dow]}</span>
-          <span class="day-name-text">${escDiet(tpl.name || 'Sem nome')}</span>
-          <button class="btn btn-ghost btn-sm" onclick="openDtEditDay(${dow})">Editar</button>
-          <button class="btn btn-ghost btn-sm" onclick="copyDtTemplate(${dow})" title="Copiar para outro dia">${ICON.copy}</button>
-        </div>
-        <div class="day-body">
-          <div class="diet-day-macros">
-            <div class="diet-day-macro cal"><div class="diet-day-macro-val">${tots.cal}</div><div class="diet-day-macro-label">kcal</div></div>
-            <div class="diet-day-macro prot"><div class="diet-day-macro-val">${tots.prot}g</div><div class="diet-day-macro-label">Prot</div></div>
-            <div class="diet-day-macro carb"><div class="diet-day-macro-val">${tots.carb}g</div><div class="diet-day-macro-label">Carb</div></div>
-            <div class="diet-day-macro fat"><div class="diet-day-macro-val">${tots.fat}g</div><div class="diet-day-macro-label">Gord</div></div>
+    // Today: full card with macros and meal pills
+    if (isToday) {
+      return `${sectionLabel}
+        <div class="day-card is-today">
+          <div class="day-header">
+            <span class="day-dow today">${DT_DAYS[dow]}</span>
+            <span class="day-name-text">${escDiet(tpl.name || 'Sem nome')}</span>
+            <button class="btn btn-ghost btn-sm" onclick="openDtEditDay(${dow})">Editar</button>
+            <button class="btn btn-ghost btn-sm" onclick="copyDtTemplate(${dow})" title="Copiar">${ICON.copy}</button>
           </div>
-          ${mealPreviews ? `<div class="dt-meal-pills">${mealPreviews}</div>` : ''}
-          <div class="day-actions">${trackBtn}</div>
+          <div class="day-body">
+            <div class="diet-day-macros">
+              <div class="diet-day-macro cal"><div class="diet-day-macro-val">${tots.cal}</div><div class="diet-day-macro-label">kcal</div></div>
+              <div class="diet-day-macro prot"><div class="diet-day-macro-val">${tots.prot}g</div><div class="diet-day-macro-label">Prot</div></div>
+              <div class="diet-day-macro carb"><div class="diet-day-macro-val">${tots.carb}g</div><div class="diet-day-macro-label">Carb</div></div>
+              <div class="diet-day-macro fat"><div class="diet-day-macro-val">${tots.fat}g</div><div class="diet-day-macro-label">Gord</div></div>
+            </div>
+            ${mealPreviews ? `<div class="dt-meal-pills">${mealPreviews}</div>` : ''}
+            <div class="day-actions">
+              <button class="btn btn-primary" style="flex:1" onclick="openDtTrack(${dow})">Acompanhar hoje</button>
+            </div>
+          </div>
+        </div>`;
+    }
+
+    // Other days: compact single row
+    return `${sectionLabel}
+      <div class="day-card day-card--compact">
+        <div class="day-header">
+          <span class="day-dow">${DT_DAYS[dow]}</span>
+          <span class="day-name-text" style="flex:1">${escDiet(tpl.name || 'Sem nome')}</span>
+          <span class="compact-kcal">${tots.cal} kcal</span>
+          <button class="btn btn-ghost btn-sm" onclick="openDtTrack(${dow})">Ver</button>
+          <button class="btn btn-ghost btn-sm" onclick="openDtEditDay(${dow})">Editar</button>
+          <button class="btn btn-ghost btn-sm" onclick="copyDtTemplate(${dow})" title="Copiar">${ICON.copy}</button>
         </div>
       </div>`;
   }).join('');
