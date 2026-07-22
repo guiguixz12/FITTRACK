@@ -955,6 +955,8 @@ function setupRegistrar(state) {
         await api.post('/api/diet/weight', { date, weight_kg: weight });
       toast('Dieta salva!');
       await loadDietHistory();
+      const today = new Date().toISOString().slice(0, 10);
+      if (date === today) loadDashboard(state);
     } catch (err) { toast(err.message, 'error'); }
   });
 }
