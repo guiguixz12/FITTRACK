@@ -25,7 +25,7 @@ function loadProgress(state) {
 }
 
 function showPgView(view, state) {
-  const views = ['peso', 'semana', 'records', 'fotos'];
+  const views = ['peso', 'cargas', 'semana', 'records', 'fotos'];
   views.forEach(v => {
     const el = document.getElementById(`pgView${v.charAt(0).toUpperCase() + v.slice(1)}`);
     if (el) el.style.display = v === view ? '' : 'none';
@@ -34,6 +34,7 @@ function showPgView(view, state) {
 
 function loadPgView(view, state) {
   if (view === 'peso')    loadEvolution(state);
+  if (view === 'cargas')  loadCargas();
   if (view === 'semana')  loadPgSemana(state);
   if (view === 'records') loadPgRecords(state);
   if (view === 'fotos')   loadPhotos(state);
@@ -140,4 +141,116 @@ function renderPgPRs(data) {
         </div>
       </div>`;
   }).join('');
+}
+
+// ══════════════════════════════════════════
+//  CARGAS — load evolution per exercise
+// ══════════════════════════════════════════
+let cargasChart = null;
+let cargasNames = [];
+
+async function loadCargas() {
+  // Load exercise names if not loaded yet
+  if (!cargasNames.length) {
+    try {
+      const data = await api.get('/api/stats/exercise-history');
+      cargasNames = data.names || [];
+    } catch {}
+  }
+}
+
+function onCargasSearch(val) {
+  const box = document.getElementById('pgCargasSuggestions');
+  if (!val.trim()) { box.style.display = 'none'; return; }
+
+  const matches = cargasNames.filter(n => n.toLowerCase().includes(val.toLowerCase())).slice(0, 8);
+  if (!matches.length) { box.style.display = 'none'; return; }
+
+  box.innerHTML = matches.map(n =>
+    `<div class="cargas-suggestion" onclick="selectCargasEx(${JSON.stringify(n)})">${n}</div>`
+  ).join('');
+  box.style.display = '';
+}
+window.onCargasSearch = onCargasSearch;
+
+async function selectCargasEx(name) {
+  document.getElementById('pgCargasSearch').value = name;
+  document.getElementById('pgCargasSuggestions').style.display = 'none';
+
+  try {
+    const data = await api.get(`/api/stats/exercise-history?name=${encodeURIComponent(name)}`);
+    renderCargasChart(name, data.history || []);
+  } catch {}
+}
+window.selectCargasEx = selectCargasEx;
+
+function renderCargasChart(name, history) {
+  const emptyEl  = document.getElementById('pgCargasEmpty');
+  const chartWrap = document.getElementById('pgCargasChart');
+  const statsEl  = document.getElementById('pgCargasStats');
+  const histEl   = document.getElementById('pgCargasHistory');
+
+  if (!history.length) {
+    emptyEl.textContent = `Nenhum registro com carga encontrado para "${name}".`;
+    emptyEl.style.display = '';
+    chartWrap.style.display = 'none';
+    histEl.innerHTML = '';
+    return;
+  }
+
+  emptyEl.style.display = 'none';
+  chartWrap.style.display = '';
+
+  const labels  = history.map(h => { const d = h.date.split('-'); return `${d[2]}/${d[1]}`; });
+  const weights = history.map(h => h.weight_kg);
+
+  if (cargasChart) { cargasChart.destroy(); cargasChart = null; }
+  const ctx = document.getElementById('cargasChart').getContext('2d');
+  cargasChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [{
+        label: 'Carga (kg)',
+        data: weights,
+        borderColor: '#FF6B35',
+        backgroundColor: 'rgba(255,107,53,.12)',
+        borderWidth: 2.5,
+        pointRadius: 4,
+        pointBackgroundColor: '#FF6B35',
+        fill: true,
+        tension: 0.3,
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: { display: false }, ticks: { font: { size: 10 }, color: '#8E8E93' } },
+        y: { grid: { color: 'rgba(0,0,0,.06)' }, ticks: { font: { size: 10 }, color: '#8E8E93', callback: v => v + ' kg' } }
+      }
+    }
+  });
+
+  // Stats row
+  const max  = Math.max(...weights);
+  const last = weights[weights.length - 1];
+  const prev = weights.length > 1 ? weights[weights.length - 2] : null;
+  const diff = prev !== null ? (last - prev) : null;
+  const diffStr = diff !== null ? (diff >= 0 ? `+${diff}` : `${diff}`) + ' kg' : '—';
+  statsEl.innerHTML = `
+    <div class="stat-box"><div class="stat-label">Atual</div><div class="stat-value mono">${last} kg</div></div>
+    <div class="stat-box"><div class="stat-label">Máximo</div><div class="stat-value mono">${max} kg</div></div>
+    <div class="stat-box"><div class="stat-label">Variação</div><div class="stat-value mono" style="color:${diff >= 0 ? 'var(--green)' : 'var(--red)'}">${diffStr}</div></div>`;
+
+  // History list
+  histEl.innerHTML = `<div class="card"><div class="card-label">Histórico — ${name}</div>` +
+    [...history].reverse().map(h => {
+      const d = h.date.split('-');
+      return `<div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border)">
+        <span style="font-size:.82rem;color:var(--text-2)">${d[2]}/${d[1]}/${d[0]}</span>
+        <span style="font-size:.9rem;font-weight:700;color:var(--text)">${h.weight_kg} kg</span>
+        <span style="font-size:.75rem;color:var(--text-3)">${h.sets || '?'}×${h.reps || '?'}</span>
+      </div>`;
+    }).join('') + '</div>';
 }

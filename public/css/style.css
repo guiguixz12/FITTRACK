@@ -1105,6 +1105,37 @@ input[type="file"] {
 .wa-mini-sets { font-size: .68rem; color: var(--text-3); margin-left: auto; white-space: nowrap; }
 .wa-mini-ex.active .wa-mini-sets { color: var(--orange); font-weight: 700; }
 
+/* ── Weight input during workout ── */
+.wa-weight-row {
+  display: flex; align-items: center; gap: 10px;
+  justify-content: center; margin-top: 20px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 10px 20px;
+}
+.wa-weight-label {
+  font-size: .72rem; font-weight: 700; color: var(--text-3);
+  text-transform: uppercase; letter-spacing: .07em;
+}
+.wa-weight-input {
+  width: 80px; border: none; background: transparent;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.6rem; font-weight: 700; color: var(--text);
+  text-align: center; outline: none; padding: 0;
+  -moz-appearance: textfield;
+}
+.wa-weight-input::-webkit-outer-spin-button,
+.wa-weight-input::-webkit-inner-spin-button { -webkit-appearance: none; }
+.wa-weight-input:focus { color: var(--orange); }
+.wa-weight-unit { font-size: .88rem; font-weight: 600; color: var(--text-3); }
+
+/* ── Cargas exercise search suggestions ── */
+.cargas-suggestion {
+  padding: 10px 14px; cursor: pointer;
+  font-size: .88rem; color: var(--text); border-bottom: 1px solid var(--border);
+}
+.cargas-suggestion:last-child { border-bottom: none; }
+.cargas-suggestion:hover { background: var(--surface); }
+
 /* ── Rest phase: circular ring ── */
 .wa-rest-screen {
   display: flex; flex-direction: column;

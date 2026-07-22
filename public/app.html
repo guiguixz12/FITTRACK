@@ -561,6 +561,7 @@
 
       <div class="sub-tabs">
         <button class="sub-tab active" data-pgview="peso">Peso</button>
+        <button class="sub-tab" data-pgview="cargas">Cargas</button>
         <button class="sub-tab" data-pgview="semana">Semana</button>
         <button class="sub-tab" data-pgview="records">Records</button>
         <button class="sub-tab" data-pgview="fotos">Fotos</button>
@@ -591,6 +592,26 @@
             <div class="stat-value mono" id="statMax">—</div>
           </div>
         </div>
+      </div>
+
+      <!-- SUB-VIEW: Cargas — load evolution per exercise -->
+      <div id="pgViewCargas" style="display:none">
+        <div class="card">
+          <div class="card-label">Evolução de Carga</div>
+          <div style="position:relative;margin-bottom:12px">
+            <input type="text" id="pgCargasSearch" placeholder="Buscar exercício..." autocomplete="off"
+              style="width:100%;box-sizing:border-box" oninput="onCargasSearch(this.value)">
+            <div id="pgCargasSuggestions" style="display:none;position:absolute;left:0;right:0;top:100%;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);z-index:20;max-height:200px;overflow-y:auto"></div>
+          </div>
+          <div id="pgCargasEmpty" style="color:var(--text-3);font-size:.85rem;text-align:center;padding:20px 0">
+            Busque um exercício acima para ver a evolução de carga.
+          </div>
+          <div id="pgCargasChart" style="display:none">
+            <div class="chart-wrap" style="height:200px"><canvas id="cargasChart"></canvas></div>
+            <div class="chart-stats" id="pgCargasStats"></div>
+          </div>
+        </div>
+        <div id="pgCargasHistory"></div>
       </div>
 
       <!-- SUB-VIEW: Semana — weekly report -->

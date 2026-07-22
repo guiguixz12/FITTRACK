@@ -119,4 +119,33 @@ router.post('/prs/check', (req, res) => {
   res.json({ is_pr, volume, previous_volume: existing?.volume || 0 });
 });
 
+// ── Exercise Weight History ───────────────────────────────────────────────────
+router.get('/exercise-history', (req, res) => {
+  const db  = getDB();
+  const uid = req.user.id;
+  const { name } = req.query;
+
+  if (!name) {
+    const names = db.prepare(`
+      SELECT DISTINCT we.name
+      FROM workout_exercises we
+      JOIN workouts w ON w.id = we.workout_id
+      WHERE w.user_id = ? AND we.weight_kg > 0
+      ORDER BY we.name
+    `).all(uid).map(r => r.name);
+    return res.json({ names });
+  }
+
+  const history = db.prepare(`
+    SELECT w.date, MAX(we.weight_kg) as weight_kg, we.sets, we.reps
+    FROM workout_exercises we
+    JOIN workouts w ON w.id = we.workout_id
+    WHERE w.user_id = ? AND LOWER(we.name) = LOWER(?) AND we.weight_kg > 0
+    GROUP BY w.date
+    ORDER BY w.date ASC
+  `).all(uid, name);
+
+  res.json({ name, history });
+});
+
 module.exports = router;

@@ -572,8 +572,7 @@ function renderWaFocus() {
 
   const prescription = [
     totalSets + ' séries',
-    ex.reps ? ex.reps + ' reps' : null,
-    ex.weight_kg ? ex.weight_kg + ' kg' : null
+    ex.reps ? ex.reps + ' reps' : null
   ].filter(Boolean).join(' × ');
 
   const miniList = waExercises.map((e, idx) => {
@@ -600,6 +599,13 @@ function renderWaFocus() {
         <div class="wa-focus-prescription">${prescription}</div>
         <div class="wa-set-dots">${dots}</div>
         <div class="wa-set-label">Série ${doneSets + 1} de ${totalSets}</div>
+        <div class="wa-weight-row">
+          <span class="wa-weight-label">Carga</span>
+          <input type="number" id="waWeightInput" class="wa-weight-input"
+            value="${ex.weight_kg || ''}" step="0.5" min="0" placeholder="—"
+            inputmode="decimal" onchange="updateExWeight(this.value)">
+          <span class="wa-weight-unit">kg</span>
+        </div>
       </div>
       <button class="btn btn-primary wa-complete-set-btn" onclick="completeSet()">
         ✓ &nbsp;Concluí a Série ${doneSets + 1}
@@ -640,6 +646,15 @@ function completeSet() {
   startRestTimer(90);
 }
 window.completeSet = completeSet;
+
+function updateExWeight(val) {
+  const w = parseFloat(val);
+  if (waExercises[waCurrentExIdx]) {
+    waExercises[waCurrentExIdx].weight_kg = isNaN(w) ? 0 : w;
+    waPersist();
+  }
+}
+window.updateExWeight = updateExWeight;
 
 function proceedFromRest() {
   clearInterval(restTimerInt);
