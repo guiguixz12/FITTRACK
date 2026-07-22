@@ -43,6 +43,50 @@ let waRestTotalSecs = 90;
 
 const WA_RING_R    = 86;
 const WA_RING_CIRC = +(2 * Math.PI * WA_RING_R).toFixed(2); // 540.35
+const WA_STORE_KEY = 'ft_wk_session';
+
+function waPersist() {
+  if (!waStartTime || !waExercises.length) return;
+  try {
+    localStorage.setItem(WA_STORE_KEY, JSON.stringify({
+      startTime:  waStartTime,
+      dow:        waWorkoutDow,
+      name:       document.getElementById('waTitle')?.textContent || '',
+      exercises:  waExercises,
+      exIdx:      waCurrentExIdx,
+      phase:      waPhase,
+    }));
+  } catch {}
+}
+
+function waClearPersist() {
+  localStorage.removeItem(WA_STORE_KEY);
+}
+
+function waLoadPersist() {
+  try {
+    const raw = localStorage.getItem(WA_STORE_KEY);
+    if (!raw) return null;
+    const d = JSON.parse(raw);
+    const today = new Date().toISOString().slice(0, 10);
+    if (new Date(d.startTime).toISOString().slice(0, 10) !== today) {
+      waClearPersist();
+      return null;
+    }
+    return d;
+  } catch { return null; }
+}
+
+function resumeWaTimerInterval() {
+  clearInterval(waTimerInt);
+  waTimerInt = setInterval(() => {
+    const s  = Math.floor((Date.now() - waStartTime) / 1000);
+    const mm = String(Math.floor(s / 60)).padStart(2, '0');
+    const ss = String(s % 60).padStart(2, '0');
+    const el = document.getElementById('waTimer');
+    if (el) el.textContent = `${mm}:${ss}`;
+  }, 1000);
+}
 
 // PR cache for current session [{exercise_name, volume}]
 let sessionPRs = [];
@@ -61,6 +105,45 @@ function initWorkouts(state) {
   setupEditDayView();
   setupRegistrarView(state);
   setupActiveMode(state);
+
+  // Restore workout if page reloaded mid-session
+  const saved = waLoadPersist();
+  if (saved) restoreWorkoutSession(saved, state);
+
+  // Restart timer interval when returning from another app
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden || !waStartTime) return;
+    if (document.getElementById('workoutActive')?.style.display === 'none') return;
+    resumeWaTimerInterval();
+  });
+}
+
+function restoreWorkoutSession(saved, state) {
+  waWorkoutDow    = saved.dow;
+  waExercises     = saved.exercises;
+  waCurrentExIdx  = saved.exIdx;
+  waPhase         = 'working'; // always return to working phase
+  waChecked       = waExercises.filter(e => e.done).length;
+  waRestTotalSecs = 90;
+
+  clearInterval(restTimerInt);
+  sessionPRs = [];
+
+  document.getElementById('waTitle').textContent      = saved.name;
+  document.getElementById('waAddExtra').style.display = 'none';
+  document.getElementById('waExtraName').value        = '';
+
+  renderWaFocus();
+  updateWaProgress();
+
+  // Resume elapsed timer from saved start time
+  waStartTime = saved.startTime;
+  resumeWaTimerInterval();
+
+  document.getElementById('workoutActive').style.display = '';
+  document.body.style.overflow = 'hidden';
+
+  toast('Treino retomado de onde parou!');
 }
 
 function switchWkView(view) {
@@ -454,6 +537,7 @@ function startActiveWorkout(dow) {
   renderWaFocus();
   updateWaProgress();
   startWaTimer();
+  waPersist();
 
   document.getElementById('workoutActive').style.display = '';
   document.body.style.overflow = 'hidden';
@@ -543,6 +627,7 @@ function completeSet() {
 
   updateWaProgress();
   renderWaFocus();
+  waPersist();
 
   if (allSetsDone && isLastExercise) {
     waNextLabel = 'Ver resultado';
@@ -567,6 +652,7 @@ function proceedFromRest() {
   waPhase = 'working';
   renderWaFocus();
   updateWaProgress();
+  waPersist();
 }
 window.proceedFromRest = proceedFromRest;
 
@@ -778,6 +864,7 @@ async function finishActiveWorkout(state) {
 function closeActiveMode() {
   clearInterval(waTimerInt);
   clearInterval(restTimerInt);
+  waClearPersist();
   document.body.style.overflow = '';
   document.getElementById('workoutActive').style.display = 'none';
   document.getElementById('waTimer').textContent = '00:00';
