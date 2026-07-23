@@ -19,7 +19,7 @@
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/style.css">
 
   <!-- SVG gradient for calorie ring (must live in DOM) -->
@@ -38,10 +38,7 @@
   <!-- ── Header ──────────────────────────────────────────── -->
   <header class="app-header">
     <span class="brand">FIT<em>TRACKER</em></span>
-    <div class="header-right">
-      <span class="header-user-name" id="headerUserName"></span>
-      <button class="btn-logout" id="logoutBtn">Sair</button>
-    </div>
+    <button class="header-avatar" id="headerAvatarBtn" aria-label="Perfil"></button>
   </header>
 
   <main class="app-main">
@@ -51,17 +48,25 @@
 
       <!-- Date navigation -->
       <div class="date-nav">
-        <button class="date-btn" id="dashPrevDay">‹</button>
-        <input type="date" id="dashDate" class="date-input">
-        <button class="date-btn" id="dashNextDay">›</button>
+        <button class="date-btn" id="dashPrevDay">
+          <svg width="8" height="14" viewBox="0 0 8 14"><polygon points="7,0 1,7 7,14" fill="currentColor"/></svg>
+        </button>
+        <div class="date-display">
+          <div class="date-display-day" id="dashDateDay">—</div>
+          <div class="date-display-date" id="dashDateText">—</div>
+        </div>
+        <input type="date" id="dashDate" class="date-input" aria-hidden="true">
+        <button class="date-btn" id="dashNextDay">
+          <svg width="8" height="14" viewBox="0 0 8 14"><polygon points="1,0 7,7 1,14" fill="currentColor"/></svg>
+        </button>
       </div>
 
       <!-- Hero Card: Calorie Ring + Macros -->
       <div class="hero-card">
         <div class="hero-ring">
-          <svg viewBox="0 0 160 160">
-            <circle class="ring-track"    cx="80" cy="80" r="69.4"/>
-            <circle class="ring-progress" cx="80" cy="80" r="69.4" id="calRing"/>
+          <svg viewBox="0 0 120 120">
+            <circle class="ring-track"    cx="60" cy="60" r="54"/>
+            <circle class="ring-progress" cx="60" cy="60" r="54" id="calRing"/>
           </svg>
           <div class="ring-center">
             <div class="ring-cal" id="dashCalories">0</div>
@@ -111,8 +116,8 @@
         </div>
         <div class="qstat">
           <div class="qstat-icon">⚖️</div>
-          <div class="qstat-val"><span id="dashWeight">—</span></div>
-          <div class="qstat-label"><span id="dashWeightUnit">kg</span></div>
+          <div class="qstat-val" id="dashWeight">—</div>
+          <div class="qstat-label">peso atual</div>
         </div>
       </div>
 
@@ -122,7 +127,9 @@
           <div class="card-label" style="margin-bottom:0">Hidratação</div>
           <span class="water-goal-txt">Meta: <span id="dashWaterGoal">2 L</span></span>
         </div>
-        <div class="water-logs" id="dashWaterLogs"></div>
+        <div class="water-progress-bar">
+          <div class="water-progress-fill" id="dashWaterProgressFill" style="width:0%"></div>
+        </div>
         <div class="water-grid" id="dashWaterGrid">
           <button class="water-btn" data-ml="150">150ml</button>
           <button class="water-btn" data-ml="200">200ml</button>
@@ -131,12 +138,20 @@
           <button class="water-btn" data-ml="500">500ml</button>
           <button class="water-btn" data-ml="1000">1L</button>
         </div>
+        <div class="water-logs" id="dashWaterLogs"></div>
       </div>
 
       <!-- Workout Summary -->
       <div class="card">
         <div class="card-label">Treino de hoje</div>
-        <div id="dashWorkout" class="empty-state">Nenhum treino registrado</div>
+        <div id="dashWorkout"></div>
+      </div>
+
+      <!-- AI Suggestion Banner -->
+      <div class="ai-banner">
+        <div class="ai-banner-title">Não sabe por onde começar?</div>
+        <div class="ai-banner-sub">Gere um plano de dieta personalizado em segundos.</div>
+        <button class="ai-banner-btn" onclick="switchTab('diet')">Sugerir plano</button>
       </div>
 
       <!-- Hidden legacy elements (populated by dashboard.js but displayed in Progress tab) -->
@@ -559,12 +574,12 @@
     <!-- ════════════════ PROGRESSO ════════════════ -->
     <section class="tab-section" id="tab-progress">
 
-      <div class="sub-tabs">
-        <button class="sub-tab active" data-pgview="peso">Peso</button>
-        <button class="sub-tab" data-pgview="cargas">Cargas</button>
-        <button class="sub-tab" data-pgview="semana">Semana</button>
-        <button class="sub-tab" data-pgview="records">Records</button>
-        <button class="sub-tab" data-pgview="fotos">Fotos</button>
+      <div class="progress-chips">
+        <button class="progress-chip active" data-pgview="peso">⚖️ Peso</button>
+        <button class="progress-chip" data-pgview="cargas">🏋️ Cargas</button>
+        <button class="progress-chip" data-pgview="semana">Semana</button>
+        <button class="progress-chip" data-pgview="records">Records</button>
+        <button class="progress-chip" data-pgview="fotos">Fotos</button>
       </div>
 
       <!-- SUB-VIEW: Peso — weight evolution chart -->
@@ -660,6 +675,18 @@
 
     <!-- ════════════════ CONFIGURAÇÕES ════════════════ -->
     <section class="tab-section" id="tab-settings">
+
+      <!-- Profile Card -->
+      <div class="card">
+        <div class="profile-card-row">
+          <div class="profile-avatar" id="profileAvatar"></div>
+          <div class="profile-info">
+            <div class="profile-name" id="profileName">—</div>
+            <div class="profile-email" id="profileEmail">—</div>
+          </div>
+          <button class="btn-logout" id="logoutBtn">Sair</button>
+        </div>
+      </div>
 
       <!-- Registrar Peso -->
       <div class="card card-orange">

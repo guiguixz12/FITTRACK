@@ -40,11 +40,19 @@ async function initApp() {
     return;
   }
 
-  document.getElementById('headerUserName').textContent = AppState.user.name;
+  // Set avatar button initial with first letter
+  const avatarBtn = document.getElementById('headerAvatarBtn');
+  if (avatarBtn) {
+    avatarBtn.textContent = (AppState.user.name || '?')[0].toUpperCase();
+    avatarBtn.addEventListener('click', () => switchTab('settings'));
+  }
 
-  document.getElementById('logoutBtn').addEventListener('click', async () => {
-    await api.post('/api/auth/logout', {});
-    location.href = '/login';
+  // Logout button (inside settings profile card)
+  document.addEventListener('click', async e => {
+    if (e.target.id === 'logoutBtn') {
+      await api.post('/api/auth/logout', {});
+      location.href = '/login';
+    }
   });
 
   document.querySelectorAll('.nav-btn').forEach(btn => {

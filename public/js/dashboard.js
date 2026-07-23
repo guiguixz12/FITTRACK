@@ -1,5 +1,16 @@
 /* Dashboard tab */
-const RING_CIRC = 2 * Math.PI * 69.4; // 435.84
+const RING_CIRC = 2 * Math.PI * 54; // 339.29 (r=54 for 120x120 svg)
+
+const WEEKDAYS_PT = ['Domingo','Segunda-feira','Terça-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sábado'];
+const MONTHS_PT   = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+
+function renderDateDisplay(dateStr) {
+  const d = new Date(dateStr + 'T12:00:00');
+  const dayEl  = document.getElementById('dashDateDay');
+  const textEl = document.getElementById('dashDateText');
+  if (dayEl)  dayEl.textContent  = WEEKDAYS_PT[d.getDay()];
+  if (textEl) textEl.textContent = `${d.getDate()} de ${MONTHS_PT[d.getMonth()]}, ${d.getFullYear()}`;
+}
 
 function initDashboard(state) {
   const dateInput = document.getElementById('dashDate');
@@ -8,6 +19,7 @@ function initDashboard(state) {
     const d = new Date(dateInput.value + 'T12:00:00');
     d.setDate(d.getDate() - 1);
     state.date = dateInput.value = d.toISOString().slice(0, 10);
+    renderDateDisplay(state.date);
     loadDashboard(state);
   });
 
@@ -15,11 +27,13 @@ function initDashboard(state) {
     const d = new Date(dateInput.value + 'T12:00:00');
     d.setDate(d.getDate() + 1);
     state.date = dateInput.value = d.toISOString().slice(0, 10);
+    renderDateDisplay(state.date);
     loadDashboard(state);
   });
 
   dateInput.addEventListener('change', () => {
     state.date = dateInput.value;
+    renderDateDisplay(state.date);
     loadDashboard(state);
   });
 
@@ -37,6 +51,7 @@ function initDashboard(state) {
 async function loadDashboard(state) {
   const date = state.date;
   document.getElementById('dashDate').value = date;
+  renderDateDisplay(date);
 
   const [dietData, weightData, workoutData, allWeights, waterData, streakData] = await Promise.all([
     api.get(`/api/diet/logs?date=${date}`),
@@ -70,9 +85,11 @@ function renderCalRing(log, user) {
   const offset   = RING_CIRC * (1 - pct);
   const ring     = document.getElementById('calRing');
 
+  ring.style.strokeDasharray  = RING_CIRC.toFixed(2);
+  ring.style.strokeDashoffset = offset.toFixed(2);
+
   document.getElementById('dashCalories').textContent = consumed;
   document.getElementById('dashCalTarget').textContent = target;
-  ring.style.strokeDashoffset = offset.toFixed(2);
   ring.classList.toggle('complete', consumed >= target);
 
   const remain   = target - consumed;
@@ -110,7 +127,6 @@ function renderWeight(todayLog, allLogs, date) {
   const recent = logs.slice(-30);
 
   const weightEl    = document.getElementById('dashWeight');
-  const unitEl      = document.getElementById('dashWeightUnit');
   const noDataEl    = document.getElementById('dashWeightNoData');
   const changeRowEl = document.getElementById('dashWeightChangeRow');
   const changeEl    = document.getElementById('dashWeightChange');
@@ -127,14 +143,12 @@ function renderWeight(todayLog, allLogs, date) {
 
   const displayLog = todayLog || prev;
   if (!displayLog) {
-    weightEl.textContent  = '—';
-    unitEl.style.display  = 'none';
-    hintEl.style.display  = '';
+    weightEl.textContent = '—';
+    hintEl.style.display = '';
     return;
   }
 
-  weightEl.textContent = displayLog.weight_kg.toFixed(1);
-  unitEl.style.display = '';
+  weightEl.textContent = displayLog.weight_kg.toFixed(1) + 'kg';
 
   if (!todayLog) {
     const d = displayLog.date.split('-');
@@ -189,7 +203,14 @@ function renderWeight(todayLog, allLogs, date) {
 function renderWorkoutSummary(workout) {
   const el = document.getElementById('dashWorkout');
   if (!workout || !workout.exercises?.length) {
-    el.innerHTML = '<span style="color:var(--text-faint);font-size:.88rem">Nenhum treino registrado</span>';
+    el.innerHTML = `
+      <div style="display:flex;flex-direction:column;align-items:center;padding:14px 0;gap:10px">
+        <div style="width:42px;height:42px;border-radius:50%;background:var(--orange-dim);display:flex;align-items:center;justify-content:center">
+          <svg width="20" height="14" viewBox="0 0 22 14"><rect x="7" y="5.5" width="8" height="3" rx="1.5" fill="var(--orange)"/><circle cx="4" cy="7" r="4" fill="var(--orange)"/><circle cx="18" cy="7" r="4" fill="var(--orange)"/></svg>
+        </div>
+        <div style="font-size:13px;color:var(--text-3)">Nenhum treino registrado</div>
+        <button onclick="switchTab('workouts')" class="btn btn-primary btn-sm">Ver programa</button>
+      </div>`;
     return;
   }
   const volume = workout.exercises.reduce((s, e) => s + (e.sets || 0) * (e.reps || 0) * (e.weight_kg || 0), 0);
@@ -220,8 +241,11 @@ function renderWater(data, date) {
 
   document.getElementById('dashWaterTotal').textContent  = total_ml >= 1000 ? (total_ml / 1000).toFixed(1) + ' L' : total_ml + ' ml';
   document.getElementById('dashWaterGoal').textContent   = goal_ml >= 1000 ? (goal_ml / 1000).toFixed(1) + ' L' : goal_ml + ' ml';
-  document.getElementById('dashWaterBar').style.width    = pct + '%';
   document.getElementById('dashWaterPct').textContent    = Math.round(pct) + '%';
+  const progressFill = document.getElementById('dashWaterProgressFill');
+  if (progressFill) progressFill.style.width = pct + '%';
+  const barEl = document.getElementById('dashWaterBar');
+  if (barEl) barEl.style.width = pct + '%';
 
   // Render log dots
   const logsEl = document.getElementById('dashWaterLogs');

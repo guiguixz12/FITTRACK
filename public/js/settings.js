@@ -104,6 +104,14 @@ async function loadSettings(state) {
   document.getElementById('setSex').value            = u.sex             || '';
   document.getElementById('setTargetWeight').value   = u.target_weight   || '';
 
+  // Populate profile card
+  const avatarEl = document.getElementById('profileAvatar');
+  const nameEl   = document.getElementById('profileName');
+  const emailEl  = document.getElementById('profileEmail');
+  if (avatarEl) avatarEl.textContent = (u.name || '?')[0].toUpperCase();
+  if (nameEl)   nameEl.textContent   = u.name  || '—';
+  if (emailEl)  emailEl.textContent  = u.email || '—';
+
   await loadWeightInfo();
 }
 
