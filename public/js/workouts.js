@@ -762,12 +762,9 @@ function renderTplChips(group) {
   const view     = MG_VIEW[group] || 'front';
 
   const diagramEl = document.getElementById('tplBodyDiagram');
-  if (muscles.length) {
-    diagramEl.innerHTML      = buildBodySvg(muscles, view);
-    diagramEl.style.display  = '';
-  } else {
-    diagramEl.innerHTML      = '';
-    diagramEl.style.display  = 'none';
+  if (diagramEl) {
+    diagramEl.innerHTML     = muscles.length ? buildBodySvg(muscles, view) : '';
+    diagramEl.style.display = muscles.length ? '' : 'none';
   }
 
   document.getElementById('tplExChips').innerHTML = (EXERCISE_LIBRARY[group] || []).map(ex =>
@@ -783,8 +780,8 @@ function renderTplChips(group) {
 function hideTplChips() {
   document.getElementById('tplExChipsWrap').style.display = 'none';
   document.getElementById('tplExChips').innerHTML = '';
-  document.getElementById('tplBodyDiagram').innerHTML = '';
-  document.getElementById('tplBodyDiagram').style.display = 'none';
+  const d = document.getElementById('tplBodyDiagram');
+  if (d) { d.innerHTML = ''; d.style.display = 'none'; }
 }
 
 function tplSelectChip(name) {
@@ -1260,8 +1257,8 @@ function setupRegistrarView(state) {
       btn.classList.remove('active');
       document.getElementById('exChipsWrap').style.display = 'none';
       document.getElementById('exChips').innerHTML = '';
-      document.getElementById('exBodyDiagram').innerHTML = '';
-      document.getElementById('exBodyDiagram').style.display = 'none';
+      const d = document.getElementById('exBodyDiagram');
+      if (d) { d.innerHTML = ''; d.style.display = 'none'; }
     } else {
       activeMg = group;
       document.querySelectorAll('#muscleGroups .mg-btn').forEach(b => b.classList.remove('active'));
@@ -1387,12 +1384,9 @@ function renderExChips(group) {
   const view     = MG_VIEW[group] || 'front';
 
   const diagramEl = document.getElementById('exBodyDiagram');
-  if (muscles.length) {
-    diagramEl.innerHTML      = buildBodySvg(muscles, view);
-    diagramEl.style.display  = '';
-  } else {
-    diagramEl.innerHTML      = '';
-    diagramEl.style.display  = 'none';
+  if (diagramEl) {
+    diagramEl.innerHTML     = muscles.length ? buildBodySvg(muscles, view) : '';
+    diagramEl.style.display = muscles.length ? '' : 'none';
   }
 
   document.getElementById('exChips').innerHTML = (EXERCISE_LIBRARY[group] || []).map(ex =>
