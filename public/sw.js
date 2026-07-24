@@ -53,8 +53,14 @@ self.addEventListener('fetch', e => {
     return;
   }
 
-  // JS / CSS / HTML → network-first so deploys always take effect
-  if (url.match(/\.(js|css|html)$/) || url.endsWith('/app') || url.endsWith('/login')) {
+  // HTML pages → always network, never cache
+  if (url.endsWith('/app') || url.endsWith('/login') || url.match(/\.(html)$/)) {
+    e.respondWith(fetch(e.request));
+    return;
+  }
+
+  // JS / CSS → network-first so deploys always take effect
+  if (url.match(/\.(js|css)(\?.*)?$/)) {
     e.respondWith(
       fetch(e.request)
         .then(r => {
