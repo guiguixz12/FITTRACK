@@ -1983,22 +1983,24 @@ input[type="file"] {
 }
 .ex-info-btn:hover { color: var(--orange); }
 
-/* Body diagram container shown below muscle group chips */
+/* Layout: chips on left, body diagram on right */
+.ex-chips-layout {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+.ex-chips-layout .ex-chips {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Body diagram container */
 .ex-body-diagram {
-  width: 88px;
-  height: 196px;
+  width: 82px;
+  height: 182px;
   flex-shrink: 0;
-  float: right;
-  margin: 0 0 10px 10px;
   border-radius: 10px;
   overflow: hidden;
-  shape-outside: margin-box;
-}
-/* clear float after chips */
-.ex-chips::after {
-  content: '';
-  display: block;
-  clear: both;
 }
 
 /* Equipment tag */
