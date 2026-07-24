@@ -83,6 +83,15 @@
       padding: 28px 22px;
     }
 
+    .login-card-title {
+      font-size: .8rem;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--text-3);
+      margin-bottom: 18px;
+    }
+
     .login-card .form-group { margin-bottom: 16px; }
     .login-card .form-group:last-of-type { margin-bottom: 22px; }
 
@@ -97,6 +106,22 @@
       border-radius: var(--radius-sm);
       border: 1px solid rgba(255,69,58,.2);
     }
+
+    .login-toggle {
+      text-align: center;
+      margin-top: 18px;
+      font-size: .82rem;
+      color: var(--text-3);
+    }
+
+    .login-toggle a {
+      color: var(--orange);
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .login-toggle a:hover { text-decoration: underline; }
   </style>
 </head>
 <body class="login-page">
@@ -112,7 +137,9 @@
       <p class="login-tagline">Seu progresso. Seus resultados.</p>
     </div>
 
-    <div class="login-card">
+    <!-- Login form -->
+    <div class="login-card" id="loginCard">
+      <div class="login-card-title">Entrar</div>
       <form id="loginForm" novalidate>
         <div class="form-group">
           <label for="name">Usuário</label>
@@ -130,15 +157,69 @@
       </form>
     </div>
 
+    <p class="login-toggle" id="loginToggle">
+      Não tem conta? <a onclick="showRegister()">Criar conta</a>
+    </p>
+
+    <!-- Register form (hidden by default) -->
+    <div class="login-card" id="registerCard" style="display:none">
+      <div class="login-card-title">Criar conta</div>
+      <form id="registerForm" novalidate>
+        <div class="form-group">
+          <label for="regName">Usuário</label>
+          <input type="text" id="regName" name="name" placeholder="Mínimo 3 caracteres" required autocomplete="username" spellcheck="false" autocapitalize="none">
+        </div>
+
+        <div class="form-group">
+          <label for="regEmail">E-mail <span style="color:var(--text-3);font-weight:400">(opcional)</span></label>
+          <input type="email" id="regEmail" name="email" placeholder="seu@email.com" autocomplete="email">
+        </div>
+
+        <div class="form-group">
+          <label for="regPassword">Senha</label>
+          <input type="password" id="regPassword" name="password" placeholder="Mínimo 6 caracteres" required autocomplete="new-password">
+        </div>
+
+        <div class="form-group">
+          <label for="regPasswordConfirm">Confirmar senha</label>
+          <input type="password" id="regPasswordConfirm" name="password_confirm" placeholder="••••••••" required autocomplete="new-password">
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-full" id="registerBtn">Criar conta</button>
+
+        <p class="login-error" id="registerError" style="display:none"></p>
+      </form>
+    </div>
+
+    <p class="login-toggle" id="registerToggle" style="display:none">
+      Já tem conta? <a onclick="showLogin()">Entrar</a>
+    </p>
+
   </div>
 
   <script>
     fetch('/api/auth/me').then(r => { if (r.ok) location.href = '/app'; }).catch(() => {});
 
+    function showRegister() {
+      document.getElementById('loginCard').style.display    = 'none';
+      document.getElementById('loginToggle').style.display  = 'none';
+      document.getElementById('registerCard').style.display  = '';
+      document.getElementById('registerToggle').style.display = '';
+      document.getElementById('regName').focus();
+    }
+
+    function showLogin() {
+      document.getElementById('registerCard').style.display   = 'none';
+      document.getElementById('registerToggle').style.display = 'none';
+      document.getElementById('loginCard').style.display      = '';
+      document.getElementById('loginToggle').style.display    = '';
+      document.getElementById('name').focus();
+    }
+
     document.getElementById('loginForm').addEventListener('submit', async e => {
       e.preventDefault();
-      const btn    = document.getElementById('loginBtn');
-      const errEl  = document.getElementById('loginError');
+      const btn   = document.getElementById('loginBtn');
+      const errEl = document.getElementById('loginError');
       errEl.style.display = 'none';
       btn.textContent = '...';
       btn.disabled = true;
@@ -159,6 +240,42 @@
         errEl.textContent = err.message;
         errEl.style.display = 'block';
         btn.textContent = 'Entrar';
+        btn.disabled = false;
+      }
+    });
+
+    document.getElementById('registerForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      const btn   = document.getElementById('registerBtn');
+      const errEl = document.getElementById('registerError');
+      errEl.style.display = 'none';
+
+      const name     = document.getElementById('regName').value.trim();
+      const password = document.getElementById('regPassword').value;
+      const confirm  = document.getElementById('regPasswordConfirm').value;
+
+      if (password !== confirm) {
+        errEl.textContent = 'As senhas não conferem';
+        errEl.style.display = 'block';
+        return;
+      }
+
+      btn.textContent = '...';
+      btn.disabled = true;
+
+      try {
+        const res = await fetch('/api/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, password, email: document.getElementById('regEmail').value.trim() || undefined })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Erro ao criar conta');
+        location.href = '/app';
+      } catch (err) {
+        errEl.textContent = err.message;
+        errEl.style.display = 'block';
+        btn.textContent = 'Criar conta';
         btn.disabled = false;
       }
     });

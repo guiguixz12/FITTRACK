@@ -202,6 +202,10 @@ function initDB() {
     "ALTER TABLE diet_template_foods ADD COLUMN sugar REAL DEFAULT 0",
     "ALTER TABLE users ADD COLUMN water_goal_ml INTEGER DEFAULT 2000",
     "ALTER TABLE users ADD COLUMN theme TEXT DEFAULT 'dark'",
+    "ALTER TABLE users ADD COLUMN email TEXT",
+    "ALTER TABLE users ADD COLUMN stripe_customer_id TEXT",
+    "ALTER TABLE users ADD COLUMN plan TEXT DEFAULT 'free'",
+    "ALTER TABLE users ADD COLUMN plan_expires_at TEXT",
   ];
   for (const sql of migrations) {
     try { database.exec(sql); } catch (_) { /* column already exists */ }
@@ -218,14 +222,14 @@ function seedDietTemplates(database) {
   const f = (name, qty, cal, prot, carb, fat, meal, order) =>
     ({ name, quantity_g: qty, calories: cal, protein: prot, carbs: carb, fat, meal, food_order: order });
 
-  const NAMES = ['guixz', 'anabutti'];
+  const NAMES = ['Guilherme', 'anabutti'];
 
   // For each named user, seed only if they have 0 templates
   for (const userName of NAMES) {
     const user = database.prepare('SELECT id FROM users WHERE name = ?').get(userName);
     if (!user) continue;
 
-    const isAna = userName === 'anabutti';
+    const isAna = userName !== 'Guilherme';
     const uid   = user.id;
 
     const days = isAna ? getDiasAna(f, uid) : getDiasGuilherme(f, uid);
@@ -412,7 +416,7 @@ function seedWorkoutTemplates(database) {
     ({ name, sets, reps, weight_kg: 0, exercise_order: order });
 
   const plans = {
-    guixz: [
+    Guilherme: [
       { dow: 1, name: 'Treino A — Ombros & Dorsais', exercises: [
         e('Puxada Alta (pegada aberta)',          4, 10, 0),
         e('Elevação Lateral c/ Halteres',         4, 13, 1),
