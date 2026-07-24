@@ -954,5 +954,24 @@
     navigator.serviceWorker.register('/sw.js').catch(() => {});
   }
 </script>
+
+<!-- Exercise Info Modal -->
+<div id="exInfoModal" style="display:none" class="ex-info-overlay">
+  <div class="ex-info-backdrop"></div>
+  <div class="ex-info-sheet">
+    <div class="ex-info-header">
+      <div id="exInfoTitle" class="ex-info-name"></div>
+      <button class="btn btn-icon btn-ghost" onclick="document.getElementById('exInfoModal').style.display='none'">✕</button>
+    </div>
+    <div class="ex-info-meta">
+      <div id="exInfoEquip"></div>
+      <div id="exInfoMuscles" class="ex-info-muscles"></div>
+    </div>
+    <div class="ex-info-diagram-wrap">
+      <div id="exInfoDiagram" class="ex-info-diagram"></div>
+      <button id="exInfoViewToggle" class="btn btn-ghost btn-sm ex-info-toggle" style="display:none">Ver costas</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>

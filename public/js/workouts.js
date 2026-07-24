@@ -4,15 +4,338 @@
 
 // ── Exercise Library ──────────────────────────────────────────────────────────
 const EXERCISE_LIBRARY = {
-  peito:   ['Supino Reto','Supino Inclinado','Supino Declinado','Supino c/ Halteres','Supino Inclinado c/ Halteres','Crucifixo Reto','Crucifixo Inclinado','Crossover','Pec Deck (Voador)','Flexão de Braço','Flexão Inclinada','Pullover'],
-  costas:  ['Puxada Frontal','Puxada Fechada','Puxada Neutra','Barra Fixa','Chin-up','Remada Curvada','Remada Unilateral','Remada Cavalinho','Remada na Máquina','Remada Serrote','Remada Baixa','Levantamento Terra','Hiperextensão','Face Pull'],
-  ombros:  ['Desenvolvimento c/ Barra','Desenvolvimento c/ Halteres','Arnold Press','Elevação Lateral','Elevação Frontal','Crucifixo Inverso','Remada Alta','Encolhimento de Ombros','Elevação Lateral na Polia'],
-  biceps:  ['Rosca Direta','Rosca Alternada','Rosca Concentrada','Rosca Martelo','Rosca Scott','Rosca 21','Rosca no Cabo','Rosca Inclinada','Rosca Inversa'],
-  triceps: ['Tríceps Pulley','Tríceps Corda','Tríceps Barra','Tríceps Testa','Tríceps Francês','Tríceps Coice','Tríceps Banco (Dips)','Extensão Unilateral','Mergulho (Dips)','Kickback'],
-  pernas:  ['Agachamento Livre','Agachamento Sumô','Agachamento Hack','Leg Press','Leg Press 45°','Extensão de Pernas','Flexão de Pernas','Mesa Flexora','Stiff','Levantamento Terra Romeno','Avanço','Afundo','Passada','Cadeira Adutora','Cadeira Abdutora','Hip Thrust','Glúteo no Cabo','Elevação de Quadril','Panturrilha em Pé','Panturrilha Sentado'],
-  abdomen: ['Crunch','Abdominal Infra','Oblíquo','Abdominal Bicicleta','Prancha','Prancha Lateral','Elevação de Pernas','Abdominal na Polia','Rollout (Roda)','Abdominal Remador','Russian Twist'],
-  cardio:  ['Esteira','Corrida','Caminhada','Bicicleta Ergométrica','Elíptico','Escada (Stairmaster)','Pular Corda','HIIT','Circuito','Remo Ergométrico','Natação','Jump']
+  peito:   ['Supino Reto','Supino Inclinado','Supino Declinado','Supino c/ Halteres','Supino Inclinado c/ Halteres','Crucifixo Reto','Crucifixo Inclinado','Crossover','Pec Deck (Voador)','Flexão de Braço','Flexão Inclinada','Flexão Diamante','Pullover','Supino Decline c/ Halteres'],
+  costas:  ['Puxada Frontal','Puxada Fechada','Puxada Neutra','Barra Fixa','Chin-up','Remada Curvada','Remada Unilateral','Remada Cavalinho','Remada na Máquina','Remada Serrote','Remada Baixa','Remada Alta na Polia','Levantamento Terra','Hiperextensão','Face Pull','Pullover'],
+  ombros:  ['Desenvolvimento c/ Barra','Desenvolvimento c/ Halteres','Desenvolvimento Sentado','Arnold Press','Elevação Lateral','Elevação Lateral Sentado','Elevação Lateral na Polia','Elevação Frontal','Crucifixo Inverso','Crucifixo Inverso na Polia','Remada Alta','Encolhimento de Ombros'],
+  biceps:  ['Rosca Direta','Rosca Alternada','Rosca Concentrada','Rosca Martelo','Rosca Scott','Rosca 21','Rosca no Cabo','Rosca Inclinada','Rosca Inversa','Rosca Zottman'],
+  triceps: ['Tríceps Pulley','Tríceps Corda','Tríceps Barra','Tríceps Testa','Tríceps Francês','Tríceps Coice','Tríceps Banco (Dips)','Extensão Unilateral','Mergulho (Dips)','Kickback','Flexão Diamante'],
+  pernas:  ['Agachamento Livre','Agachamento Sumô','Agachamento Goblet','Agachamento Hack','Agachamento Búlgaro','Leg Press','Leg Press 45°','Extensão de Pernas','Flexão de Pernas','Mesa Flexora','Stiff','Levantamento Terra Romeno','Levantamento Terra Sumo','Avanço','Afundo','Passada','Cadeira Adutora','Cadeira Abdutora','Hip Thrust','Glúteo 4 Apoios','Glúteo no Cabo','Elevação de Quadril','Abdutora com Elástico','Panturrilha em Pé','Panturrilha Sentado','Jump Squat'],
+  abdomen: ['Crunch','Abdominal Infra','Oblíquo','Abdominal Bicicleta','Prancha','Prancha Lateral','Prancha com Elevação','Elevação de Pernas','Hanging Knee Raise','Abdominal na Polia','Rollout (Roda)','Abdominal Remador','Russian Twist','Dead Bug','Hollow Body'],
+  cardio:  ['Esteira','Corrida','Caminhada','Bicicleta Ergométrica','Elíptico','Escada (Stairmaster)','Pular Corda','HIIT','Circuito','Remo Ergométrico','Natação','Jump','Burpee','Box Jump']
 };
+
+// ── Exercise metadata: muscles + equipment ────────────────────────────────────
+const MUSCLE_LABELS = {
+  'chest':          'Peitoral',
+  'front-shoulder': 'Deltóide Frontal',
+  'side-shoulder':  'Deltóide Lateral',
+  'rear-shoulder':  'Deltóide Posterior',
+  'biceps':         'Bíceps',
+  'triceps':        'Tríceps',
+  'forearms':       'Antebraço',
+  'abs':            'Abdômen',
+  'obliques':       'Oblíquos',
+  'traps':          'Trapézio',
+  'lats':           'Dorsais',
+  'rhomboids':      'Rombóides',
+  'lower-back':     'Lombar',
+  'quads':          'Quadríceps',
+  'hamstrings':     'Isquiotibiais',
+  'glutes':         'Glúteos',
+  'calves':         'Panturrilha',
+  'hip-flexors':    'Flexores do Quadril',
+};
+
+// Primary muscles visible on each view (used for auto view detection)
+const MUSCLE_VIEW = {
+  'chest':'front','front-shoulder':'front','side-shoulder':'front',
+  'biceps':'front','abs':'front','obliques':'front','hip-flexors':'front','quads':'front',
+  'forearms':'front','traps':'back','rear-shoulder':'back','lats':'back',
+  'rhomboids':'back','triceps':'back','lower-back':'back','glutes':'back','hamstrings':'back',
+  'calves':'back',
+};
+
+// Which muscles to highlight when a muscle group chip is selected
+const MG_MUSCLES = {
+  peito:   ['chest','front-shoulder','triceps'],
+  costas:  ['lats','rhomboids','lower-back','traps'],
+  ombros:  ['side-shoulder','front-shoulder','rear-shoulder'],
+  biceps:  ['biceps','forearms'],
+  triceps: ['triceps'],
+  pernas:  ['quads','hamstrings','glutes','calves'],
+  abdomen: ['abs','obliques'],
+  cardio:  [],
+};
+
+// Which view to show for each muscle group
+const MG_VIEW = {
+  peito:'front', costas:'back', ombros:'front', biceps:'front',
+  triceps:'back', pernas:'front', abdomen:'front', cardio:'front',
+};
+
+// Exercise → { muscles[], equipment }
+const EX_META = {
+  // PEITO
+  'Supino Reto':                   { muscles:['chest','triceps','front-shoulder'],        equipment:'Barra' },
+  'Supino Inclinado':              { muscles:['chest','front-shoulder','triceps'],        equipment:'Barra' },
+  'Supino Declinado':              { muscles:['chest','triceps'],                         equipment:'Barra' },
+  'Supino c/ Halteres':            { muscles:['chest','triceps','front-shoulder'],        equipment:'Halteres' },
+  'Supino Inclinado c/ Halteres':  { muscles:['chest','front-shoulder'],                 equipment:'Halteres' },
+  'Supino Decline c/ Halteres':    { muscles:['chest','triceps'],                        equipment:'Halteres' },
+  'Crucifixo Reto':                { muscles:['chest','front-shoulder'],                 equipment:'Halteres' },
+  'Crucifixo Inclinado':           { muscles:['chest','front-shoulder'],                 equipment:'Halteres' },
+  'Crossover':                     { muscles:['chest','front-shoulder'],                 equipment:'Cabo/Polia' },
+  'Pec Deck (Voador)':             { muscles:['chest'],                                  equipment:'Máquina' },
+  'Flexão de Braço':               { muscles:['chest','triceps','front-shoulder'],        equipment:'Peso Corporal' },
+  'Flexão Inclinada':              { muscles:['chest','front-shoulder','triceps'],        equipment:'Peso Corporal' },
+  'Flexão Diamante':               { muscles:['triceps','chest'],                        equipment:'Peso Corporal' },
+  'Pullover':                      { muscles:['lats','chest','triceps'],                 equipment:'Halteres' },
+  // COSTAS
+  'Puxada Frontal':                { muscles:['lats','biceps','rhomboids'],              equipment:'Cabo/Polia' },
+  'Puxada Fechada':                { muscles:['lats','biceps'],                          equipment:'Cabo/Polia' },
+  'Puxada Neutra':                 { muscles:['lats','biceps'],                          equipment:'Cabo/Polia' },
+  'Barra Fixa':                    { muscles:['lats','biceps','rhomboids'],              equipment:'Peso Corporal' },
+  'Chin-up':                       { muscles:['lats','biceps'],                          equipment:'Peso Corporal' },
+  'Remada Curvada':                { muscles:['lats','rhomboids','rear-shoulder','biceps'], equipment:'Barra' },
+  'Remada Unilateral':             { muscles:['lats','rhomboids','biceps'],              equipment:'Halteres' },
+  'Remada Cavalinho':              { muscles:['lats','rhomboids','rear-shoulder'],       equipment:'Barra' },
+  'Remada na Máquina':             { muscles:['lats','rhomboids','rear-shoulder'],       equipment:'Máquina' },
+  'Remada Serrote':                { muscles:['lats','rhomboids','biceps'],              equipment:'Halteres' },
+  'Remada Baixa':                  { muscles:['lats','rhomboids','rear-shoulder','biceps'], equipment:'Cabo/Polia' },
+  'Remada Alta na Polia':          { muscles:['rear-shoulder','rhomboids','traps'],      equipment:'Cabo/Polia' },
+  'Levantamento Terra':            { muscles:['lower-back','glutes','hamstrings','traps','lats'], equipment:'Barra' },
+  'Hiperextensão':                 { muscles:['lower-back','glutes','hamstrings'],       equipment:'Banco' },
+  'Face Pull':                     { muscles:['rear-shoulder','rhomboids','traps'],      equipment:'Cabo/Polia' },
+  // OMBROS
+  'Desenvolvimento c/ Barra':      { muscles:['front-shoulder','side-shoulder','triceps','traps'], equipment:'Barra' },
+  'Desenvolvimento c/ Halteres':   { muscles:['front-shoulder','side-shoulder','triceps'], equipment:'Halteres' },
+  'Desenvolvimento Sentado':       { muscles:['front-shoulder','side-shoulder','triceps'], equipment:'Halteres' },
+  'Arnold Press':                  { muscles:['front-shoulder','side-shoulder','triceps'], equipment:'Halteres' },
+  'Elevação Lateral':              { muscles:['side-shoulder'],                          equipment:'Halteres' },
+  'Elevação Lateral Sentado':      { muscles:['side-shoulder'],                          equipment:'Halteres' },
+  'Elevação Lateral na Polia':     { muscles:['side-shoulder'],                          equipment:'Cabo/Polia' },
+  'Crucifixo Inverso na Polia':    { muscles:['rear-shoulder','rhomboids'],              equipment:'Cabo/Polia' },
+  'Elevação Frontal':              { muscles:['front-shoulder','traps'],                 equipment:'Halteres' },
+  'Crucifixo Inverso':             { muscles:['rear-shoulder','rhomboids','traps'],      equipment:'Halteres' },
+  'Remada Alta':                   { muscles:['side-shoulder','traps','front-shoulder'], equipment:'Barra' },
+  'Encolhimento de Ombros':        { muscles:['traps'],                                  equipment:'Halteres' },
+  // BÍCEPS
+  'Rosca Direta':                  { muscles:['biceps','forearms'],                      equipment:'Barra' },
+  'Rosca Alternada':               { muscles:['biceps','forearms'],                      equipment:'Halteres' },
+  'Rosca Concentrada':             { muscles:['biceps'],                                 equipment:'Halteres' },
+  'Rosca Martelo':                 { muscles:['biceps','forearms'],                      equipment:'Halteres' },
+  'Rosca Scott':                   { muscles:['biceps'],                                 equipment:'Barra' },
+  'Rosca 21':                      { muscles:['biceps'],                                 equipment:'Barra' },
+  'Rosca no Cabo':                 { muscles:['biceps'],                                 equipment:'Cabo/Polia' },
+  'Rosca Inclinada':               { muscles:['biceps'],                                 equipment:'Halteres' },
+  'Rosca Inversa':                 { muscles:['forearms','biceps'],                      equipment:'Barra' },
+  'Rosca Zottman':                 { muscles:['biceps','forearms'],                      equipment:'Halteres' },
+  // TRÍCEPS
+  'Tríceps Pulley':                { muscles:['triceps'],                                equipment:'Cabo/Polia' },
+  'Tríceps Corda':                 { muscles:['triceps'],                                equipment:'Cabo/Polia' },
+  'Tríceps Barra':                 { muscles:['triceps'],                                equipment:'Cabo/Polia' },
+  'Tríceps Testa':                 { muscles:['triceps'],                                equipment:'Barra' },
+  'Tríceps Francês':               { muscles:['triceps'],                                equipment:'Halteres' },
+  'Tríceps Coice':                 { muscles:['triceps'],                                equipment:'Halteres' },
+  'Tríceps Banco (Dips)':          { muscles:['triceps','chest','front-shoulder'],       equipment:'Peso Corporal' },
+  'Extensão Unilateral':           { muscles:['triceps'],                                equipment:'Halteres' },
+  'Mergulho (Dips)':               { muscles:['triceps','chest','front-shoulder'],       equipment:'Peso Corporal' },
+  'Kickback':                      { muscles:['triceps'],                                equipment:'Halteres' },
+  // PERNAS
+  'Agachamento Livre':             { muscles:['quads','glutes','hamstrings','lower-back'], equipment:'Barra' },
+  'Agachamento Sumô':              { muscles:['quads','glutes','hamstrings'],            equipment:'Halteres' },
+  'Agachamento Goblet':            { muscles:['quads','glutes'],                         equipment:'Halteres' },
+  'Agachamento Hack':              { muscles:['quads','glutes'],                         equipment:'Máquina' },
+  'Agachamento Búlgaro':           { muscles:['quads','glutes','hamstrings'],            equipment:'Halteres' },
+  'Jump Squat':                    { muscles:['quads','glutes','calves'],                equipment:'Peso Corporal' },
+  'Leg Press':                     { muscles:['quads','glutes','hamstrings'],            equipment:'Máquina' },
+  'Leg Press 45°':                 { muscles:['quads','glutes','hamstrings'],            equipment:'Máquina' },
+  'Extensão de Pernas':            { muscles:['quads'],                                  equipment:'Máquina' },
+  'Flexão de Pernas':              { muscles:['hamstrings'],                             equipment:'Máquina' },
+  'Mesa Flexora':                  { muscles:['hamstrings'],                             equipment:'Máquina' },
+  'Stiff':                         { muscles:['hamstrings','glutes','lower-back'],       equipment:'Barra' },
+  'Levantamento Terra Romeno':     { muscles:['hamstrings','glutes','lower-back'],       equipment:'Barra' },
+  'Levantamento Terra Sumo':       { muscles:['hamstrings','glutes','lower-back','quads'], equipment:'Barra' },
+  'Avanço':                        { muscles:['quads','glutes','hamstrings'],            equipment:'Halteres' },
+  'Afundo':                        { muscles:['quads','glutes','hamstrings'],            equipment:'Halteres' },
+  'Passada':                       { muscles:['quads','glutes','hamstrings'],            equipment:'Halteres' },
+  'Cadeira Adutora':               { muscles:['hip-flexors'],                            equipment:'Máquina' },
+  'Cadeira Abdutora':              { muscles:['glutes','hip-flexors'],                   equipment:'Máquina' },
+  'Hip Thrust':                    { muscles:['glutes','hamstrings'],                    equipment:'Barra' },
+  'Glúteo 4 Apoios':               { muscles:['glutes','hamstrings'],                   equipment:'Cabo/Polia' },
+  'Glúteo no Cabo':                { muscles:['glutes','hamstrings'],                   equipment:'Cabo/Polia' },
+  'Elevação de Quadril':           { muscles:['glutes','hamstrings'],                   equipment:'Peso Corporal' },
+  'Abdutora com Elástico':         { muscles:['glutes'],                                 equipment:'Elástico' },
+  'Panturrilha em Pé':             { muscles:['calves'],                                 equipment:'Máquina' },
+  'Panturrilha Sentado':           { muscles:['calves'],                                 equipment:'Máquina' },
+  // ABDÔMEN
+  'Crunch':                        { muscles:['abs'],                                    equipment:'Peso Corporal' },
+  'Abdominal Infra':               { muscles:['abs','hip-flexors'],                      equipment:'Peso Corporal' },
+  'Oblíquo':                       { muscles:['obliques','abs'],                         equipment:'Peso Corporal' },
+  'Abdominal Bicicleta':           { muscles:['abs','obliques'],                         equipment:'Peso Corporal' },
+  'Prancha':                       { muscles:['abs','obliques'],                         equipment:'Peso Corporal' },
+  'Prancha Lateral':               { muscles:['obliques'],                               equipment:'Peso Corporal' },
+  'Prancha com Elevação':          { muscles:['abs','obliques'],                         equipment:'Peso Corporal' },
+  'Elevação de Pernas':            { muscles:['abs','hip-flexors'],                      equipment:'Peso Corporal' },
+  'Hanging Knee Raise':            { muscles:['abs','hip-flexors'],                      equipment:'Barra Fixa' },
+  'Abdominal na Polia':            { muscles:['abs'],                                    equipment:'Cabo/Polia' },
+  'Rollout (Roda)':                { muscles:['abs','lower-back'],                       equipment:'Roda Abdominal' },
+  'Abdominal Remador':             { muscles:['abs','obliques'],                         equipment:'Peso Corporal' },
+  'Russian Twist':                 { muscles:['obliques','abs'],                         equipment:'Peso Corporal' },
+  'Dead Bug':                      { muscles:['abs','obliques','hip-flexors'],           equipment:'Peso Corporal' },
+  'Hollow Body':                   { muscles:['abs','hip-flexors'],                      equipment:'Peso Corporal' },
+  // CARDIO
+  'Esteira':                       { muscles:['quads','calves','hamstrings'],            equipment:'Máquina' },
+  'Corrida':                       { muscles:['quads','calves','hamstrings'],            equipment:'Peso Corporal' },
+  'Caminhada':                     { muscles:['quads','calves'],                         equipment:'Peso Corporal' },
+  'Bicicleta Ergométrica':         { muscles:['quads','calves','hamstrings'],            equipment:'Máquina' },
+  'Elíptico':                      { muscles:['quads','calves','hamstrings','glutes'],   equipment:'Máquina' },
+  'Escada (Stairmaster)':          { muscles:['quads','glutes','calves'],               equipment:'Máquina' },
+  'Pular Corda':                   { muscles:['calves','quads'],                         equipment:'Corda' },
+  'HIIT':                          { muscles:['quads','glutes','abs'],                   equipment:'Peso Corporal' },
+  'Circuito':                      { muscles:['quads','glutes','abs'],                   equipment:'Peso Corporal' },
+  'Remo Ergométrico':              { muscles:['lats','rhomboids','quads','hamstrings'],  equipment:'Máquina' },
+  'Natação':                       { muscles:['lats','front-shoulder','triceps'],        equipment:'Piscina' },
+  'Jump':                          { muscles:['quads','calves','glutes'],               equipment:'Peso Corporal' },
+  'Burpee':                        { muscles:['quads','glutes','chest','abs'],           equipment:'Peso Corporal' },
+  'Box Jump':                      { muscles:['quads','glutes','calves'],               equipment:'Caixote' },
+};
+
+// ── Body SVG diagram ──────────────────────────────────────────────────────────
+function buildBodySvg(muscles = [], view = 'front') {
+  const primary   = muscles[0] || null;
+  const allActive = new Set(muscles);
+
+  function fill(m) {
+    if (!allActive.size) return 'rgba(255,255,255,0.05)';
+    if (m === primary)       return 'rgba(249,115,22,0.92)';
+    if (allActive.has(m))   return 'rgba(249,115,22,0.38)';
+    return 'rgba(255,255,255,0.05)';
+  }
+  // Shoulders: front view shows front+side; back shows rear+side
+  function fillShoulder() {
+    if (!allActive.size) return fill('front-shoulder');
+    if (view === 'front') {
+      if (allActive.has('front-shoulder') || allActive.has('side-shoulder')) {
+        const isPrimary = primary === 'front-shoulder' || primary === 'side-shoulder';
+        return isPrimary ? 'rgba(249,115,22,0.92)' : 'rgba(249,115,22,0.38)';
+      }
+      return 'rgba(255,255,255,0.05)';
+    } else {
+      if (allActive.has('rear-shoulder') || allActive.has('side-shoulder')) {
+        const isPrimary = primary === 'rear-shoulder' || primary === 'side-shoulder';
+        return isPrimary ? 'rgba(249,115,22,0.92)' : 'rgba(249,115,22,0.38)';
+      }
+      return 'rgba(255,255,255,0.05)';
+    }
+  }
+
+  const b = '#2a2a32'; // body part base color
+  const base = `
+    <ellipse cx="50" cy="16" rx="13" ry="14" fill="${b}"/>
+    <rect x="43" y="29" width="14" height="9" rx="2" fill="${b}"/>
+    <path d="M12,37 L88,37 Q92,37 92,44 L90,80 Q90,84 86,84 L14,84 Q10,84 10,80 L8,44 Q8,37 12,37 Z" fill="${b}"/>
+    <rect x="28" y="82" width="44" height="30" rx="4" fill="${b}"/>
+    <path d="M22,110 L78,110 L82,116 L80,124 L20,124 L18,116 Z" fill="${b}"/>
+    <rect x="0" y="39" width="14" height="57" rx="7" fill="${b}"/>
+    <rect x="86" y="39" width="14" height="57" rx="7" fill="${b}"/>
+    <rect x="1" y="98" width="12" height="52" rx="6" fill="${b}"/>
+    <rect x="87" y="98" width="12" height="52" rx="6" fill="${b}"/>
+    <rect x="19" y="124" width="26" height="56" rx="10" fill="${b}"/>
+    <rect x="55" y="124" width="26" height="56" rx="10" fill="${b}"/>
+    <rect x="20" y="182" width="23" height="46" rx="8" fill="${b}"/>
+    <rect x="57" y="182" width="23" height="46" rx="8" fill="${b}"/>`;
+
+  if (view === 'front') {
+    return `<svg viewBox="0 0 100 232" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%">
+      <rect width="100" height="232" fill="#16161c" rx="10"/>
+      ${base}
+      <path fill="${fill('chest')}" d="M12,39 L50,39 L50,80 C45,83 14,80 10,72 L8,52 Q8,39 12,39 Z"/>
+      <path fill="${fill('chest')}" d="M88,39 L50,39 L50,80 C55,83 86,80 90,72 L92,52 Q92,39 88,39 Z"/>
+      <ellipse fill="${fillShoulder()}" cx="7" cy="47" rx="9" ry="10"/>
+      <ellipse fill="${fillShoulder()}" cx="93" cy="47" rx="9" ry="10"/>
+      <path fill="${fill('traps')}" d="M44,30 L56,30 L78,39 L72,43 L50,41 L28,43 L22,39 Z"/>
+      <rect fill="${fill('biceps')}" x="1" y="56" width="12" height="28" rx="6"/>
+      <rect fill="${fill('biceps')}" x="87" y="56" width="12" height="28" rx="6"/>
+      <rect fill="${fill('forearms')}" x="1" y="98" width="12" height="52" rx="6"/>
+      <rect fill="${fill('forearms')}" x="87" y="98" width="12" height="52" rx="6"/>
+      <rect fill="${fill('abs')}" x="32" y="84" width="36" height="24" rx="4"/>
+      <path fill="${fill('obliques')}" d="M28,84 L32,84 L32,108 L24,110 L20,116 L18,108 L24,90 Z"/>
+      <path fill="${fill('obliques')}" d="M72,84 L68,84 L68,108 L76,110 L80,116 L82,108 L76,90 Z"/>
+      <path fill="${fill('hip-flexors')}" d="M22,110 L50,110 L50,124 L18,124 L18,116 Z"/>
+      <path fill="${fill('hip-flexors')}" d="M78,110 L50,110 L50,124 L82,124 L82,116 Z"/>
+      <rect fill="${fill('quads')}" x="19" y="126" width="26" height="52" rx="9"/>
+      <rect fill="${fill('quads')}" x="55" y="126" width="26" height="52" rx="9"/>
+      <rect fill="${fill('calves')}" x="20" y="184" width="22" height="42" rx="7"/>
+      <rect fill="${fill('calves')}" x="57" y="184" width="22" height="42" rx="7"/>
+    </svg>`;
+  } else {
+    return `<svg viewBox="0 0 100 232" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%">
+      <rect width="100" height="232" fill="#16161c" rx="10"/>
+      ${base}
+      <path fill="${fill('traps')}" d="M44,30 L56,30 L86,39 L86,45 L50,43 L14,45 L14,39 Z"/>
+      <ellipse fill="${fillShoulder()}" cx="7" cy="47" rx="9" ry="10"/>
+      <ellipse fill="${fillShoulder()}" cx="93" cy="47" rx="9" ry="10"/>
+      <path fill="${fill('lats')}" d="M10,46 L20,46 L33,82 L28,84 L10,68 Z"/>
+      <path fill="${fill('lats')}" d="M90,46 L80,46 L67,82 L72,84 L90,68 Z"/>
+      <rect fill="${fill('rhomboids')}" x="30" y="47" width="40" height="30" rx="4"/>
+      <rect fill="${fill('triceps')}" x="1" y="46" width="12" height="40" rx="6"/>
+      <rect fill="${fill('triceps')}" x="87" y="46" width="12" height="40" rx="6"/>
+      <rect fill="${fill('forearms')}" x="1" y="98" width="12" height="52" rx="6"/>
+      <rect fill="${fill('forearms')}" x="87" y="98" width="12" height="52" rx="6"/>
+      <rect fill="${fill('lower-back')}" x="34" y="79" width="32" height="28" rx="4"/>
+      <path fill="${fill('glutes')}" d="M20,108 L80,108 L82,118 L80,124 L20,124 L18,118 Z"/>
+      <rect fill="${fill('hamstrings')}" x="19" y="126" width="26" height="52" rx="9"/>
+      <rect fill="${fill('hamstrings')}" x="55" y="126" width="26" height="52" rx="9"/>
+      <rect fill="${fill('calves')}" x="20" y="184" width="22" height="30" rx="6"/>
+      <rect fill="${fill('calves')}" x="57" y="184" width="22" height="30" rx="6"/>
+    </svg>`;
+  }
+}
+
+function autoView(muscles) {
+  if (!muscles?.length) return 'front';
+  let front = 0, back = 0;
+  muscles.forEach(m => {
+    const v = MUSCLE_VIEW[m];
+    if (v === 'front') front++;
+    else if (v === 'back') back++;
+  });
+  return back > front ? 'back' : 'front';
+}
+
+// ── Exercise info modal ───────────────────────────────────────────────────────
+function showExerciseInfo(name) {
+  const meta = EX_META[name];
+  const el   = document.getElementById('exInfoModal');
+  if (!el) return;
+
+  const muscles   = meta?.muscles || [];
+  const equipment = meta?.equipment || '—';
+  const view      = autoView(muscles);
+
+  document.getElementById('exInfoTitle').textContent = name;
+  document.getElementById('exInfoEquip').innerHTML =
+    `<span class="equip-tag">${equipment}</span>`;
+  document.getElementById('exInfoMuscles').innerHTML = muscles.map((m, i) =>
+    `<span class="muscle-tag${i === 0 ? ' primary' : ''}">${MUSCLE_LABELS[m] || m}</span>`
+  ).join('');
+
+  const svgWrap = document.getElementById('exInfoDiagram');
+  svgWrap.innerHTML = buildBodySvg(muscles, view);
+
+  // Show back/front toggle only if there are muscles on both sides
+  const hasFront = muscles.some(m => MUSCLE_VIEW[m] === 'front' || m === 'traps' || m === 'calves');
+  const hasBack  = muscles.some(m => MUSCLE_VIEW[m] === 'back'  || m === 'traps' || m === 'calves');
+  const toggleEl = document.getElementById('exInfoViewToggle');
+  if (hasFront && hasBack) {
+    toggleEl.style.display = '';
+    toggleEl.dataset.view  = view;
+    toggleEl.textContent   = view === 'front' ? 'Ver costas' : 'Ver frente';
+    toggleEl.onclick = () => {
+      const next = toggleEl.dataset.view === 'front' ? 'back' : 'front';
+      toggleEl.dataset.view = next;
+      toggleEl.textContent  = next === 'front' ? 'Ver costas' : 'Ver frente';
+      svgWrap.innerHTML     = buildBodySvg(muscles, next);
+    };
+  } else {
+    toggleEl.style.display = 'none';
+  }
+
+  el.style.display = '';
+  el.querySelector('.ex-info-backdrop').onclick = () => { el.style.display = 'none'; };
+}
+window.showExerciseInfo = showExerciseInfo;
 
 const DAYS = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
 const DAYS_FULL = ['Domingo','Segunda-feira','Terça-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sábado'];
@@ -434,11 +757,22 @@ function setupEditDayView() {
 }
 
 function renderTplChips(group) {
-  const current = document.getElementById('tplExName').value.trim();
-  document.getElementById('tplExChips').innerHTML = (EXERCISE_LIBRARY[group] || []).map(ex =>
-    `<button type="button" class="ex-chip${current === ex ? ' selected' : ''}"
-      onclick="tplSelectChip('${escHtml(ex)}')">${escHtml(ex)}</button>`
+  const current  = document.getElementById('tplExName').value.trim();
+  const muscles  = MG_MUSCLES[group] || [];
+  const view     = MG_VIEW[group] || 'front';
+
+  const diagram = muscles.length
+    ? `<div class="ex-body-diagram">${buildBodySvg(muscles, view)}</div>` : '';
+
+  const chips = (EXERCISE_LIBRARY[group] || []).map(ex =>
+    `<div class="ex-chip-row">
+      <button type="button" class="ex-chip${current === ex ? ' selected' : ''}"
+        onclick="tplSelectChip('${escHtml(ex)}')">${escHtml(ex)}</button>
+      ${EX_META[ex] ? `<button type="button" class="ex-info-btn" onclick="showExerciseInfo('${escHtml(ex)}')" title="Ver músculos">ⓘ</button>` : ''}
+    </div>`
   ).join('');
+
+  document.getElementById('tplExChips').innerHTML = diagram + chips;
   document.getElementById('tplExChipsWrap').style.display = '';
 }
 
@@ -919,6 +1253,7 @@ function setupRegistrarView(state) {
       activeMg = null;
       btn.classList.remove('active');
       document.getElementById('exChipsWrap').style.display = 'none';
+      document.getElementById('exChips').innerHTML = '';
     } else {
       activeMg = group;
       document.querySelectorAll('#muscleGroups .mg-btn').forEach(b => b.classList.remove('active'));
@@ -1039,11 +1374,22 @@ function resetManualExForm() {
 }
 
 function renderExChips(group) {
-  const current = document.getElementById('exName').value.trim();
-  document.getElementById('exChips').innerHTML = (EXERCISE_LIBRARY[group] || []).map(ex =>
-    `<button type="button" class="ex-chip${current === ex ? ' selected' : ''}"
-      onclick="selectExChip('${escHtml(ex)}')">${escHtml(ex)}</button>`
+  const current  = document.getElementById('exName').value.trim();
+  const muscles  = MG_MUSCLES[group] || [];
+  const view     = MG_VIEW[group] || 'front';
+
+  const diagram = muscles.length
+    ? `<div class="ex-body-diagram">${buildBodySvg(muscles, view)}</div>` : '';
+
+  const chips = (EXERCISE_LIBRARY[group] || []).map(ex =>
+    `<div class="ex-chip-row">
+      <button type="button" class="ex-chip${current === ex ? ' selected' : ''}"
+        onclick="selectExChip('${escHtml(ex)}')">${escHtml(ex)}</button>
+      ${EX_META[ex] ? `<button type="button" class="ex-info-btn" onclick="showExerciseInfo('${escHtml(ex)}')" title="Ver músculos">ⓘ</button>` : ''}
+    </div>`
   ).join('');
+
+  document.getElementById('exChips').innerHTML = diagram + chips;
   document.getElementById('exChipsWrap').style.display = '';
 }
 

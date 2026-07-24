@@ -1958,3 +1958,151 @@ input[type="file"] {
 .weight-range-val   { font-family: 'JetBrains Mono', monospace; font-size: .88rem; font-weight: 700; color: var(--text); }
 .weight-range-label { font-size: .6rem; color: var(--text-3); text-transform: uppercase; letter-spacing: .07em; margin-top: 2px; }
 .weight-hint { font-size: .76rem; color: var(--text-3); margin-top: 10px; line-height: 1.5; }
+
+/* ═══════════════════════════════════════════
+   Exercise Info — body diagram + modal
+   ═══════════════════════════════════════════ */
+
+/* Row wrapper for each chip + info button */
+.ex-chip-row {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+.ex-info-btn {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  padding: 2px 4px;
+  color: var(--text-3);
+  font-size: .85rem;
+  cursor: pointer;
+  line-height: 1;
+  border-radius: var(--radius-xs);
+  transition: color .15s;
+}
+.ex-info-btn:hover { color: var(--orange); }
+
+/* Body diagram container shown below muscle group chips */
+.ex-body-diagram {
+  width: 88px;
+  height: 196px;
+  flex-shrink: 0;
+  float: right;
+  margin: 0 0 10px 10px;
+  border-radius: 10px;
+  overflow: hidden;
+  shape-outside: margin-box;
+}
+/* clear float after chips */
+.ex-chips::after {
+  content: '';
+  display: block;
+  clear: both;
+}
+
+/* Equipment tag */
+.equip-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--blue-dim);
+  color: var(--blue);
+  font-size: .72rem;
+  font-weight: 600;
+  padding: 3px 9px;
+  border-radius: 20px;
+  letter-spacing: .03em;
+}
+
+/* Muscle tags */
+.muscle-tag {
+  display: inline-flex;
+  align-items: center;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text-2);
+  font-size: .72rem;
+  font-weight: 500;
+  padding: 3px 8px;
+  border-radius: 20px;
+}
+.muscle-tag.primary {
+  background: var(--orange-dim);
+  border-color: var(--orange-glow);
+  color: var(--orange);
+  font-weight: 700;
+}
+
+/* ── Exercise Info Modal (bottom sheet) ── */
+.ex-info-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 800;
+  display: flex;
+  align-items: flex-end;
+}
+.ex-info-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+}
+.ex-info-sheet {
+  position: relative;
+  background: var(--surface);
+  border-radius: 20px 20px 0 0;
+  width: 100%;
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 0 0 32px;
+  box-shadow: var(--shadow-lg);
+  animation: slideUpSheet .22s ease;
+}
+@keyframes slideUpSheet {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+.ex-info-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px 12px;
+  border-bottom: 1px solid var(--border);
+}
+.ex-info-name {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+  padding-right: 8px;
+}
+.ex-info-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 20px;
+}
+.ex-info-muscles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+.ex-info-diagram-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 20px 0;
+}
+.ex-info-diagram {
+  width: 130px;
+  height: 286px;
+  border-radius: 10px;
+  overflow: hidden;
+}
+.ex-info-toggle {
+  font-size: .78rem;
+  color: var(--text-3);
+  border: 1px solid var(--border);
+}
