@@ -958,6 +958,13 @@
 <script>
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/sw.js').catch(() => {});
+    // When a new SW activates, reload so the page gets fresh HTML/JS
+    let _swRefreshing = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (_swRefreshing) return;
+      _swRefreshing = true;
+      window.location.reload();
+    });
   }
 </script>
 
