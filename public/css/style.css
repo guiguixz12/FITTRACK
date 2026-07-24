@@ -2090,6 +2090,19 @@ input[type="file"] {
   flex-wrap: wrap;
   gap: 5px;
 }
+.ex-info-images {
+  display: flex;
+  gap: 8px;
+  padding: 4px 16px 0;
+}
+.ex-info-photo {
+  flex: 1;
+  min-width: 0;
+  border-radius: 8px;
+  object-fit: cover;
+  aspect-ratio: 4/3;
+  background: var(--card-bg);
+}
 .ex-info-diagram-wrap {
   display: flex;
   flex-direction: column;
