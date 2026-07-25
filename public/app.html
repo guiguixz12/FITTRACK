@@ -20,7 +20,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/style.css?v=16">
+  <link rel="stylesheet" href="/css/style.css?v=17">
 
   <!-- SVG gradient for calorie ring (must live in DOM) -->
   <svg width="0" height="0" style="position:absolute">
@@ -221,6 +221,11 @@
 
     <!-- ════════════════ DIETA ════════════════ -->
     <section class="tab-section" id="tab-diet">
+
+      <div class="tab-page-header">
+        <h1 class="tab-page-title">Sua dieta</h1>
+        <p class="tab-page-sub">Coma bem, treine melhor.</p>
+      </div>
 
       <div class="sub-tabs">
         <button class="sub-tab active" data-dtview="programa">Programa</button>
@@ -458,6 +463,11 @@
     <!-- ════════════════ TREINO ════════════════ -->
     <section class="tab-section" id="tab-workouts">
 
+      <div class="tab-page-header">
+        <h1 class="tab-page-title">Seu treino</h1>
+        <p class="tab-page-sub">Consistência gera resultado.</p>
+      </div>
+
       <div class="sub-tabs">
         <button class="sub-tab active" data-view="programa">Programa</button>
         <button class="sub-tab" data-view="registrar">Registrar</button>
@@ -625,6 +635,11 @@
 
     <!-- ════════════════ PROGRESSO ════════════════ -->
     <section class="tab-section" id="tab-progress">
+
+      <div class="tab-page-header">
+        <h1 class="tab-page-title">Seu progresso</h1>
+        <p class="tab-page-sub">Pequenos passos, grandes mudanças.</p>
+      </div>
 
       <div class="progress-chips">
         <button class="progress-chip active" data-pgview="peso">⚖️ Peso</button>
@@ -990,19 +1005,19 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
-<script src="/js/vendor/body-highlighter.iife.js?v=16"></script>
-<script src="/js/muscle-map.js?v=16"></script>
-<script src="/js/api.js?v=16"></script>
-<script src="/js/scanner.js?v=16"></script>
-<script src="/js/dashboard.js?v=16"></script>
-<script src="/js/diet.js?v=16"></script>
-<script src="/js/workouts.js?v=16"></script>
-<script src="/js/evolution.js?v=16"></script>
-<script src="/js/photos.js?v=16"></script>
-<script src="/js/progress.js?v=16"></script>
-<script src="/js/settings.js?v=16"></script>
-<script src="/js/app.js?v=16"></script>
-<script src="/js/plans.js?v=16"></script>
+<script src="/js/vendor/body-highlighter.iife.js?v=17"></script>
+<script src="/js/muscle-map.js?v=17"></script>
+<script src="/js/api.js?v=17"></script>
+<script src="/js/scanner.js?v=17"></script>
+<script src="/js/dashboard.js?v=17"></script>
+<script src="/js/diet.js?v=17"></script>
+<script src="/js/workouts.js?v=17"></script>
+<script src="/js/evolution.js?v=17"></script>
+<script src="/js/photos.js?v=17"></script>
+<script src="/js/progress.js?v=17"></script>
+<script src="/js/settings.js?v=17"></script>
+<script src="/js/app.js?v=17"></script>
+<script src="/js/plans.js?v=17"></script>
 <script>
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/sw.js').catch(() => {});

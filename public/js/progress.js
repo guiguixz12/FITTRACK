@@ -213,11 +213,11 @@ function renderCargasChart(name, history) {
       datasets: [{
         label: 'Carga (kg)',
         data: weights,
-        borderColor: '#FF6B35',
-        backgroundColor: 'rgba(255,107,53,.12)',
+        borderColor: '#C4E538',
+        backgroundColor: 'rgba(196,229,56,.12)',
         borderWidth: 2.5,
         pointRadius: 4,
-        pointBackgroundColor: '#FF6B35',
+        pointBackgroundColor: '#C4E538',
         fill: true,
         tension: 0.3,
       }]
@@ -226,8 +226,8 @@ function renderCargasChart(name, history) {
       responsive: true, maintainAspectRatio: false,
       plugins: { legend: { display: false } },
       scales: {
-        x: { grid: { display: false }, ticks: { font: { size: 10 }, color: '#8E8E93' } },
-        y: { grid: { color: 'rgba(0,0,0,.06)' }, ticks: { font: { size: 10 }, color: '#8E8E93', callback: v => v + ' kg' } }
+        x: { grid: { display: false }, ticks: { font: { size: 10 }, color: 'rgba(255,255,255,0.35)' } },
+        y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { font: { size: 10 }, color: 'rgba(255,255,255,0.35)', callback: v => v + ' kg' } }
       }
     }
   });

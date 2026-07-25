@@ -54,16 +54,16 @@ function renderChart(labels, data, targetWeight) {
   if (weightChart) weightChart.destroy();
 
   const gradient = ctx.createLinearGradient(0, 0, 0, 220);
-  gradient.addColorStop(0, 'rgba(255, 107, 53, 0.3)');
-  gradient.addColorStop(1, 'rgba(255, 107, 53, 0)');
+  gradient.addColorStop(0, 'rgba(196, 229, 56, 0.28)');
+  gradient.addColorStop(1, 'rgba(196, 229, 56, 0)');
 
   const datasets = [{
     label: 'Peso (kg)',
     data,
-    borderColor: '#FF6B35',
+    borderColor: '#C4E538',
     backgroundColor: gradient,
-    borderWidth: 2,
-    pointBackgroundColor: '#FF6B35',
+    borderWidth: 2.5,
+    pointBackgroundColor: '#C4E538',
     pointRadius: data.length > 30 ? 2 : 4,
     pointHoverRadius: 6,
     tension: 0.3,
@@ -75,7 +75,7 @@ function renderChart(labels, data, targetWeight) {
     datasets.push({
       label: `Meta: ${targetWeight} kg`,
       data: Array(labels.length).fill(targetWeight),
-      borderColor: 'rgba(80,200,120,0.7)',
+      borderColor: 'rgba(232,133,61,0.7)',
       backgroundColor: 'transparent',
       borderWidth: 1.5,
       borderDash: [6, 4],
@@ -97,7 +97,7 @@ function renderChart(labels, data, targetWeight) {
         legend: {
           display: !!targetWeight,
           labels: {
-            color: '#888',
+            color: 'rgba(255,255,255,0.35)',
             font: { size: 11 },
             boxWidth: 20,
             usePointStyle: true,
@@ -120,11 +120,11 @@ function renderChart(labels, data, targetWeight) {
       },
       scales: {
         x: {
-          ticks: { color: '#888', font: { size: 10 }, maxTicksLimit: 8, maxRotation: 0 },
+          ticks: { color: 'rgba(255,255,255,0.35)', font: { size: 10 }, maxTicksLimit: 8, maxRotation: 0 },
           grid: { color: 'rgba(255,255,255,0.05)' }
         },
         y: {
-          ticks: { color: '#888', font: { family: 'JetBrains Mono', size: 11 }, callback: v => v + ' kg' },
+          ticks: { color: 'rgba(255,255,255,0.35)', font: { family: 'JetBrains Mono', size: 11 }, callback: v => v + ' kg' },
           grid: { color: 'rgba(255,255,255,0.05)' }
         }
       }
