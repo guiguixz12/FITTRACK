@@ -20,8 +20,14 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/style.css?v=24">
-  <link rel="stylesheet" href="/css/v2.css?v=24">
+  <link rel="stylesheet" href="/css/base.css?v=25">
+  <link rel="stylesheet" href="/css/home.css?v=25">
+  <link rel="stylesheet" href="/css/dieta.css?v=25">
+  <link rel="stylesheet" href="/css/treino.css?v=25">
+  <link rel="stylesheet" href="/css/progresso.css?v=25">
+  <link rel="stylesheet" href="/css/config.css?v=25">
+  <link rel="stylesheet" href="/css/fidelidade.css?v=25">
+  <link rel="stylesheet" href="/css/v2.css?v=25">
 
   <!-- SVG gradient for calorie ring (must live in DOM) -->
   <svg width="0" height="0" style="position:absolute">
@@ -981,19 +987,29 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
-<script src="/js/vendor/body-highlighter.iife.js?v=24"></script>
-<script src="/js/muscle-map.js?v=24"></script>
-<script src="/js/api.js?v=24"></script>
-<script src="/js/scanner.js?v=24"></script>
-<script src="/js/dashboard.js?v=24"></script>
-<script src="/js/diet.js?v=24"></script>
-<script src="/js/workouts.js?v=24"></script>
-<script src="/js/evolution.js?v=24"></script>
-<script src="/js/photos.js?v=24"></script>
-<script src="/js/progress.js?v=24"></script>
-<script src="/js/settings.js?v=24"></script>
-<script src="/js/app.js?v=24"></script>
-<script src="/js/plans.js?v=24"></script>
+<script src="/js/vendor/body-highlighter.iife.js?v=25"></script>
+<script src="/js/muscle-map.js?v=25"></script>
+<script src="/js/api.js?v=25"></script>
+<script src="/js/scanner.js?v=25"></script>
+<script src="/js/dashboard.js?v=25"></script>
+<!-- diet.js → módulos -->
+<script src="/js/diet-data.js?v=25"></script>
+<script src="/js/diet-programa.js?v=25"></script>
+<script src="/js/diet-track.js?v=25"></script>
+<script src="/js/diet-editor.js?v=25"></script>
+<script src="/js/diet-manual.js?v=25"></script>
+<!-- workouts.js → módulos -->
+<script src="/js/workouts-data.js?v=25"></script>
+<script src="/js/workouts-editor.js?v=25"></script>
+<script src="/js/workouts-session.js?v=25"></script>
+<script src="/js/workouts-report.js?v=25"></script>
+<script src="/js/workouts-manual.js?v=25"></script>
+<script src="/js/evolution.js?v=25"></script>
+<script src="/js/photos.js?v=25"></script>
+<script src="/js/progress.js?v=25"></script>
+<script src="/js/settings.js?v=25"></script>
+<script src="/js/app.js?v=25"></script>
+<script src="/js/plans.js?v=25"></script>
 <script>
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/sw.js').catch(() => {});

@@ -1,0 +1,167 @@
+/* ═══════════════════════════════════════════
+   DIET — Meal Sections
+   ═══════════════════════════════════════════ */
+.meal-section { margin-bottom: 12px; }
+.meal-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 0 8px;
+}
+.meal-icon  { font-size: 16px; }
+.meal-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.meal-label.all-done { color: var(--accent); }
+.meal-kcal  { font-size: 11.5px; color: var(--text-3); }
+.meal-kcal.all-done { color: var(--accent); }
+
+.meal-foods { display: flex; flex-direction: column; }
+.diet-food-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 0;
+  border-top: 1px solid var(--border);
+}
+.diet-food-info { flex: 1; min-width: 0; }
+.diet-food-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.diet-food-meta { font-size: 11px; color: var(--text-3); margin-top: 1px; }
+.diet-food-kcal { font-size: 12.5px; font-weight: 700; color: var(--orange); white-space: nowrap; }
+
+/* Track view food items */
+.dt-track-food {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0;
+  border-top: 1px solid var(--border);
+  cursor: pointer;
+  transition: opacity .15s;
+}
+.dt-track-food.done { opacity: .5; }
+.dt-track-food.extra .dt-track-food-name { color: var(--accent-warm); }
+.dt-track-check {
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border-hi);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px;
+  color: var(--accent);
+  flex-shrink: 0;
+  transition: all .15s;
+  background: transparent;
+}
+.dt-track-food.done .dt-track-check {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+.dt-track-food-info { flex: 1; min-width: 0; }
+.dt-track-food-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.dt-track-food-meta { font-size: 11px; color: var(--text-3); margin-top: 1px; }
+.dt-track-food-kcal { font-size: 12.5px; font-weight: 700; color: var(--orange); white-space: nowrap; }
+.dt-extra-badge {
+  font-size: 10px;
+  font-weight: 700;
+  background: var(--orange-dim);
+  color: var(--accent-warm);
+  border-radius: var(--radius-xs);
+  padding: 1px 5px;
+  margin-left: 5px;
+  vertical-align: middle;
+}
+
+
+/* ═══════════════════════════════════════════
+   DIET — Track Progress Card
+   ═══════════════════════════════════════════ */
+.track-progress-card {
+  background: var(--orange-dim);
+  border: 1px solid rgba(255,107,53,0.2);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 12px;
+}
+.track-cal-row {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+.track-cal-big {
+  font-family: inherit;
+  font-size: 34px;
+  font-weight: 700;
+  color: var(--orange);
+  line-height: 1;
+}
+.track-cal-of { color: var(--text-2); font-size: 14px; }
+
+
+/* ═══════════════════════════════════════════
+   DIET TEMPLATE TOTALS
+   ═══════════════════════════════════════════ */
+.dtpl-totals-row {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.dtpl-total-chip {
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 20px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+.dtpl-total-chip.cal  { color: var(--orange); }
+.dtpl-total-chip.prot { color: var(--accent); }
+.dtpl-total-chip.carb { color: var(--text-2); }
+.dtpl-total-chip.fat  { color: var(--accent-warm); }
+
+/* ═══════════════════════════════════════════
+   REGISTRAR (manual diet log) — table
+   ═══════════════════════════════════════════ */
+.history-table-wrap { overflow-x: auto; }
+.history-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+}
+.history-table th {
+  text-align: left;
+  padding: 6px 8px;
+  color: var(--text-3);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  border-bottom: 1px solid var(--border);
+}
+.history-table td {
+  padding: 9px 8px;
+  color: var(--text-2);
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+.history-table tr:last-child td { border-bottom: none; }
+.history-table td:first-child { font-weight: 600; color: var(--text); }
+

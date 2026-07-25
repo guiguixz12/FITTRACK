@@ -1,0 +1,1329 @@
+/* ═══════════════════════════════════════════
+   ETAPA 1 — Dark Design System: global fixes
+   ═══════════════════════════════════════════ */
+
+/* Form inputs dark */
+.form-group input,
+.form-group select,
+.form-group textarea,
+input[type="date"].date-input,
+input[type="number"],
+input[type="text"],
+input[type="password"],
+input[type="email"],
+input[type="file"] {
+  background: var(--card-soft);
+  border-color: var(--border);
+  color: var(--text);
+}
+input::placeholder, textarea::placeholder { color: var(--text-3); }
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(196,229,56,.18);
+}
+
+/* ── Header: right cluster ── */
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.streak-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--card-soft);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: var(--radius-pill);
+  padding: 6px 13px 6px 10px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1;
+}
+.streak-chip svg { flex-shrink: 0; }
+
+/* ── Dashboard: page header ── */
+.dash-page-header {
+  margin-bottom: 14px;
+  margin-top: 4px;
+}
+.dash-page-title {
+  font-size: 1.85rem;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+.dash-page-sub {
+  font-size: 14px;
+  color: var(--text-3);
+  margin-top: 3px;
+}
+
+/* ── Period tabs ── */
+.period-tabs-wrap {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 16px;
+  flex-wrap: nowrap;
+}
+.period-tab {
+  padding: 8px 15px;
+  border-radius: var(--radius-pill);
+  border: none;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  background: transparent;
+  color: var(--text-3);
+  transition: all .15s;
+  white-space: nowrap;
+}
+.period-tab.active {
+  background: var(--accent);
+  color: #000;
+  font-weight: 700;
+}
+.period-tab:not(.active):hover { color: var(--text-2); }
+
+/* ── Hero card dark refresh ── */
+.hero-card {
+  background: var(--card);
+  border: 1px solid rgba(255,255,255,0.06);
+  box-shadow: none;
+}
+.ring-track { stroke: rgba(255,255,255,0.08); }
+.hero-remain { color: var(--text); }
+
+/* ── Quick stats dark refresh ── */
+.qstat { background: var(--card); box-shadow: none; border: 1px solid rgba(255,255,255,0.06); }
+.qstat-val { font-family: 'Manrope', system-ui, sans-serif; }
+
+/* ── Water card v2 ── */
+.water-card-v2 { padding: 16px; }
+.water-main-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.water-icon-sq {
+  width: 44px; height: 44px;
+  background: var(--card-soft);
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--accent);
+  flex-shrink: 0;
+  border: 1px solid rgba(255,255,255,0.07);
+}
+.water-content { flex: 1; min-width: 0; }
+.water-label-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+.water-label-txt {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+}
+.water-goal-txt {
+  font-size: 12.5px;
+  color: var(--text-3);
+}
+.water-card-v2 .water-progress-bar { margin-bottom: 0; }
+.water-quick-add {
+  flex-shrink: 0;
+  padding: 9px 15px;
+  background: var(--accent);
+  color: #000;
+  font-weight: 700;
+  font-size: 13px;
+  border: none;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  font-family: inherit;
+  transition: opacity .15s;
+}
+.water-quick-add:hover { opacity: .88; }
+.water-grid-secondary {
+  margin-top: 12px;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 6px;
+}
+
+/* ── Day card dark refresh ── */
+.day-card {
+  background: var(--card);
+  border-color: rgba(255,255,255,0.07);
+}
+.day-card.is-today {
+  border-color: rgba(232,133,61,0.3);
+  background: var(--card);
+}
+
+/* ── Card orange dark ── */
+.card-orange {
+  background: rgba(232,133,61,.07);
+  border: 1px solid rgba(232,133,61,.18);
+}
+
+/* ── AI banner dark ── */
+.ai-banner {
+  background: var(--card-soft);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: var(--radius-card);
+}
+.ai-banner-title { color: var(--text); }
+.ai-banner-sub   { color: var(--text-3); }
+.ai-banner-btn   { background: var(--accent); color: #000; font-weight: 700; }
+
+/* ── Misc inline style overrides ── */
+.mg-btn { background: var(--card-soft); border-color: var(--border); color: var(--text-2); }
+.mg-btn:hover { border-color: var(--accent); color: var(--accent); }
+.mg-btn.active { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
+
+.dt-track-check { border-color: var(--border-hi); }
+
+/* ── Scrollbar hide global ── */
+::-webkit-scrollbar { width: 0; height: 0; }
+
+
+/* ── Ajustes finos Etapa 1b ───────────────────────────────── */
+
+/* Header brand logo */
+.brand-logo {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+.brand-mark {
+  width: 34px; height: 34px;
+  background: var(--accent);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  color: #000;
+  flex-shrink: 0;
+}
+.brand {
+  font-family: 'Manrope', system-ui, sans-serif;
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: .12em;
+  color: var(--text);
+}
+
+/* Water logs "Hoje:" label via CSS */
+#dashWaterLogs:not(:empty) {
+  padding-top: 10px;
+}
+#dashWaterLogs:not(:empty)::before {
+  content: 'Hoje';
+  display: block;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  margin-bottom: 6px;
+  width: 100%;
+}
+
+/* Macro palette: diet tab value colors */
+.diet-day-macro.cal  .diet-day-macro-val { color: var(--accent-warm); }
+.diet-day-macro.prot .diet-day-macro-val { color: var(--accent); }
+.diet-day-macro.carb .diet-day-macro-val { color: #7BC9E8; }
+.diet-day-macro.fat  .diet-day-macro-val { color: var(--accent-warm); }
+
+/* Track food kcal */
+.diet-food-kcal { color: var(--accent-warm); }
+.dt-track-food-kcal { color: var(--accent-warm); }
+
+
+/* ═══════════════════════════════════════════
+   ETAPA 2 — Treino: paleta + CTAs + dots
+   ═══════════════════════════════════════════ */
+
+/* Active workout progress bar → accent */
+.wa-prog-bar {
+  background: linear-gradient(90deg, var(--accent), #d6f040);
+}
+
+/* "Concluí a Série" CTA */
+.wa-complete-set-btn {
+  background: var(--accent) !important;
+  color: #000 !important;
+  border: none !important;
+  font-size: 18px;
+  font-weight: 800;
+}
+.wa-complete-set-btn:active { opacity: .85; }
+
+/* Finalizar treino footer button — also already btn-primary */
+#waFinishBtn { background: var(--accent); color: #000; font-weight: 700; }
+#waToggleExtra { color: var(--text-3); border-color: var(--border); }
+
+/* ── Set dots ─────────────────────────────── */
+.wa-set-dot { position: relative; }
+
+.wa-set-dot.done {
+  background: var(--accent);
+  color: transparent;              /* hide set number */
+  border: 2.5px solid var(--accent);
+  box-shadow: 0 0 0 4px rgba(196,229,56,.15);
+}
+.wa-set-dot.done::after {
+  content: '✓';
+  position: absolute;
+  color: #000;
+  font-size: 18px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.wa-set-dot.active {
+  background: transparent;
+  color: var(--accent);
+  border: 2.5px solid var(--accent);
+  box-shadow: 0 0 0 5px rgba(196,229,56,.18);
+}
+
+.wa-set-dot.pending {
+  background: transparent;
+  color: var(--text-3);
+  border: 2.5px solid rgba(255,255,255,0.13);
+}
+
+/* ── Mini exercise list: active state → accent ── */
+.wa-mini-ex.active {
+  background: rgba(196,229,56,.07);
+  border-color: rgba(196,229,56,.35);
+}
+.wa-mini-ex.active .wa-mini-icon {
+  background: var(--accent);
+  color: #000;
+}
+.wa-mini-ex.active .wa-mini-sets { color: var(--accent); }
+.wa-mini-ex.done .wa-mini-icon { background: rgba(196,229,56,.18); color: var(--accent); }
+.wa-mini-info-btn:active {
+  color: var(--accent);
+  background: rgba(196,229,56,.1);
+}
+
+/* ── Rest ring → accent ── */
+.wa-ring-track { stroke: rgba(255,255,255,0.08); }
+.wa-ring-arc { stroke: var(--accent); }
+.wa-ring-arc.complete { stroke: var(--accent); }
+.wa-ring-ready { color: var(--accent); }
+.wa-skip-btn.ready {
+  background: var(--accent);
+  color: #000;
+  border-color: var(--accent);
+  font-weight: 700;
+}
+
+/* Weight input focus */
+.wa-weight-input:focus { color: var(--accent); }
+.wa-weight-row {
+  background: var(--card-soft);
+  border-color: var(--border);
+}
+
+/* Workout active header / footer */
+.wa-header { background: var(--card); border-color: rgba(255,255,255,0.07); }
+.wa-footer  { background: var(--card); border-color: rgba(255,255,255,0.07); }
+.wa-timer   { color: var(--text-2); }
+
+/* Exercise focus meta top (série X / Y) → accent-warm for warmth */
+.wa-focus-meta-top { color: var(--accent-warm); }
+
+/* ── Exercise info modal → dark sheet ── */
+.ex-info-sheet {
+  background: var(--card);
+  border-top: 1px solid rgba(255,255,255,0.07);
+}
+.ex-info-header { border-color: rgba(255,255,255,0.07); }
+.ex-info-backdrop { background: rgba(0,0,0,0.65); }
+.ex-info-btn:hover { color: var(--accent); }
+
+/* Muscle tags in modal */
+.muscle-tag {
+  background: var(--card-soft);
+  border-color: var(--border);
+  color: var(--text-3);
+}
+.muscle-tag.primary {
+  background: rgba(232,133,61,.12);
+  border-color: rgba(232,133,61,.25);
+  color: var(--accent-warm);
+}
+
+/* Equipment tags */
+.equip-tag {
+  background: var(--card-soft);
+  color: var(--text-2);
+}
+
+/* Workout editor: exercise number dot */
+.exercise-num { background: var(--card-soft); color: var(--text-3); }
+
+/* ── Workout Report Modal ── */
+.wkr-header {
+  background: linear-gradient(160deg, var(--card) 0%, #141418 100%);
+  border-bottom: 1px solid rgba(196,229,56,.15);
+}
+.wkr-title { font-family: 'Manrope', system-ui, sans-serif; }
+.wkr-duration { color: var(--accent); }
+.wkr-date { color: var(--text-3); }
+.wkr-stat-val { color: var(--text); }
+.wkr-pr-badge {
+  background: var(--accent-warm);
+  color: #fff;
+}
+.wkr-pr-item { color: var(--text); }
+.wkr-ex-item { background: var(--card-soft); }
+.wkr-ex-name { color: var(--text); }
+.wkr-close-btn {
+  background: var(--accent) !important;
+  color: #000 !important;
+  font-weight: 700;
+  border: none;
+}
+
+/* Workout history stat badge */
+.hist-stat.vol { background: var(--accent-dim); color: var(--accent-warm); }
+
+/* Workout day card active border */
+.day-card.is-today { border-color: rgba(232,133,61,.45); }
+.day-dow.today { color: var(--accent-warm); }
+.week-section-label.today-label { color: var(--accent-warm); }
+
+/* ═══════════════════════════════════════════════════════════════════
+   ETAPA 3/4 — Treino + Dieta + Progresso + Configurações
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ── Tab page headers ────────────────────────────────────────────── */
+.tab-page-header { padding: 18px 0 2px; }
+.tab-page-title {
+  font-family: inherit;
+  font-size: 1.85rem;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.1;
+  margin: 0 0 4px;
+  letter-spacing: -.025em;
+}
+.tab-page-sub {
+  font-size: 14px;
+  color: var(--text-3);
+  margin: 0 0 14px;
+  font-weight: 400;
+}
+
+/* ── Sub-tabs → active as lime pill ─────────────────────────────── */
+.sub-tab.active {
+  background: var(--accent);
+  color: #000 !important;
+  box-shadow: none;
+  font-weight: 800;
+}
+.sub-tabs { background: rgba(255,255,255,0.04); }
+
+/* ── Diet/Workout week grid ─────────────────────────────────────── */
+/* compact day cards (upcoming days) */
+.day-card--compact .day-header { align-items: center; }
+.compact-kcal { color: var(--text-3); font-size: 12px; }
+
+/* "Próximos dias" section label */
+.week-section-label { color: rgba(255,255,255,0.3); letter-spacing: .12em; }
+
+/* ── Meal pills → 2-col icon+kcal boxes ─────────────────────────── */
+.dt-meal-pills {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 7px;
+  margin-bottom: 12px;
+}
+.dt-meal-pill {
+  background: var(--card-soft);
+  border-radius: var(--radius-sm);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 8px;
+  font-size: 12px;
+  color: var(--text-2);
+  font-weight: 600;
+  gap: 3px;
+  text-align: center;
+  border: none;
+  line-height: 1.3;
+}
+
+/* "Acompanhar hoje" → accent-warm (diet) */
+.day-card.is-today .day-actions .btn-primary,
+.day-card.is-today .btn-primary {
+  background: var(--accent-warm) !important;
+  color: #fff !important;
+  font-weight: 700;
+  border-radius: 100px !important;
+}
+
+/* ── Diet track food items ──────────────────────────────────────── */
+.dt-track-food {
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.dt-track-food:last-child { border-bottom: none; }
+.dt-track-check { border-color: rgba(255,255,255,0.2); }
+.dt-track-food.done .dt-track-check {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #000;
+  font-weight: 900;
+  font-size: 16px;
+}
+.dt-track-food-kcal { color: var(--accent-warm); }
+
+/* Meal section header */
+.meal-header { background: transparent; padding: 8px 0; }
+.meal-icon { font-size: 16px; }
+.meal-label { font-weight: 700; font-size: 14px; flex: 1; }
+.meal-kcal { font-size: 12px; color: var(--text-3); }
+.meal-kcal.all-done { color: var(--accent); }
+.meal-label.all-done { color: var(--accent); }
+
+/* Diet track summary card */
+#dtTrackCalEaten { color: var(--accent-warm) !important; }
+.wa-prog-bar { background: var(--accent-warm) !important; }
+
+/* ── Progress tab chips → period-tab style ──────────────────────── */
+.progress-chips {
+  display: flex;
+  gap: 6px;
+  padding: 0 0 14px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.progress-chips::-webkit-scrollbar { display: none; }
+.progress-chip {
+  background: transparent;
+  border: 1.5px solid rgba(255,255,255,0.12);
+  color: var(--text-3);
+  border-radius: 100px;
+  padding: 6px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all .15s;
+}
+.progress-chip.active {
+  background: var(--accent);
+  color: #000;
+  border-color: var(--accent);
+  font-weight: 800;
+}
+.progress-chip:hover:not(.active) {
+  color: var(--text-2);
+  border-color: rgba(255,255,255,0.25);
+}
+
+/* ── Weekly bars (Semana sub-view) → lime ───────────────────────── */
+.weekly-bar { background: var(--accent); border-radius: 4px 4px 0 0; }
+.weekly-bar.trained { background: var(--accent); }
+.weekly-stat { background: var(--card-soft); border-radius: var(--radius-sm); }
+
+/* ── Period buttons (Peso view) → lime ─────────────────────────── */
+.period-btn.active { border-color: var(--accent); color: var(--accent); }
+.period-btn:hover:not(.active) { border-color: var(--text-3); color: var(--text-2); }
+
+/* ── PR items (Records view) ─────────────────────────────────────── */
+.pr-item {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+.pr-item:last-child { border-bottom: none; }
+.pr-badge {
+  background: var(--accent-warm);
+  color: #fff;
+  border-radius: 5px;
+  padding: 2px 7px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .05em;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.pr-name { flex: 1; font-weight: 600; font-size: 14px; color: var(--text); }
+.pr-stats { font-size: 14px; font-weight: 700; color: var(--accent); }
+.pr-date { font-size: 11px; color: var(--text-3); margin-top: 2px; }
+
+/* Streak card (Records) */
+#progStreakVal { color: var(--accent-warm) !important; }
+
+/* ── Settings: profile avatar → lime with person icon ───────────── */
+.profile-avatar {
+  background: var(--accent) !important;
+  color: #000 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* Header avatar button → lime, person icon */
+.header-avatar {
+  background: var(--accent) !important;
+  color: #000 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* ── Settings: logout button → outlined accent-warm ─────────────── */
+.btn-logout {
+  background: transparent !important;
+  color: var(--accent-warm) !important;
+  border: 1.5px solid var(--accent-warm) !important;
+  border-radius: 100px !important;
+  padding: 7px 18px !important;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: opacity .15s;
+}
+.btn-logout:active { opacity: .8; }
+
+/* ── Settings section title ──────────────────────────────────────── */
+.settings-section-title {
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--text);
+  margin-bottom: 12px;
+}
+
+/* ── Plan suggest bar → dark card ───────────────────────────────── */
+.plan-suggest-bar {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+.plan-suggest-bar-text strong { color: var(--text); }
+
+/* ── "Iniciar Treino" button in today workout card → lime ─────── */
+/* Workout today card CTA — needs more specificity to override diet orange */
+#tab-workouts .day-card.is-today .day-actions .btn-primary {
+  background: var(--accent) !important;
+  color: #000 !important;
+}
+
+/* ── Workout history list (Histórico sub-tab) ────────────────────── */
+.wk-hist-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 8px; padding: 14px 16px; }
+.wk-hist-date { font-size: 11.5px; color: var(--text-3); text-transform: uppercase; letter-spacing: .07em; margin-bottom: 4px; }
+.wk-hist-name { font-weight: 700; font-size: 15px; color: var(--text); }
+.wk-hist-meta { font-size: 12.5px; color: var(--text-2); margin-top: 4px; }
+
+/* ═══════════════════════════════════════════════════════════════════
+   FIDELIDADE VISUAL — valores extraídos do mockup exato
+   ═══════════════════════════════════════════════════════════════════ */
+
+
+
+/* ── 2. Tab section — horizontal breathing room ──────────────────── */
+.tab-section {
+  padding: 16px 20px 20px;
+}
+
+/* ── 3. Tab page header & title ──────────────────────────────────── */
+.tab-page-header {
+  padding: 18px 0 0;
+  margin-bottom: 2px;
+}
+.tab-page-title {
+  font-size: 23px;
+  font-weight: 800;
+  letter-spacing: -0.4px;
+  line-height: 1.1;
+  margin: 0 0 3px;
+}
+.tab-page-sub {
+  font-size: 13px;
+  color: #8A8A8E;
+  font-weight: 500;
+  margin: 0 0 16px;
+}
+
+/* ── 4. Sub-tabs → flat pill buttons (no container background) ───── */
+.sub-tabs {
+  display: flex;
+  gap: 6px;
+  background: none;
+  border-radius: 0;
+  padding: 0;
+  margin-bottom: 16px;
+}
+.sub-tab {
+  flex: 1;
+  padding: 8px 0;
+  border-radius: 999px;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #8A8A8E;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  white-space: nowrap;
+  transition: all .15s;
+}
+.sub-tab.active {
+  background: var(--accent);
+  color: #000;
+  font-weight: 700;
+  box-shadow: none;
+}
+
+/* ── 5. Week section labels ─────────────────────────────────────── */
+.week-section-label {
+  font-size: 11.5px;
+  font-weight: 800;
+  color: #8A8A8E;
+  text-transform: none;
+  letter-spacing: 1px;
+  padding: 22px 0 0;
+  margin-bottom: 12px;
+}
+.week-section-label.today-label {
+  color: var(--accent-warm);
+  text-align: center;
+}
+
+/* ── 6. Day cards ────────────────────────────────────────────────── */
+.day-card {
+  border-radius: 16px;
+  border: 1px solid #26262A;
+  margin-bottom: 10px;
+}
+.day-card.is-today {
+  border-color: var(--accent-warm);
+  background: var(--card);
+  background-image: none;
+}
+.day-header {
+  padding: 16px 18px;
+  gap: 12px;
+}
+.day-dow {
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: none;
+  letter-spacing: 0;
+  width: 34px;
+  min-width: 34px;
+  flex-shrink: 0;
+}
+.day-name-text {
+  font-size: 14.5px;
+  font-weight: 700;
+}
+.day-body { padding: 0 18px 16px; }
+
+/* ── 7. Workout exercise rows inside day card ───────────────────── */
+.wk-ex-row {
+  padding: 10px 0;
+  border-bottom: 1px solid #26262A;
+}
+.wk-ex-name { font-size: 13.5px; font-weight: 600; }
+.wk-ex-meta { font-size: 12.5px; color: #8A8A8E; font-weight: 600; }
+
+/* ── 8. Diet day macro section ──────────────────────────────────── */
+.diet-day-macros {
+  margin-top: 20px;
+  padding-top: 18px;
+  border-top: 1px solid #26262A;
+  margin-bottom: 18px;
+}
+.diet-day-macro {
+  padding: 4px;
+}
+.diet-day-macro-val {
+  font-family: 'Manrope', system-ui, sans-serif;
+  font-size: 19px;
+  font-weight: 800;
+  line-height: 1.15;
+}
+.diet-day-macro-label {
+  font-size: 10.5px;
+  color: #8A8A8E;
+  font-weight: 600;
+  margin-top: 3px;
+}
+.diet-day-macro.cal  .diet-day-macro-val { color: var(--accent-warm); }
+.diet-day-macro.prot .diet-day-macro-val { color: var(--accent); }
+.diet-day-macro.carb .diet-day-macro-val { color: var(--text); }
+.diet-day-macro.fat  .diet-day-macro-val { color: var(--text); }
+.diet-day-macro + .diet-day-macro { border-left: 1px solid #26262A; }
+
+/* ── 9. Meal pills → 4-col flex, icon+kcal dark boxes ───────────── */
+.dt-meal-pills {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 16px;
+  grid-template-columns: unset;
+}
+.dt-meal-pill {
+  flex: 1;
+  background: #0D0D0D;
+  border: none;
+  border-radius: 14px;
+  padding: 12px 6px;
+  font-size: 11.5px;
+  font-weight: 800;
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+}
+
+/* ── 10. "Acompanhar hoje" / CTA buttons ─────────────────────────── */
+.day-card.is-today .day-actions .btn-primary,
+.day-card.is-today .btn-primary {
+  background: var(--accent-warm) !important;
+  color: #0D0D0D !important;
+  font-weight: 800 !important;
+  font-size: 14px !important;
+  padding: 14px !important;
+  border-radius: 14px !important;
+  width: 100%;
+}
+#tab-workouts .day-card.is-today .day-actions .btn-primary {
+  background: var(--accent) !important;
+  color: #000 !important;
+}
+
+/* ── 11. Header avatar → dark card with border (not lime) ────────── */
+.header-avatar {
+  background: #1A1A1C !important;
+  border: 1px solid #26262A !important;
+  color: #F2F2F0 !important;
+  width: 36px !important;
+  height: 36px !important;
+}
+
+/* ── 12. Streak chip ─────────────────────────────────────────────── */
+.streak-chip {
+  background: #1A1A1C;
+  border: 1px solid #26262A;
+  border-radius: 999px;
+  padding: 7px 12px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #F2F2F0;
+  gap: 5px;
+}
+
+/* ── 13. Bottom nav ──────────────────────────────────────────────── */
+.bottom-nav {
+  border-top: 1px solid #26262A;
+}
+.nav-btn { gap: 5px; }
+.nav-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+/* ── 14. Main card padding ───────────────────────────────────────── */
+.card { padding: 20px; }
+.card-sm { padding: 14px 16px; }
+
+/* ── 15. Settings profile card ───────────────────────────────────── */
+.profile-avatar {
+  width: 56px !important;
+  height: 56px !important;
+  border-radius: 50% !important;
+  background: var(--accent) !important;
+  color: #0D0D0D !important;
+  flex-shrink: 0 !important;
+}
+#profileName {
+  font-size: 16px;
+  font-weight: 800;
+}
+#profileEmail {
+  font-size: 12.5px;
+  color: #8A8A8E;
+  font-weight: 500;
+  margin-top: 2px;
+}
+
+/* ── 16. Logout button ───────────────────────────────────────────── */
+.btn-logout {
+  background: transparent !important;
+  color: var(--accent-warm) !important;
+  border: 1px solid rgba(255,145,66,0.35) !important;
+  border-radius: 10px !important;
+  padding: 8px 14px !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  font-family: inherit;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+/* ── 17. Settings section label ──────────────────────────────────── */
+.settings-section-title {
+  font-size: 11.5px;
+  font-weight: 800;
+  color: #8A8A8E;
+  letter-spacing: 1px;
+  margin-bottom: 12px;
+  margin-top: 24px;
+  text-transform: none;
+}
+
+/* ── 18. Progress period tab buttons ─────────────────────────────── */
+.period-tab {
+  flex: 1;
+  border: none;
+  cursor: pointer;
+  font-size: 12.5px;
+  font-weight: 700;
+  padding: 8px 0;
+  border-radius: 999px;
+  background: transparent;
+  color: #8A8A8E;
+  font-family: inherit;
+  transition: all .15s;
+}
+.period-tab.active {
+  background: var(--accent);
+  color: #000;
+}
+.period-tabs-wrap {
+  gap: 6px;
+  flex-wrap: nowrap;
+  margin-bottom: 16px;
+}
+
+/* Progress view sub-tabs (progress-chips) → flat pill style */
+.progress-chips {
+  flex-wrap: nowrap;
+  gap: 6px;
+  padding-bottom: 16px;
+}
+.progress-chip {
+  border: none;
+  background: transparent;
+  color: #8A8A8E;
+  border-radius: 999px;
+  padding: 8px 14px;
+  font-size: 12.5px;
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all .15s;
+  flex-shrink: 0;
+}
+.progress-chip.active {
+  background: var(--accent);
+  color: #000;
+  border-color: var(--accent);
+  font-weight: 700;
+}
+
+/* Period buttons (7D / 30D / 90D / Tudo) in weight chart */
+.period-btns {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+.period-btn {
+  flex: 1;
+  border: none;
+  background: transparent;
+  color: #8A8A8E;
+  font-size: 12.5px;
+  font-weight: 700;
+  padding: 8px 0;
+  border-radius: 999px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all .15s;
+}
+.period-btn.active {
+  background: var(--accent);
+  color: #000;
+  border-color: var(--accent);
+}
+
+/* ── 19. Dash page header to match mockup size ───────────────────── */
+.dash-page-title {
+  font-size: 23px;
+  font-weight: 800;
+  letter-spacing: -0.4px;
+}
+.dash-page-sub {
+  font-size: 13px;
+  color: #8A8A8E;
+  font-weight: 500;
+  margin-top: 3px;
+}
+
+/* ── 20. Progress bar (água, metas) ──────────────────────────────── */
+.qstat-mini-bar,
+.prog-bar-track {
+  height: 6px;
+  border-radius: 3px;
+}
+
+/* ── 21. Compact day card header → diet "next days" ─────────────── */
+.day-card--compact .day-header {
+  padding: 14px 16px;
+}
+.compact-kcal {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #8A8A8E;
+}
+
+/* ── 22. FAB "+" central no nav ──────────────────────────────────── */
+.nav-fab {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  background: var(--accent);
+  color: #0D0D0D;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: -24px;
+  box-shadow: 0 8px 20px rgba(196,229,56,0.35);
+  transition: transform .15s, box-shadow .15s;
+  position: relative;
+  z-index: 1;
+}
+.nav-fab:active { transform: scale(0.93); box-shadow: 0 4px 10px rgba(196,229,56,0.25); }
+.nav-fab.open {
+  transform: rotate(45deg);
+}
+
+/* ── 23. Quick-action panel (above nav) ──────────────────────────── */
+.quick-action-panel {
+  position: fixed;
+  bottom: calc(var(--nav-h) + env(safe-area-inset-bottom) + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 32px);
+  max-width: calc(520px - 32px);
+  background: #1A1A1C;
+  border: 1px solid #26262A;
+  border-radius: 18px;
+  padding: 8px;
+  z-index: 299;
+  display: none;
+  flex-direction: column;
+  gap: 2px;
+  box-shadow: 0 -4px 32px rgba(0,0,0,0.4);
+}
+.quick-action-panel.open {
+  display: flex;
+}
+.quick-action-item {
+  width: 100%;
+  border: none;
+  background: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 13px 12px;
+  text-align: left;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  color: #F2F2F0;
+  border-radius: 12px;
+  transition: background .12s;
+}
+.quick-action-item svg { color: var(--accent); flex-shrink: 0; }
+.quick-action-item:hover { background: rgba(255,255,255,0.05); }
+
+/* ═══════════════════════════════════════════════════════════════════
+   FIDELIDADE v21 — valores exatos do mockup
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* Brand / logo */
+.brand {
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -0.3px;
+}
+.brand-logo {
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  background: var(--accent);
+  color: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+/* Nav label — no uppercase, 10px, 700 */
+.nav-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: none;
+  letter-spacing: 0;
+}
+/* Nav inactive color → text-dim */
+.nav-btn { color: var(--text-dim); }
+
+/* Bottom nav — glass, correct border */
+.bottom-nav {
+  background: rgba(13,13,13,0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid var(--border);
+  padding: 12px 12px calc(12px + env(safe-area-inset-bottom, 0px));
+  align-items: flex-start;
+}
+
+/* Buttons — 13px standard, weight 600 */
+.btn { font-size: 13px; font-weight: 600; }
+.btn-sm { font-size: 12px; padding: 6px 11px; }
+.btn-ghost { font-size: 12px; }
+.btn-danger { background: var(--accent-warm); color: #fff; }
+
+/* Form labels — 11px, no uppercase */
+.form-group label {
+  font-size: 11px;
+  letter-spacing: 0;
+  text-transform: none;
+  font-weight: 600;
+  color: var(--text-dim);
+}
+
+/* Inputs — 13px */
+.form-group input,
+.form-group select,
+.form-group textarea,
+input[type="date"],
+input[type="number"],
+input[type="text"],
+input[type="password"] {
+  font-size: 13px;
+  border: 1px solid var(--border);
+}
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  border-color: var(--accent);
+  outline: none;
+  box-shadow: 0 0 0 3px var(--accent-dim);
+}
+
+/* Hero calorie number — 30px/800/-0.8px */
+#dashCalories { font-size: 30px; font-weight: 800; letter-spacing: -0.8px; line-height: 1; }
+.hero-cal-num  { font-size: 30px; font-weight: 800; letter-spacing: -0.8px; }
+#dtTrackCalEaten { font-size: 30px; font-weight: 800; letter-spacing: -0.8px; line-height: 1; }
+
+/* Weight big number */
+.weight-value { font-size: 30px; font-weight: 800; letter-spacing: -0.8px; line-height: 1; }
+
+/* Streak large number */
+#progStreakVal { font-size: 48px; font-weight: 800; letter-spacing: -1px; line-height: 1; }
+
+/* Card inner spacing */
+.card + .card { margin-top: 0; }
+.card-label { font-size: 13px; font-weight: 600; color: var(--text-dim); text-transform: none; letter-spacing: 0; }
+
+/* Macro values in hero card */
+.mcval { font-size: 13px; font-weight: 600; }
+.mcval strong { font-weight: 800; }
+
+/* History date small labels */
+.wk-hist-date,
+.pr-date,
+.hist-date {
+  font-size: 10.5px;
+  color: var(--text-dim);
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+/* Stat boxes (peso) */
+.stat-label { font-size: 11px; color: var(--text-dim); font-weight: 600; }
+.stat-value  { font-size: 16px; font-weight: 800; letter-spacing: -0.3px; }
+
+/* Calc result values */
+.calc-result-value { font-size: 21px; font-weight: 800; color: var(--orange); }
+.calc-macro-value  { font-size: 16px; font-weight: 800; }
+
+/* Weight change chips */
+.weight-change {
+  font-size: 12px;
+  font-weight: 700;
+  border-radius: 999px;
+  padding: 3px 8px;
+}
+.weight-change.up   { color: var(--accent-warm); background: var(--orange-dim); }
+.weight-change.down { color: var(--accent);       background: var(--accent-dim); }
+.weight-change.same { color: var(--text-dim);     background: transparent; }
+
+/* Diet macro total chips */
+.dtpl-total-chip.prot { color: var(--accent); }
+.dtpl-total-chip.carb { color: var(--text-2); }
+.dtpl-total-chip.fat  { color: var(--accent-warm); }
+
+/* Macro pill colors (day card) */
+.diet-day-macro.prot .diet-day-macro-val { color: var(--accent); }
+.diet-day-macro.carb .diet-day-macro-val { color: var(--text-2); }
+.diet-day-macro.fat  .diet-day-macro-val { color: var(--accent-warm); }
+
+/* Track food check → accent */
+.dt-track-check { color: var(--accent); }
+.dt-track-food.done .dt-track-check { background: var(--accent); border-color: var(--accent); color: #000; }
+
+/* Meal done color */
+.meal-label.all-done { color: var(--accent); }
+.meal-kcal.all-done  { color: var(--accent); }
+.dt-track-food.extra .dt-track-food-name { color: var(--accent-warm); }
+
+/* Workout active: set dots done = accent */
+.wa-set-dot.done { background: var(--accent); color: #000; border: 2.5px solid var(--accent); }
+.wa-mini-ex.done .wa-mini-icon { background: var(--accent); color: #000; }
+.wa-ring-arc.complete { stroke: var(--accent); }
+.wa-skip-btn.ready { background: var(--accent); color: #000; border-color: var(--accent); }
+.wa-ex-card.done .wa-check-btn { background: var(--accent); border-color: var(--accent); color: #000; }
+
+/* Cancel button color → text-dim, not orange */
+.wa-cancel-btn:hover { color: var(--accent-warm); }
+
+/* Toast error uses accent-warm */
+.toast.error { border-color: rgba(255,145,66,0.4); background: rgba(255,145,66,0.15); color: var(--accent-warm); }
+
+/* Calc macro items */
+.calc-macro-item.green .calc-macro-value { color: var(--accent); }
+.calc-macro-item.blue  .calc-macro-value { color: var(--text-2); }
+.calc-macro-item.yellow .calc-macro-value { color: var(--accent-warm); }
+
+/* Hero remain text */
+.hero-remain { font-size: 12px; color: var(--text-dim); }
+.hero-remain.over { color: var(--accent-warm); }
+.hero-remain.met  { color: var(--accent); }
+
+/* ── Dashboard overview chart cards ─────────────────────────────────────── */
+.dash-chart-card { padding: 16px 20px 18px; }
+.dash-chart-card .card-label { margin-bottom: 10px; }
+.dash-big-stat {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+.dash-stat-val {
+  font-size: 30px;
+  font-weight: 800;
+  letter-spacing: -0.8px;
+  color: var(--text);
+  line-height: 1;
+}
+.dash-stat-unit {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-dim);
+}
+.dash-stat-delta {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1px;
+}
+.dash-chart-wrap {
+  height: 88px;
+  position: relative;
+}
+
+/* ── Streak + Water 2-col row ────────────────────────────────────────────── */
+.dash-row-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.dash-mini-card { padding: 14px 16px; }
+.dash-mini-card .card-label { margin-bottom: 8px; }
+.dash-streak-content {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.dash-streak-icon { flex-shrink: 0; color: var(--text-3); }
+.dash-streak-num {
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.6px;
+  color: var(--text);
+  line-height: 1;
+}
+.dash-streak-label {
+  font-size: 11px;
+  color: var(--text-dim);
+  font-weight: 600;
+  margin-top: 2px;
+}
+.dash-water-content { display: flex; flex-direction: column; gap: 4px; }
+.dash-water-num { font-size: 22px !important; }
+.dash-water-bar-wrap {
+  height: 3px;
+  background: var(--border);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.dash-water-bar-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 2px;
+  transition: width 0.4s ease;
+}
+.water-quick-add-mini {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  font-family: inherit;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--border-hi);
+  background: transparent;
+  color: var(--text-dim);
+  cursor: pointer;
+  margin-top: 2px;
+  transition: color 0.15s, border-color 0.15s;
+}
+.water-quick-add-mini:hover { color: var(--text); border-color: var(--accent); }

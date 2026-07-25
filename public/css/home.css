@@ -1,0 +1,276 @@
+/* ═══════════════════════════════════════════
+   DASHBOARD — Hero Card (dark)
+   ═══════════════════════════════════════════ */
+.hero-card {
+  background: var(--dark-hero);
+  border: none;
+  border-radius: 24px;
+  padding: 22px 20px;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 10px;
+  box-shadow: 0 12px 28px -12px rgba(0,0,0,0.35);
+}
+
+/* Ring column */
+.hero-ring {
+  flex-shrink: 0;
+  position: relative;
+  width: 108px;
+  height: 108px;
+}
+.hero-ring svg {
+  transform: rotate(-90deg);
+  width: 108px;
+  height: 108px;
+}
+.ring-track {
+  fill: none;
+  stroke: rgba(255,255,255,0.12);
+  stroke-width: 11;
+}
+.ring-progress {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 11;
+  stroke-linecap: round;
+  stroke-dasharray: 339.29;
+  stroke-dashoffset: 339.29;
+  transition: stroke-dashoffset .8s cubic-bezier(.4,0,.2,1);
+}
+.ring-progress.complete { stroke: var(--accent); }
+.ring-center {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%,-50%);
+  text-align: center;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.ring-cal {
+  font-family: inherit;
+  font-size: 25px;
+  font-weight: 800;
+  color: #fff;
+  line-height: 1;
+}
+.ring-unit-sm {
+  font-size: 9px;
+  color: rgba(255,255,255,0.55);
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  margin-top: 2px;
+}
+
+/* Info column (right of ring) */
+.hero-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.hero-target {
+  font-size: 11.5px;
+  color: rgba(255,255,255,0.55);
+  margin-bottom: 2px;
+}
+.hero-target strong { color: rgba(255,255,255,0.85); }
+.hero-remain {
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 12px;
+}
+.hero-remain.over  { color: var(--accent-warm); }
+.hero-remain.met   { color: var(--accent); }
+
+/* Compact macro rows */
+.macro-compact { display: flex; flex-direction: column; gap: 7px; }
+.mcrow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.mcdot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.mcdot-g { background: var(--accent); }
+.mcdot-b { background: var(--text-dim); }
+.mcdot-y { background: var(--accent-warm); }
+
+.mclabel {
+  font-size: 11px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.7);
+  width: 32px;
+  flex-shrink: 0;
+}
+.mcbar-track {
+  flex: 1;
+  height: 5px;
+  background: rgba(255,255,255,0.15);
+  border-radius: 99px;
+  overflow: hidden;
+}
+.mcbar-fill {
+  height: 100%;
+  border-radius: 99px;
+  transition: width .5s cubic-bezier(.4,0,.2,1);
+  max-width: 100%;
+}
+.fill-green  { background: var(--accent); }
+.fill-blue   { background: var(--text-dim); }
+.fill-yellow { background: var(--accent-warm); }
+.fill-orange { background: var(--accent-warm); }
+.fill-over   { background: var(--accent-warm); }
+
+.mcval {
+  font-size: 10px;
+  color: rgba(255,255,255,0.75);
+  width: 56px;
+  text-align: right;
+  flex-shrink: 0;
+}
+.mcval strong { color: rgba(255,255,255,0.9); font-weight: 600; }
+
+/* ═══════════════════════════════════════════
+   DASHBOARD — Quick Stats Row
+   ═══════════════════════════════════════════ */
+.quick-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.qstat {
+  background: var(--card);
+  border: none;
+  border-radius: 18px;
+  padding: 14px 8px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  min-width: 0;
+  box-shadow: var(--shadow-card);
+}
+.qstat-icon { font-size: 18px; margin-bottom: 2px; }
+.qstat-val {
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--text);
+  line-height: 1.1;
+  text-align: center;
+}
+.qstat-mini-bar {
+  display: none;
+}
+.qstat-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-3);
+  text-align: center;
+  letter-spacing: .03em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+/* ═══════════════════════════════════════════
+   DASHBOARD — Water Card
+   ═══════════════════════════════════════════ */
+.water-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.water-amount { display: flex; align-items: baseline; gap: 4px; }
+.water-amount strong { font-size: 14px; color: var(--accent); font-weight: 700; }
+.water-goal-txt { font-size: 12px; color: var(--text-3); }
+
+/* Full-width water progress bar */
+.water-progress-bar {
+  height: 5px;
+  border-radius: 99px;
+  background: rgba(255,255,255,0.09);
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+.water-progress-fill {
+  height: 100%;
+  border-radius: 99px;
+  background: var(--accent);
+  transition: width .5s cubic-bezier(.4,0,.2,1);
+}
+
+.water-logs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  min-height: 0;
+  margin-top: 8px;
+}
+.water-log-dot {
+  display: inline-flex;
+  align-items: center;
+  background: var(--accent-dim);
+  color: var(--accent);
+  border: 1px solid rgba(196,229,56,.22);
+  border-radius: 20px;
+  padding: 3px 9px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .15s;
+}
+.water-log-dot:hover { opacity: 0.75; }
+.water-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 7px;
+}
+.water-btn {
+  background: rgba(255,255,255,0.07);
+  color: var(--text-2);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 11px;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 9px 2px;
+  cursor: pointer;
+  transition: all .15s;
+  font-family: inherit;
+  text-align: center;
+}
+.water-btn:hover { background: rgba(255,255,255,0.12); color: var(--text); }
+.water-btn.water-btn-primary {
+  background: var(--accent); color: #000; border-color: transparent;
+  border-radius: var(--radius-pill); padding: 9px 18px;
+}
+
+/* ═══════════════════════════════════════════
+   DASHBOARD — Workout Summary
+   ═══════════════════════════════════════════ */
+.workout-exercise-chip {
+  display: inline-block;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xs);
+  padding: 4px 10px;
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--text-2);
+  margin: 3px 3px 0 0;
+}
+
