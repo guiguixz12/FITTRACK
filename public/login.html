@@ -3,291 +3,421 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>FIT — Login</title>
-  <!-- PWA -->
+  <title>FitX</title>
   <link rel="manifest" href="/manifest.json">
-  <meta name="theme-color" content="#F2F2F7">
+  <meta name="theme-color" content="#0D0D0D">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content="FIT">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="FitX">
   <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
   <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
     html, body {
-      height: 100%;
-      margin: 0;
+      min-height: 100%;
+      background: #0D0D0D;
+      color: #F2F2F0;
+      font-family: 'Manrope', system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
     }
 
-    .login-page {
-      background: var(--bg);
-      font-family: 'Inter', system-ui, sans-serif;
+    .lp {
       min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 24px;
+      padding-top: max(40px, env(safe-area-inset-top, 0px));
+      padding-bottom: max(40px, env(safe-area-inset-bottom, 0px));
+    }
+
+    .lp-wrap { width: 100%; max-width: 390px; }
+
+    /* ── Logo ── */
+    .lp-logo {
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 24px 20px;
-      padding-top: max(24px, env(safe-area-inset-top));
-      padding-bottom: max(24px, env(safe-area-inset-bottom));
+      gap: 14px;
+      margin-bottom: 14px;
     }
-
-    .login-container {
-      width: 100%;
-      max-width: 360px;
+    .lp-logo-mark {
+      width: 58px; height: 58px;
+      background: #C4E538;
+      border-radius: 18px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
     }
-
-    .login-logo {
-      text-align: center;
-      margin-bottom: 32px;
-    }
-
-    .login-mark {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 58px;
-      height: 58px;
-      border-radius: 16px;
-      background: var(--orange-dim);
-      border: 1.5px solid rgba(255,107,53,.3);
-      margin-bottom: 16px;
-      color: var(--orange);
-    }
-
-    .login-logo h1 {
-      font-size: 1.9rem;
+    .lp-logo-name {
+      font-size: 38px;
       font-weight: 800;
-      letter-spacing: 0.18em;
-      color: var(--text);
+      color: #F2F2F0;
+      letter-spacing: -0.5px;
       line-height: 1;
     }
-
-    .login-logo h1 span { color: var(--orange); }
-
-    .login-tagline {
-      font-size: .72rem;
-      color: var(--text-3);
-      letter-spacing: .16em;
-      text-transform: uppercase;
-      margin-top: 8px;
-      font-weight: 600;
+    .lp-tagline {
+      text-align: center;
+      color: #8A8A8E;
+      font-size: 15px;
+      font-weight: 500;
+      margin-bottom: 40px;
     }
 
-    .login-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-top: 2px solid var(--orange);
-      border-radius: var(--radius);
-      padding: 28px 22px;
-    }
-
-    .login-card-title {
-      font-size: .8rem;
+    /* ── Form fields ── */
+    .lp-field { margin-bottom: 20px; }
+    .lp-label {
+      display: block;
+      font-size: 11px;
       font-weight: 700;
-      letter-spacing: .1em;
+      color: #8A8A8E;
+      letter-spacing: 0.09em;
       text-transform: uppercase;
-      color: var(--text-3);
-      margin-bottom: 18px;
+      margin-bottom: 9px;
     }
+    .lp-input {
+      width: 100%;
+      background: #1A1A1C;
+      border: 1.5px solid transparent;
+      border-radius: 14px;
+      padding: 17px 18px;
+      font-size: 16px;
+      font-weight: 500;
+      color: #F2F2F0;
+      font-family: inherit;
+      outline: none;
+      transition: border-color .15s;
+      -webkit-appearance: none;
+    }
+    .lp-input::placeholder { color: #44444A; }
+    .lp-input:focus { border-color: #C4E538; }
 
-    .login-card .form-group { margin-bottom: 16px; }
-    .login-card .form-group:last-of-type { margin-bottom: 22px; }
-
-    .login-error {
-      color: var(--red);
-      font-size: .82rem;
+    /* ── Forgot ── */
+    .lp-forgot {
+      text-align: right;
+      margin-top: 10px;
+      margin-bottom: 30px;
+    }
+    .lp-forgot a {
+      color: #C4E538;
+      font-size: 14px;
       font-weight: 600;
-      text-align: center;
-      margin-top: 12px;
-      padding: 10px;
-      background: var(--red-dim);
-      border-radius: var(--radius-sm);
-      border: 1px solid rgba(255,69,58,.2);
+      text-decoration: underline;
+      cursor: pointer;
     }
 
-    .login-toggle {
-      text-align: center;
-      margin-top: 18px;
-      font-size: .82rem;
-      color: var(--text-3);
+    /* ── Primary button ── */
+    .lp-btn {
+      width: 100%;
+      background: #C4E538;
+      color: #0D0D0D;
+      border: none;
+      border-radius: 16px;
+      padding: 18px;
+      font-size: 17px;
+      font-weight: 800;
+      font-family: inherit;
+      cursor: pointer;
+      text-decoration: underline;
+      letter-spacing: 0.01em;
+      transition: opacity .15s;
+    }
+    .lp-btn:active { opacity: 0.85; }
+    .lp-btn:disabled { opacity: 0.45; cursor: not-allowed; text-decoration: none; }
+
+    /* ── Divider ── */
+    .lp-divider {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin: 30px 0;
+    }
+    .lp-divider-line { flex: 1; height: 1px; background: #26262A; }
+    .lp-divider-text {
+      font-size: 13px;
+      color: #5A5A60;
+      font-weight: 500;
+      white-space: nowrap;
     }
 
-    .login-toggle a {
-      color: var(--orange);
-      font-weight: 600;
+    /* ── Social buttons ── */
+    .lp-social-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 34px;
+    }
+    .lp-social-btn {
+      background: #1A1A1C;
+      border: 1.5px solid #26262A;
+      border-radius: 14px;
+      padding: 15px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      font-size: 15px;
+      font-weight: 700;
+      color: #F2F2F0;
+      font-family: inherit;
+      cursor: pointer;
+      transition: border-color .15s, opacity .15s;
+    }
+    .lp-social-btn:active { opacity: 0.7; }
+
+    /* ── Footer ── */
+    .lp-footer {
+      text-align: center;
+      font-size: 14px;
+      color: #6A6A6E;
+      font-weight: 500;
+    }
+    .lp-footer a {
+      color: #C4E538;
+      font-weight: 700;
       text-decoration: none;
       cursor: pointer;
     }
 
-    .login-toggle a:hover { text-decoration: underline; }
+    /* ── Error ── */
+    .lp-error {
+      color: #ff7070;
+      font-size: 13px;
+      font-weight: 600;
+      text-align: center;
+      margin-top: 14px;
+      padding: 12px 14px;
+      background: rgba(255,80,80,0.10);
+      border-radius: 12px;
+      border: 1px solid rgba(255,80,80,0.18);
+    }
 
-    /* Prevent iOS auto-zoom on input focus (requires font-size ≥ 16px) */
-    input, select, textarea { font-size: 16px !important; }
+    /* ── Panels ── */
+    .lp-panel { display: none; }
+    .lp-panel.active { display: block; }
+
+    /* ── Toast ── */
+    #lp-toast {
+      position: fixed;
+      bottom: 32px; left: 50%;
+      transform: translateX(-50%) translateY(12px);
+      background: #2A2A2C;
+      color: #F2F2F0;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 12px 20px;
+      border-radius: 99px;
+      border: 1px solid #36363A;
+      opacity: 0;
+      transition: opacity .2s, transform .2s;
+      pointer-events: none;
+      white-space: nowrap;
+      z-index: 999;
+      font-family: 'Manrope', system-ui, sans-serif;
+    }
+    #lp-toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
   </style>
 </head>
-<body class="login-page">
-  <div class="login-container">
+<body>
+<div class="lp">
+  <div class="lp-wrap">
 
-    <div class="login-logo">
-      <div class="login-mark">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M6 4v16M18 4v16M3 8h3M3 16h3M21 8h-3M21 16h-3M9 12h6"/>
+    <!-- Logo -->
+    <div class="lp-logo">
+      <div class="lp-logo-mark">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#0D0D0D" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
         </svg>
       </div>
-      <h1>FIT</h1>
-      <p class="login-tagline">Seu progresso. Seus resultados.</p>
+      <span class="lp-logo-name">FitX</span>
+    </div>
+    <p class="lp-tagline">Entre para continuar sua jornada.</p>
+
+    <!-- ── Login panel ── -->
+    <div class="lp-panel active" id="panelLogin">
+      <div class="lp-field">
+        <label class="lp-label" for="loginName">E-MAIL</label>
+        <input class="lp-input" type="text" id="loginName" placeholder="seuemail@exemplo.com"
+               autocomplete="username" spellcheck="false" autocapitalize="none">
+      </div>
+      <div class="lp-field" style="margin-bottom:0">
+        <label class="lp-label" for="loginPassword">SENHA</label>
+        <input class="lp-input" type="password" id="loginPassword" placeholder="••••••••"
+               autocomplete="current-password">
+      </div>
+      <div class="lp-forgot">
+        <a onclick="lpToast('Em breve 🔒')">Esqueci minha senha</a>
+      </div>
+      <button class="lp-btn" id="loginBtn" onclick="doLogin()">Entrar</button>
+      <div class="lp-error" id="loginError" style="display:none"></div>
+
+      <div class="lp-divider">
+        <div class="lp-divider-line"></div>
+        <span class="lp-divider-text">ou continue com</span>
+        <div class="lp-divider-line"></div>
+      </div>
+
+      <div class="lp-social-row">
+        <button class="lp-social-btn" onclick="lpToast('Em breve')">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect width="20" height="16" x="2" y="4" rx="2"/>
+            <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+          </svg>
+          Apple
+        </button>
+        <button class="lp-social-btn" onclick="lpToast('Em breve')">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/>
+            <path d="M2 12h20"/>
+          </svg>
+          Google
+        </button>
+      </div>
+
+      <p class="lp-footer">Não tem conta? <a onclick="showRegister()">Cadastre-se</a></p>
     </div>
 
-    <!-- Login form -->
-    <div class="login-card" id="loginCard">
-      <div class="login-card-title">Entrar</div>
-      <form id="loginForm" novalidate>
-        <div class="form-group">
-          <label for="name">Usuário</label>
-          <input type="text" id="name" name="name" placeholder="Usuário" required autocomplete="username" spellcheck="false" autocapitalize="none">
-        </div>
+    <!-- ── Register panel ── -->
+    <div class="lp-panel" id="panelRegister">
+      <div class="lp-field">
+        <label class="lp-label" for="regName">USUÁRIO</label>
+        <input class="lp-input" type="text" id="regName" placeholder="Mínimo 3 caracteres"
+               autocomplete="username" spellcheck="false" autocapitalize="none">
+      </div>
+      <div class="lp-field">
+        <label class="lp-label" for="regEmail">E-MAIL <span style="color:#5A5A60;font-weight:500;text-transform:none;letter-spacing:0">(opcional)</span></label>
+        <input class="lp-input" type="email" id="regEmail" placeholder="seu@email.com"
+               autocomplete="email">
+      </div>
+      <div class="lp-field">
+        <label class="lp-label" for="regPassword">SENHA</label>
+        <input class="lp-input" type="password" id="regPassword" placeholder="Mínimo 6 caracteres"
+               autocomplete="new-password">
+      </div>
+      <div class="lp-field" style="margin-bottom:30px">
+        <label class="lp-label" for="regConfirm">CONFIRMAR SENHA</label>
+        <input class="lp-input" type="password" id="regConfirm" placeholder="••••••••"
+               autocomplete="new-password">
+      </div>
+      <button class="lp-btn" id="registerBtn" onclick="doRegister()">Criar conta</button>
+      <div class="lp-error" id="registerError" style="display:none"></div>
 
-        <div class="form-group">
-          <label for="password">Senha</label>
-          <input type="password" id="password" name="password" placeholder="••••••••" required autocomplete="current-password">
-        </div>
-
-        <button type="submit" class="btn btn-primary btn-full" id="loginBtn">Entrar</button>
-
-        <p class="login-error" id="loginError" style="display:none"></p>
-      </form>
+      <p class="lp-footer" style="margin-top:28px">Já tem conta? <a onclick="showLogin()">Entrar</a></p>
     </div>
-
-    <p class="login-toggle" id="loginToggle">
-      Não tem conta? <a onclick="showRegister()">Criar conta</a>
-    </p>
-
-    <!-- Register form (hidden by default) -->
-    <div class="login-card" id="registerCard" style="display:none">
-      <div class="login-card-title">Criar conta</div>
-      <form id="registerForm" novalidate>
-        <div class="form-group">
-          <label for="regName">Usuário</label>
-          <input type="text" id="regName" name="name" placeholder="Mínimo 3 caracteres" required autocomplete="username" spellcheck="false" autocapitalize="none">
-        </div>
-
-        <div class="form-group">
-          <label for="regEmail">E-mail <span style="color:var(--text-3);font-weight:400">(opcional)</span></label>
-          <input type="email" id="regEmail" name="email" placeholder="seu@email.com" autocomplete="email">
-        </div>
-
-        <div class="form-group">
-          <label for="regPassword">Senha</label>
-          <input type="password" id="regPassword" name="password" placeholder="Mínimo 6 caracteres" required autocomplete="new-password">
-        </div>
-
-        <div class="form-group">
-          <label for="regPasswordConfirm">Confirmar senha</label>
-          <input type="password" id="regPasswordConfirm" name="password_confirm" placeholder="••••••••" required autocomplete="new-password">
-        </div>
-
-        <button type="submit" class="btn btn-primary btn-full" id="registerBtn">Criar conta</button>
-
-        <p class="login-error" id="registerError" style="display:none"></p>
-      </form>
-    </div>
-
-    <p class="login-toggle" id="registerToggle" style="display:none">
-      Já tem conta? <a onclick="showLogin()">Entrar</a>
-    </p>
 
   </div>
+</div>
 
-  <script>
-    fetch('/api/auth/me').then(async r => {
-      if (!r.ok) return;
-      const d = await r.json();
-      const role = d.user?.role;
+<div id="lp-toast"></div>
+
+<script>
+  // Redirect if already logged in
+  fetch('/api/auth/me').then(async r => {
+    if (!r.ok) return;
+    const d = await r.json();
+    const role = d.user?.role;
+    location.href = (role === 'admin' || role === 'super_admin') ? '/admin' : '/app';
+  }).catch(() => {});
+
+  function showRegister() {
+    document.getElementById('panelLogin').classList.remove('active');
+    document.getElementById('panelRegister').classList.add('active');
+    document.getElementById('regName').focus();
+  }
+
+  function showLogin() {
+    document.getElementById('panelRegister').classList.remove('active');
+    document.getElementById('panelLogin').classList.add('active');
+    document.getElementById('loginName').focus();
+  }
+
+  async function doLogin() {
+    const btn   = document.getElementById('loginBtn');
+    const errEl = document.getElementById('loginError');
+    const name  = document.getElementById('loginName').value.trim();
+    const pass  = document.getElementById('loginPassword').value;
+
+    errEl.style.display = 'none';
+    btn.textContent = '...';
+    btn.disabled = true;
+
+    try {
+      const res  = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, password: pass }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Usuário ou senha inválidos');
+      const role = data.user?.role;
       location.href = (role === 'admin' || role === 'super_admin') ? '/admin' : '/app';
-    }).catch(() => {});
+    } catch (err) {
+      errEl.textContent = err.message;
+      errEl.style.display = 'block';
+      btn.textContent = 'Entrar';
+      btn.disabled = false;
+    }
+  }
 
-    function showRegister() {
-      document.getElementById('loginCard').style.display    = 'none';
-      document.getElementById('loginToggle').style.display  = 'none';
-      document.getElementById('registerCard').style.display  = '';
-      document.getElementById('registerToggle').style.display = '';
-      document.getElementById('regName').focus();
+  async function doRegister() {
+    const btn     = document.getElementById('registerBtn');
+    const errEl   = document.getElementById('registerError');
+    const name    = document.getElementById('regName').value.trim();
+    const email   = document.getElementById('regEmail').value.trim();
+    const pass    = document.getElementById('regPassword').value;
+    const confirm = document.getElementById('regConfirm').value;
+
+    errEl.style.display = 'none';
+
+    if (pass !== confirm) {
+      errEl.textContent = 'As senhas não conferem';
+      errEl.style.display = 'block';
+      return;
     }
 
-    function showLogin() {
-      document.getElementById('registerCard').style.display   = 'none';
-      document.getElementById('registerToggle').style.display = 'none';
-      document.getElementById('loginCard').style.display      = '';
-      document.getElementById('loginToggle').style.display    = '';
-      document.getElementById('name').focus();
+    btn.textContent = '...';
+    btn.disabled = true;
+
+    try {
+      const res  = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, password: pass, email: email || undefined }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Erro ao criar conta');
+      location.href = '/app';
+    } catch (err) {
+      errEl.textContent = err.message;
+      errEl.style.display = 'block';
+      btn.textContent = 'Criar conta';
+      btn.disabled = false;
     }
+  }
 
-    document.getElementById('loginForm').addEventListener('submit', async e => {
-      e.preventDefault();
-      const btn   = document.getElementById('loginBtn');
-      const errEl = document.getElementById('loginError');
-      errEl.style.display = 'none';
-      btn.textContent = '...';
-      btn.disabled = true;
+  // Enter key submits
+  document.addEventListener('keydown', e => {
+    if (e.key !== 'Enter') return;
+    if (document.getElementById('panelLogin').classList.contains('active')) doLogin();
+    else doRegister();
+  });
 
-      try {
-        const res = await fetch('/api/auth/login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            name:     document.getElementById('name').value.trim(),
-            password: document.getElementById('password').value
-          })
-        });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'Usuário ou senha inválidos');
-        const role = data.user?.role;
-        location.href = (role === 'admin' || role === 'super_admin') ? '/admin' : '/app';
-      } catch (err) {
-        errEl.textContent = err.message;
-        errEl.style.display = 'block';
-        btn.textContent = 'Entrar';
-        btn.disabled = false;
-      }
-    });
-
-    document.getElementById('registerForm').addEventListener('submit', async e => {
-      e.preventDefault();
-      const btn   = document.getElementById('registerBtn');
-      const errEl = document.getElementById('registerError');
-      errEl.style.display = 'none';
-
-      const name     = document.getElementById('regName').value.trim();
-      const password = document.getElementById('regPassword').value;
-      const confirm  = document.getElementById('regPasswordConfirm').value;
-
-      if (password !== confirm) {
-        errEl.textContent = 'As senhas não conferem';
-        errEl.style.display = 'block';
-        return;
-      }
-
-      btn.textContent = '...';
-      btn.disabled = true;
-
-      try {
-        const res = await fetch('/api/auth/register', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name, password, email: document.getElementById('regEmail').value.trim() || undefined })
-        });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'Erro ao criar conta');
-        location.href = '/app'; // register always creates role='user'
-      } catch (err) {
-        errEl.textContent = err.message;
-        errEl.style.display = 'block';
-        btn.textContent = 'Criar conta';
-        btn.disabled = false;
-      }
-    });
-  </script>
+  // Simple toast
+  let _toastTimer;
+  function lpToast(msg) {
+    const el = document.getElementById('lp-toast');
+    el.textContent = msg;
+    el.classList.add('show');
+    clearTimeout(_toastTimer);
+    _toastTimer = setTimeout(() => el.classList.remove('show'), 2200);
+  }
+</script>
 </body>
 </html>
