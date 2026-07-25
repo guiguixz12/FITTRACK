@@ -138,6 +138,16 @@ function initDB() {
       FOREIGN KEY (user_id) REFERENCES users(id)
     );
 
+    CREATE TABLE IF NOT EXISTS email_verifications (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER NOT NULL UNIQUE,
+      code TEXT NOT NULL,
+      expires_at TEXT NOT NULL,
+      resend_count INTEGER DEFAULT 0,
+      resend_window_start TEXT DEFAULT (datetime('now')),
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    );
+
     CREATE TABLE IF NOT EXISTS exercise_prs (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       user_id INTEGER NOT NULL,
@@ -213,6 +223,7 @@ function initDB() {
     "ALTER TABLE users ADD COLUMN role TEXT DEFAULT 'user'",
     "ALTER TABLE users ADD COLUMN admin_id INTEGER",
     "ALTER TABLE users ADD COLUMN token_version INTEGER DEFAULT 0",
+    "ALTER TABLE users ADD COLUMN verified INTEGER DEFAULT 1",
   ];
   for (const sql of migrations) {
     try { database.exec(sql); } catch (_) { /* column already exists */ }

@@ -4,10 +4,11 @@ const sharp    = require('sharp');
 const path     = require('path');
 const fs       = require('fs');
 const { getDB }       = require('../db/init');
-const { requireAuth } = require('../middleware/auth');
+const { requireAuth, requireVerified } = require('../middleware/auth');
 
 const router = express.Router();
 router.use(requireAuth);
+router.use(requireVerified);
 
 const MAX_MB      = 10;
 const MAX_SIDE    = 1280;

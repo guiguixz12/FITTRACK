@@ -1,9 +1,10 @@
 const express = require('express');
 const { getDB } = require('../db/init');
-const { requireAuth } = require('../middleware/auth');
+const { requireAuth, requireVerified } = require('../middleware/auth');
 
 const router = express.Router();
 router.use(requireAuth);
+router.use(requireVerified);
 
 router.get('/', (req, res) => {
   const db = getDB();

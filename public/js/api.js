@@ -10,6 +10,10 @@ const api = {
     const data = await res.json().catch(() => ({}));
     if (!res.ok) {
       if (res.status === 401) { location.href = '/login'; return; }
+      if (res.status === 403 && data.code === 'EMAIL_NOT_VERIFIED') {
+        if (typeof showEmailVerificationBanner === 'function') showEmailVerificationBanner();
+        throw new Error(data.error);
+      }
       throw new Error(data.error || `Erro ${res.status}`);
     }
     return data;
