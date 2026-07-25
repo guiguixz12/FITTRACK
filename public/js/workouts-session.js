@@ -1,3 +1,37 @@
+// Fuzzy lookup for EX_IMAGES and EX_META:
+// 1. exact match → 2. strip "(parenthetical)" → 3. longest-prefix match
+// Handles user exercises like "Remada Baixa (pegada neutra)", "Crossover / Crucifixo na Polia", etc.
+(function buildExLookupCache() {
+  const imgKeys  = Object.keys(EX_IMAGES);
+  const metaKeys = Object.keys(EX_META);
+  const allKeys  = [...new Set([...imgKeys, ...metaKeys])];
+
+  window._waExKeys = allKeys; // sorted by length descending for prefix search
+  window._waExKeys.sort((a, b) => b.length - a.length);
+})();
+
+function waFindExData(name) {
+  // 1. Exact match
+  if (EX_IMAGES[name] !== undefined || EX_META[name] !== undefined) {
+    return { imgs: EX_IMAGES[name] ?? null, meta: EX_META[name] ?? null };
+  }
+  // 2. Strip parenthetical "(…)" and try again
+  const stripped = name.replace(/\s*\([^)]*\)/g, '').replace(/\s*\/.*$/, '').trim();
+  if (stripped && stripped !== name) {
+    if (EX_IMAGES[stripped] !== undefined || EX_META[stripped] !== undefined) {
+      return { imgs: EX_IMAGES[stripped] ?? null, meta: EX_META[stripped] ?? null };
+    }
+  }
+  // 3. Longest-prefix match (e.g. "Remada Serrote c/ Halter" → "Remada Serrote")
+  const haystack = name.toLowerCase();
+  for (const key of (window._waExKeys || [])) {
+    if (haystack.startsWith(key.toLowerCase())) {
+      return { imgs: EX_IMAGES[key] ?? null, meta: EX_META[key] ?? null };
+    }
+  }
+  return { imgs: null, meta: null };
+}
+
 function startActiveWorkout(dow) {
   const tpl = wkTemplates[dow];
   waWorkoutDow    = dow;
@@ -66,17 +100,14 @@ function renderWaFocus() {
 
   const weightDisplay = (ex.weight_kg && ex.weight_kg > 0) ? ex.weight_kg + 'kg' : '—';
 
-  // Exercise images (start + end position)
-  const imgs    = EX_IMAGES[ex.name];
+  // Exercise images (start + end position) — fuzzy lookup handles custom names
+  const { imgs, meta: exMeta } = waFindExData(ex.name);
   const imgsHtml = imgs
     ? `<div class="wa-ex-images">
          <div class="wa-ex-img-wrap"><img src="${escHtml(imgs.imgStart)}" alt="Início" loading="lazy"><span class="wa-ex-img-lbl">Início</span></div>
          <div class="wa-ex-img-wrap"><img src="${escHtml(imgs.imgEnd)}"   alt="Fim"   loading="lazy"><span class="wa-ex-img-lbl">Fim</span></div>
        </div>`
     : '';
-
-  // Muscle diagram placeholder (populated after innerHTML)
-  const exMeta     = EX_META[ex.name];
   const muscleHtml = exMeta ? '<div id="waExMuscleChip" class="wa-ex-muscle-inline"></div>' : '';
 
   const miniList = waExercises.map((e, idx) => {
