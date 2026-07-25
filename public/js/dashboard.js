@@ -1,207 +1,213 @@
-/* Dashboard tab */
-const RING_CIRC = 2 * Math.PI * 54; // 339.29 (r=54 for 120x120 svg)
-
+/* Dashboard tab — weekly overview */
 const WEEKDAYS_PT = ['Domingo','Segunda-feira','Terça-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sábado'];
 const MONTHS_PT   = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
 
-function renderDateDisplay(dateStr) {
-  const d = new Date(dateStr + 'T12:00:00');
-  const dayEl  = document.getElementById('dashDateDay');
-  const textEl = document.getElementById('dashDateText');
-  if (dayEl)  dayEl.textContent  = WEEKDAYS_PT[d.getDay()];
-  if (textEl) textEl.textContent = `${d.getDate()} de ${MONTHS_PT[d.getMonth()]}, ${d.getFullYear()}`;
-}
+let _dashCalChart = null;
+let _dashWtChart  = null;
 
 function initDashboard(state) {
-  const dateInput = document.getElementById('dashDate');
-
-  document.getElementById('dashPrevDay').addEventListener('click', () => {
-    const d = new Date(dateInput.value + 'T12:00:00');
-    d.setDate(d.getDate() - 1);
-    state.date = dateInput.value = d.toISOString().slice(0, 10);
-    renderDateDisplay(state.date);
-    loadDashboard(state);
+  // Period tabs
+  document.querySelectorAll('#dashPeriodTabs .period-tab').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#dashPeriodTabs .period-tab').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      state.dashPeriod = btn.dataset.period;
+      loadDashboard(state);
+    });
   });
 
-  document.getElementById('dashNextDay').addEventListener('click', () => {
-    const d = new Date(dateInput.value + 'T12:00:00');
-    d.setDate(d.getDate() + 1);
-    state.date = dateInput.value = d.toISOString().slice(0, 10);
-    renderDateDisplay(state.date);
-    loadDashboard(state);
-  });
+  // Full water grid
+  const grid = document.getElementById('dashWaterGrid');
+  if (grid) {
+    grid.addEventListener('click', async e => {
+      const btn = e.target.closest('[data-ml]');
+      if (!btn) return;
+      const today = new Date().toISOString().slice(0, 10);
+      await api.post('/api/water', { date: today, amount_ml: parseInt(btn.dataset.ml) });
+      loadWater(today);
+    });
+  }
 
-  dateInput.addEventListener('change', () => {
-    state.date = dateInput.value;
-    renderDateDisplay(state.date);
-    loadDashboard(state);
-  });
-
-  // Water quick-add buttons
-  document.getElementById('dashWaterGrid').addEventListener('click', async e => {
-    const btn = e.target.closest('[data-ml]');
-    if (!btn) return;
-    const ml   = parseInt(btn.dataset.ml);
-    const date = state.date;
-    await api.post('/api/water', { date, amount_ml: ml });
-    loadWater(date);
-  });
+  // Mini +250ml button
+  const miniBtn = document.getElementById('dashWaterMiniBtn');
+  if (miniBtn) {
+    miniBtn.addEventListener('click', async () => {
+      const today = new Date().toISOString().slice(0, 10);
+      await api.post('/api/water', { date: today, amount_ml: 250 });
+      loadWater(today);
+    });
+  }
 }
 
 async function loadDashboard(state) {
-  const date = state.date;
-  document.getElementById('dashDate').value = date;
-  renderDateDisplay(date);
+  const today = new Date().toISOString().slice(0, 10);
+  state.date = today;
 
-  const [dietData, weightData, workoutData, allWeights, waterData, streakData] = await Promise.all([
-    api.get(`/api/diet/logs?date=${date}`),
-    api.get(`/api/diet/weight?date=${date}`),
-    api.get(`/api/workouts?date=${date}`),
+  const [weeklyData, weightData, workoutData, waterData, streakData] = await Promise.all([
+    api.get('/api/stats/weekly'),
     api.get('/api/diet/weight'),
-    api.get(`/api/water?date=${date}`),
+    api.get(`/api/workouts?date=${today}`),
+    api.get(`/api/water?date=${today}`),
     api.get('/api/stats/streak'),
   ]);
 
-  renderCalRing(dietData.log, state.user);
-  renderMacros(dietData.log, state.user);
-  renderWeight(weightData.log, allWeights.logs, date);
+  renderCalWeek(weeklyData);
+  renderWeightTrend(weightData.logs || []);
   renderWorkoutSummary(workoutData.workout);
-  renderWater(waterData, date);
+  renderWater(waterData, today);
   renderStreak(streakData);
+}
 
-  // Load weekly report only on today
+// ── Calorie bar chart ─────────────────────────────────────────────────────────
+function renderCalWeek(data) {
+  const { days = [], summary = {}, prevSummary = {} } = data || {};
   const today = new Date().toISOString().slice(0, 10);
-  if (date === today) {
-    const weekly = await api.get('/api/stats/weekly');
-    renderWeeklyReport(weekly);
+  const DOW   = ['D','S','T','Q','Q','S','S'];
+
+  // Big stat
+  const avg = summary.avgCalories || 0;
+  const avgEl = document.getElementById('dashCalAvg');
+  if (avgEl) avgEl.textContent = avg ? avg.toLocaleString('pt-BR') : '—';
+
+  // Delta badge
+  const deltaEl = document.getElementById('dashCalDelta');
+  if (deltaEl) {
+    if (avg && prevSummary.avgCalories) {
+      const pct  = Math.round(((avg - prevSummary.avgCalories) / prevSummary.avgCalories) * 100);
+      const sign = pct >= 0 ? '+' : '';
+      deltaEl.textContent     = `${sign}${pct}% vs sem. anterior`;
+      deltaEl.style.color     = pct > 0 ? 'var(--accent-warm)' : 'var(--accent)';
+      deltaEl.style.display   = '';
+    } else {
+      deltaEl.style.display = 'none';
+    }
   }
+
+  // Chart
+  const ctx = document.getElementById('dashCalChart');
+  if (!ctx) return;
+
+  const labels = days.map(d => DOW[new Date(d.date + 'T12:00:00').getDay()]);
+  const values = days.map(d => d.calories || 0);
+  const colors = days.map(d =>
+    d.date === today ? '#FF9142'
+    : d.calories > 0 ? '#C4E538'
+    : 'rgba(196,229,56,0.18)'
+  );
+
+  if (_dashCalChart) { _dashCalChart.destroy(); _dashCalChart = null; }
+  _dashCalChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{
+        data: values,
+        backgroundColor: colors,
+        borderRadius: 6,
+        borderSkipped: false,
+        barPercentage: 0.6,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: { duration: 300 },
+      plugins: { legend: { display: false }, tooltip: { enabled: false } },
+      scales: {
+        x: {
+          grid: { display: false },
+          border: { display: false },
+          ticks: { color: 'rgba(255,255,255,0.3)', font: { size: 11, family: 'Manrope', weight: '600' } },
+        },
+        y: {
+          grid: { color: 'rgba(255,255,255,0.04)', drawTicks: false },
+          border: { display: false },
+          ticks: { display: false },
+          min: 0,
+        }
+      },
+      layout: { padding: { top: 4 } }
+    }
+  });
 }
 
-// ── Calorie Ring ──────────────────────────────────────────────────────────────
-function renderCalRing(log, user) {
-  const consumed = log?.calories || 0;
-  const target   = user?.target_calories || 2000;
-  const pct      = Math.min(consumed / target, 1);
-  const offset   = RING_CIRC * (1 - pct);
-  const ring     = document.getElementById('calRing');
+// ── Weight trend line chart ───────────────────────────────────────────────────
+function renderWeightTrend(logs) {
+  const sorted = (logs || []).slice().sort((a, b) => a.date.localeCompare(b.date));
+  const recent = sorted.slice(-14);
 
-  ring.style.strokeDasharray  = RING_CIRC.toFixed(2);
-  ring.style.strokeDashoffset = offset.toFixed(2);
+  const latest = recent.length ? recent[recent.length - 1].weight_kg : null;
+  const prev   = recent.length > 1 ? recent[recent.length - 2].weight_kg : null;
 
-  document.getElementById('dashCalories').textContent = consumed;
-  document.getElementById('dashCalTarget').textContent = target;
-  ring.classList.toggle('complete', consumed >= target);
-
-  const remain   = target - consumed;
-  const remainEl = document.getElementById('dashCalRemain');
-  if (remain > 0) {
-    remainEl.textContent = `Faltam ${remain} kcal`;
-    remainEl.style.color = 'var(--text-muted)';
-  } else if (remain < 0) {
-    remainEl.textContent = `${Math.abs(remain)} kcal acima da meta`;
-    remainEl.style.color = 'var(--accent-warm)';
-  } else {
-    remainEl.textContent = 'Meta atingida!';
-    remainEl.style.color = 'var(--accent)';
+  const valEl   = document.getElementById('dashWtVal');
+  const deltaEl = document.getElementById('dashWtDelta');
+  if (valEl) valEl.textContent = latest ? latest.toFixed(1) : '—';
+  if (deltaEl) {
+    if (latest && prev) {
+      const diff = +(latest - prev).toFixed(1);
+      const sign = diff >= 0 ? '+' : '';
+      deltaEl.textContent   = `${sign}${diff} kg`;
+      deltaEl.style.color   = diff < 0 ? 'var(--accent)' : 'var(--accent-warm)';
+      deltaEl.style.display = '';
+    } else {
+      deltaEl.style.display = 'none';
+    }
   }
-}
 
-// ── Macros ────────────────────────────────────────────────────────────────────
-function renderMacros(log, user) {
-  const items = [
-    ['Prot', log?.protein || 0, user?.target_protein || 150],
-    ['Carb', log?.carbs   || 0, user?.target_carbs   || 200],
-    ['Fat',  log?.fat     || 0, user?.target_fat     || 65]
-  ];
-  for (const [key, consumed, target] of items) {
-    const pct = Math.min((consumed / target) * 100, 100).toFixed(1);
-    document.getElementById(`bar${key}`).style.width = `${pct}%`;
-    document.getElementById(`val${key}`).innerHTML   = `<strong>${consumed}</strong>/${target}g`;
-  }
-}
+  const wrap = document.getElementById('dashWtChartWrap');
+  const ctx  = document.getElementById('dashWtChart');
+  if (!ctx) return;
 
-// ── Weight ────────────────────────────────────────────────────────────────────
-function renderWeight(todayLog, allLogs, date) {
-  const logs   = (allLogs || []).slice().sort((a, b) => a.date.localeCompare(b.date));
-  const prev   = logs.filter(l => l.date < date).at(-1);
-  const recent = logs.slice(-30);
-
-  const weightEl    = document.getElementById('dashWeight');
-  const noDataEl    = document.getElementById('dashWeightNoData');
-  const changeRowEl = document.getElementById('dashWeightChangeRow');
-  const changeEl    = document.getElementById('dashWeightChange');
-  const vsEl        = document.getElementById('dashWeightVs');
-  const sparkEl     = document.getElementById('dashWeightSparkline');
-  const rangeRowEl  = document.getElementById('dashWeightRangeRow');
-  const hintEl      = document.getElementById('dashWeightHint');
-
-  noDataEl.style.display    = 'none';
-  changeRowEl.style.display = 'none';
-  sparkEl.style.display     = 'none';
-  rangeRowEl.style.display  = 'none';
-  hintEl.style.display      = 'none';
-
-  const displayLog = todayLog || prev;
-  if (!displayLog) {
-    weightEl.textContent = '—';
-    hintEl.style.display = '';
+  if (recent.length < 2) {
+    if (wrap) wrap.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:12px;color:var(--text-faint)">Registre seu peso para ver a tendência</div>';
     return;
   }
 
-  weightEl.textContent = displayLog.weight_kg.toFixed(1) + 'kg';
+  const labels = recent.map(l => { const [, m, d] = l.date.split('-'); return `${d}/${m}`; });
+  const values = recent.map(l => l.weight_kg);
 
-  if (!todayLog) {
-    const d = displayLog.date.split('-');
-    noDataEl.textContent   = `Último: ${d[2]}/${d[1]}/${d[0]}`;
-    noDataEl.style.display = '';
-    hintEl.style.display   = '';
-  }
-
-  const compareLog = todayLog ? prev : logs.filter(l => l.date < displayLog.date).at(-1);
-  if (compareLog) {
-    const diff    = +(displayLog.weight_kg - compareLog.weight_kg).toFixed(1);
-    const d       = compareLog.date.split('-');
-    const dateStr = `${d[2]}/${d[1]}`;
-    if (diff > 0) {
-      changeEl.textContent = `▲ +${diff} kg`;
-      changeEl.className   = 'weight-change up';
-    } else if (diff < 0) {
-      changeEl.textContent = `▼ ${diff} kg`;
-      changeEl.className   = 'weight-change down';
-    } else {
-      changeEl.textContent = '= sem variação';
-      changeEl.className   = 'weight-change same';
+  if (_dashWtChart) { _dashWtChart.destroy(); _dashWtChart = null; }
+  _dashWtChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [{
+        data: values,
+        borderColor: '#C4E538',
+        backgroundColor: 'rgba(196,229,56,0.08)',
+        borderWidth: 2,
+        pointRadius: 3,
+        pointBackgroundColor: '#C4E538',
+        fill: true,
+        tension: 0.35,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: { duration: 300 },
+      plugins: { legend: { display: false }, tooltip: { enabled: false } },
+      scales: {
+        x: {
+          grid: { display: false },
+          border: { display: false },
+          ticks: { color: 'rgba(255,255,255,0.3)', font: { size: 9, family: 'Manrope' }, maxTicksLimit: 7 },
+        },
+        y: {
+          grid: { color: 'rgba(255,255,255,0.04)' },
+          border: { display: false },
+          ticks: { color: 'rgba(255,255,255,0.25)', font: { size: 9 }, callback: v => v + ' kg', maxTicksLimit: 3 },
+        }
+      },
+      layout: { padding: { top: 4 } }
     }
-    vsEl.textContent          = `vs. ${dateStr}`;
-    changeRowEl.style.display = '';
-  }
-
-  const spark7 = logs.slice(-7);
-  if (spark7.length >= 2) {
-    const vals  = spark7.map(l => l.weight_kg);
-    const sMin  = Math.min(...vals);
-    const sMax  = Math.max(...vals);
-    const range = sMax - sMin || 1;
-    sparkEl.style.display = '';
-    sparkEl.innerHTML = spark7.map(l => {
-      const pct     = Math.round(((l.weight_kg - sMin) / range) * 80 + 15);
-      const isToday = l.date === date;
-      return `<div class="weight-spark-bar${isToday ? ' today-bar' : ''}" style="height:${pct}%" title="${l.weight_kg.toFixed(1)} kg"></div>`;
-    }).join('');
-  }
-
-  if (recent.length >= 2) {
-    const vals = recent.map(l => l.weight_kg);
-    document.getElementById('dashWeightMin').textContent   = Math.min(...vals).toFixed(1) + ' kg';
-    document.getElementById('dashWeightMax').textContent   = Math.max(...vals).toFixed(1) + ' kg';
-    document.getElementById('dashWeightCount').textContent = logs.length;
-    rangeRowEl.style.display = '';
-  }
+  });
 }
 
 // ── Workout Summary ───────────────────────────────────────────────────────────
 function renderWorkoutSummary(workout) {
   const el = document.getElementById('dashWorkout');
+  if (!el) return;
   if (!workout || !workout.exercises?.length) {
     el.innerHTML = `
       <div style="display:flex;flex-direction:column;align-items:center;padding:14px 0;gap:10px">
@@ -239,16 +245,28 @@ function renderWater(data, date) {
   const { total_ml = 0, goal_ml = 2000, logs = [] } = data;
   const pct = Math.min((total_ml / goal_ml) * 100, 100);
 
-  document.getElementById('dashWaterTotal').textContent  = total_ml >= 1000 ? (total_ml / 1000).toFixed(1) + ' L' : total_ml + ' ml';
-  document.getElementById('dashWaterGoal').textContent   = goal_ml >= 1000 ? (goal_ml / 1000).toFixed(1) + ' L' : goal_ml + ' ml';
-  document.getElementById('dashWaterPct').textContent    = Math.round(pct) + '%';
-  const progressFill = document.getElementById('dashWaterProgressFill');
-  if (progressFill) progressFill.style.width = pct + '%';
-  const barEl = document.getElementById('dashWaterBar');
-  if (barEl) barEl.style.width = pct + '%';
+  // Mini water card
+  const miniValEl = document.getElementById('dashWaterTodayVal');
+  const miniFill  = document.getElementById('dashWaterMiniBar');
+  if (miniValEl) miniValEl.textContent = total_ml >= 1000 ? (total_ml / 1000).toFixed(1) + ' L' : total_ml + ' ml';
+  if (miniFill)  miniFill.style.width  = pct + '%';
 
-  // Render log dots
+  // Full water card
+  const goalEl    = document.getElementById('dashWaterGoal');
+  const fillEl    = document.getElementById('dashWaterProgressFill');
+  if (goalEl) goalEl.textContent = goal_ml >= 1000 ? (goal_ml / 1000).toFixed(1) + ' L' : goal_ml + ' ml';
+  if (fillEl) fillEl.style.width = pct + '%';
+
+  // Legacy compat
+  const totalEl = document.getElementById('dashWaterTotal');
+  const pctEl   = document.getElementById('dashWaterPct');
+  const barEl   = document.getElementById('dashWaterBar');
+  if (totalEl) totalEl.textContent = total_ml >= 1000 ? (total_ml / 1000).toFixed(1) + ' L' : total_ml + ' ml';
+  if (pctEl)   pctEl.textContent   = Math.round(pct) + '%';
+  if (barEl)   barEl.style.width   = pct + '%';
+
   const logsEl = document.getElementById('dashWaterLogs');
+  if (!logsEl) return;
   if (logs.length) {
     logsEl.innerHTML = logs.map(l =>
       `<span class="water-log-dot" onclick="deleteWaterLog(${l.id},'${date}')" title="Remover ${l.amount_ml}ml">
@@ -268,52 +286,25 @@ window.deleteWaterLog = deleteWaterLog;
 
 // ── Streak ────────────────────────────────────────────────────────────────────
 function renderStreak(data) {
-  const { streak = 0, longest = 0 } = data;
-  const el = document.getElementById('dashStreakVal');
-  if (!el) return;
-  el.textContent = streak;
-  const longestEl = document.getElementById('dashStreakLongest');
-  if (longestEl) longestEl.textContent = `Recorde: ${longest} dias`;
+  const { streak = 0, longest = 0 } = data || {};
 
-  // Fire emoji milestones
-  const flameEl = document.getElementById('dashStreakFlame');
+  const valEl    = document.getElementById('dashStreakVal');
+  const flameEl  = document.getElementById('dashStreakFlame');
+  const longEl   = document.getElementById('dashStreakLongest');
+
+  if (valEl)   valEl.textContent  = streak;
+  if (longEl)  longEl.textContent = longest > 0 ? `Recorde: ${longest} dias` : '';
+
   if (flameEl) {
     const flameSvg = `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 3z"/></svg>`;
     const dropSvg  = `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>`;
     flameEl.style.color = streak >= 3 ? 'var(--accent-warm)' : 'var(--text-3)';
-    flameEl.innerHTML = streak >= 3 ? flameSvg : dropSvg;
+    flameEl.innerHTML   = streak >= 3 ? flameSvg : dropSvg;
   }
 }
 
-// ── Weekly Report ─────────────────────────────────────────────────────────────
-function renderWeeklyReport(data) {
-  const el = document.getElementById('dashWeeklyReport');
-  if (!el || !data) return;
-
-  const { summary, days } = data;
-  const DAY_ABBR = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
-
-  const maxCal = Math.max(...days.map(d => d.calories), 1);
-
-  el.innerHTML = `
-    <div class="weekly-bars">
-      ${days.map(d => {
-        const dow = new Date(d.date + 'T12:00:00').getDay();
-        const h   = Math.max(Math.round((d.calories / maxCal) * 52), d.calories > 0 ? 4 : 0);
-        return `
-          <div class="weekly-bar-col">
-            <div class="weekly-bar-wrap">
-              <div class="weekly-bar${d.trained ? ' trained' : ''}" style="height:${h}px" title="${d.calories} kcal"></div>
-            </div>
-            <div class="weekly-bar-label">${DAY_ABBR[dow]}</div>
-          </div>`;
-      }).join('')}
-    </div>
-    <div class="weekly-stats">
-      <div class="weekly-stat"><div class="weekly-stat-val">${summary.avgCalories || '—'}</div><div class="weekly-stat-label">kcal médio</div></div>
-      <div class="weekly-stat"><div class="weekly-stat-val">${summary.avgProtein || '—'}g</div><div class="weekly-stat-label">prot médio</div></div>
-      <div class="weekly-stat"><div class="weekly-stat-val">${summary.trainedDays}</div><div class="weekly-stat-label">treinos</div></div>
-      <div class="weekly-stat"><div class="weekly-stat-val">${summary.loggedDays}</div><div class="weekly-stat-label">dias log</div></div>
-    </div>
-  `;
-}
+// ── Legacy stubs (kept for any external callers) ──────────────────────────────
+function renderCalRing()     {}
+function renderMacros()      {}
+function renderWeight()      {}
+function renderWeeklyReport(){}

@@ -84,7 +84,20 @@ router.get('/weekly', (req, res) => {
   const avgProtein   = loggedDays ? Math.round(report.filter(d => d.protein  > 0).reduce((s, d) => s + d.protein,  0) / loggedDays) : 0;
   const totalVolume  = report.reduce((s, d) => s + d.volume, 0);
 
-  res.json({ days: report, summary: { loggedDays, trainedDays, avgCalories, avgProtein, totalVolume } });
+  // Previous week for delta calculation
+  const prevDays = [];
+  for (let i = 13; i >= 7; i--) {
+    prevDays.push(new Date(Date.now() - i * 86400000).toISOString().slice(0, 10));
+  }
+  const prevDiet     = db.prepare(`SELECT calories FROM diet_logs WHERE user_id=? AND date>=? AND date<=? AND calories>0`).all(uid, prevDays[0], prevDays[6]);
+  const prevAvgCal   = prevDiet.length ? Math.round(prevDiet.reduce((s, d) => s + d.calories, 0) / prevDiet.length) : 0;
+  const prevTrained  = db.prepare(`SELECT COUNT(DISTINCT date) as n FROM workouts WHERE user_id=? AND date>=? AND date<=?`).get(uid, prevDays[0], prevDays[6]).n;
+
+  res.json({
+    days: report,
+    summary: { loggedDays, trainedDays, avgCalories, avgProtein, totalVolume },
+    prevSummary: { avgCalories: prevAvgCal, loggedDays: prevDiet.length, trainedDays: prevTrained },
+  });
 });
 
 // ── Personal Records ──────────────────────────────────────────────────────────
