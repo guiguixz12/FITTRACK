@@ -95,9 +95,14 @@ router.post('/logout', (req, res) => {
 router.get('/me', requireAuth, (req, res) => {
   const db   = getDB();
   const user = db
-    .prepare('SELECT id, name, email, target_calories, target_protein, target_carbs, target_fat, height_cm, age, sex, target_weight, theme, plan, role, activity_factor, goal_diff, targets_auto FROM users WHERE id = ?')
+    .prepare('SELECT id, name, email, target_calories, target_protein, target_carbs, target_fat, height_cm, age, sex, target_weight, theme, plan, role FROM users WHERE id = ?')
     .get(req.user.id);
   if (!user) return res.status(404).json({ error: 'Usuário não encontrado' });
+  // New columns added in Mudança 1 — fetch separately so missing columns never crash /me
+  try {
+    const extra = db.prepare('SELECT activity_factor, goal_diff, targets_auto FROM users WHERE id=?').get(req.user.id);
+    if (extra) Object.assign(user, extra);
+  } catch (_) { /* columns not yet migrated in this env — safe to skip */ }
 
   const resp = { user };
   if (req.user._impersonatedBy) {

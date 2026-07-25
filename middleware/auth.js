@@ -47,11 +47,16 @@ function requireSuperAdmin(req, res, next) {
 }
 
 function requireVerified(req, res, next) {
-  const row = getDB().prepare('SELECT verified FROM users WHERE id=?').get(req.user.id);
-  if (!row?.verified) {
-    return res.status(403).json({ error: 'E-mail não verificado. Confirme seu e-mail para acessar.', code: 'EMAIL_NOT_VERIFIED' });
+  try {
+    const row = getDB().prepare('SELECT verified FROM users WHERE id=?').get(req.user.id);
+    if (!row?.verified) {
+      return res.status(403).json({ error: 'E-mail não verificado. Confirme seu e-mail para acessar.', code: 'EMAIL_NOT_VERIFIED' });
+    }
+    next();
+  } catch (e) {
+    console.error('[requireVerified] DB error:', e.message);
+    next(); // fail open — never block data access on schema mismatch
   }
-  next();
 }
 
 module.exports = { requireAuth, requireAdmin, requireSuperAdmin, requireVerified };

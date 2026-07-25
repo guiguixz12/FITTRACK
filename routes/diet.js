@@ -104,17 +104,21 @@ router.post('/weight', (req, res) => {
     ON CONFLICT(user_id, date) DO UPDATE SET weight_kg=excluded.weight_kg
   `).run(req.user.id, date, weight_kg);
 
-  // Auto-recalculate targets if user is in auto mode
-  const userRow = db.prepare('SELECT targets_auto FROM users WHERE id=?').get(req.user.id);
-  if (userRow?.targets_auto) {
-    const targets = computeTargets(req.user.id);
-    if (targets) {
-      db.prepare(`
-        UPDATE users SET target_calories=?, target_protein=?, target_carbs=?, target_fat=?
-        WHERE id=?
-      `).run(targets.target_calories, targets.target_protein, targets.target_carbs, targets.target_fat, req.user.id);
-      return res.json({ success: true, targetsUpdated: true, targets, notification: targets.notification });
+  // Auto-recalculate targets if user is in auto mode — never let this crash the weight save
+  try {
+    const userRow = db.prepare('SELECT targets_auto FROM users WHERE id=?').get(req.user.id);
+    if (userRow?.targets_auto) {
+      const targets = computeTargets(req.user.id);
+      if (targets) {
+        db.prepare(`
+          UPDATE users SET target_calories=?, target_protein=?, target_carbs=?, target_fat=?
+          WHERE id=?
+        `).run(targets.target_calories, targets.target_protein, targets.target_carbs, targets.target_fat, req.user.id);
+        return res.json({ success: true, targetsUpdated: true, targets, notification: targets.notification });
+      }
     }
+  } catch (e) {
+    console.error('[POST /weight] computeTargets skipped:', e.message);
   }
   res.json({ success: true });
 });

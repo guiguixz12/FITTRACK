@@ -267,9 +267,13 @@ function initDB() {
   // Existing accounts already have target_calories set manually — honour them.
   // targets_auto=0 means "do not overwrite on weight change".
   // New users (no target_calories) keep the column DEFAULT (1 = auto mode).
-  database.prepare(
-    'UPDATE users SET targets_auto=0 WHERE target_calories IS NOT NULL AND targets_auto=1'
-  ).run();
+  try {
+    database.prepare(
+      'UPDATE users SET targets_auto=0 WHERE target_calories IS NOT NULL AND targets_auto=1'
+    ).run();
+  } catch (e) {
+    console.error('[initDB] targets_auto migration step skipped:', e.message);
+  }
 
   // Ensure Guilherme is always super_admin
   database.prepare("UPDATE users SET role='super_admin' WHERE name='Guilherme' AND (role IS NULL OR role='user')").run();

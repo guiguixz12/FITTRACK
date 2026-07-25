@@ -16,14 +16,16 @@ router.get('/me', (req, res) => {
 
 router.put('/me', (req, res) => {
   const { target_calories, target_protein, target_carbs, target_fat, height_cm, age, sex, target_weight, theme } = req.body;
-  getDB().prepare(`
+  const db = getDB();
+  db.prepare(`
     UPDATE users SET
       target_calories=?, target_protein=?, target_carbs=?, target_fat=?,
-      height_cm=?, age=?, sex=?, target_weight=?, theme=?,
-      targets_auto=0
+      height_cm=?, age=?, sex=?, target_weight=?, theme=?
     WHERE id=?
   `).run(target_calories, target_protein, target_carbs, target_fat, height_cm, age, sex,
          target_weight || null, theme || 'light', req.user.id);
+  // Switch to manual mode — isolated so missing column never kills the main save
+  try { db.prepare('UPDATE users SET targets_auto=0 WHERE id=?').run(req.user.id); } catch (_) {}
   res.json({ success: true });
 });
 
