@@ -129,7 +129,7 @@ async function loadWeightInfo() {
     const infoEl   = document.getElementById('setWeightLastInfo');
 
     if (todayLog) {
-      infoEl.innerHTML = `✅ Hoje: <strong style="color:var(--orange)">${todayLog.weight_kg} kg</strong> já registrado`;
+      infoEl.innerHTML = `Hoje: <strong style="color:var(--orange)">${todayLog.weight_kg} kg</strong> já registrado`;
       document.getElementById('setWeightValue').value = todayLog.weight_kg;
     } else if (last) {
       const d = last.date.split('-');

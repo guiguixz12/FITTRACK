@@ -19,7 +19,7 @@ function openBarcodeScanner(onResult) {
     <div style="width:100%;max-width:400px;background:var(--card);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-lg)">
       <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--border)">
         <span style="font-weight:700;font-size:.95rem">Escanear produto</span>
-        <button id="_scannerClose" style="background:none;border:none;color:var(--text-muted);font-size:1.3rem;cursor:pointer;line-height:1">✕</button>
+        <button id="_scannerClose" style="background:none;border:none;color:var(--text-muted);font-size:1.3rem;cursor:pointer;line-height:1"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
       </div>
       <div id="_scannerViewport" style="width:100%;background:#000;position:relative;min-height:280px"></div>
       <div style="padding:14px 16px">

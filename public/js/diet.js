@@ -2,11 +2,17 @@
    Diet — programa semanal + acompanhamento do dia
    ═══════════════════════════════════════════ */
 
+const MEAL_ICON_SVG = {
+  cafe_manha: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v8"/><path d="m4.93 10.93 1.41 1.41"/><path d="M2 18h2"/><path d="M20 18h2"/><path d="m19.07 10.93-1.41 1.41"/><path d="M22 22H2"/><path d="m8 6 4-4 4 4"/><path d="M16 18a4 4 0 0 0-8 0"/></svg>`,
+  almoco:     `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3zm0 0v7"/></svg>`,
+  cafe_tarde: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8h1a4 4 0 1 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"/><line x1="6" x2="6" y1="2" y2="4"/><line x1="10" x2="10" y1="2" y2="4"/><line x1="14" x2="14" y1="2" y2="4"/></svg>`,
+  janta:      `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>`,
+};
 const MEALS = [
-  { id: 'cafe_manha', label: 'Café da Manhã', icon: '🌅' },
-  { id: 'almoco',     label: 'Almoço',        icon: '🍽️' },
-  { id: 'cafe_tarde', label: 'Café da Tarde', icon: '☕' },
-  { id: 'janta',      label: 'Jantar',        icon: '🌙' },
+  { id: 'cafe_manha', label: 'Café da Manhã', icon: MEAL_ICON_SVG.cafe_manha },
+  { id: 'almoco',     label: 'Almoço',        icon: MEAL_ICON_SVG.almoco },
+  { id: 'cafe_tarde', label: 'Café da Tarde', icon: MEAL_ICON_SVG.cafe_tarde },
+  { id: 'janta',      label: 'Jantar',        icon: MEAL_ICON_SVG.janta },
 ];
 
 // ── Food Library ──────────────────────────────────────────────────────────────
@@ -387,7 +393,7 @@ function renderDtTrackMeals() {
       const extraBadge = f.extra ? `<span class="dt-extra-badge">extra</span>` : '';
       return `
         <div class="dt-track-food${f.done ? ' done' : ''}${f.extra ? ' extra' : ''}" onclick="toggleDtTrackFood(${gi})">
-          <div class="dt-track-check">${f.done ? '✓' : ''}</div>
+          <div class="dt-track-check">${f.done ? '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>' : ''}</div>
           <div class="dt-track-food-info">
             <div class="dt-track-food-name">${escDiet(f.name)}${extraBadge}</div>
             <div class="dt-track-food-meta">${f.quantity_g}g · P: ${f.protein}g · C: ${f.carbs}g · G: ${f.fat}g</div>
@@ -397,7 +403,7 @@ function renderDtTrackMeals() {
     }).join('');
 
     const kcalStr = allDone
-      ? `<span class="meal-kcal all-done">${mealTot.cal} kcal ✓</span>`
+      ? `<span class="meal-kcal all-done">${mealTot.cal} kcal <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>`
       : `<span class="meal-kcal">${mealDone.cal} / ${mealTot.cal} kcal</span>`;
 
     return `
@@ -469,8 +475,8 @@ async function saveDtTrackToDiary(state) {
                 Novos valores do tracking:<br>
                 <strong>${tots.cal} kcal · ${tots.prot}g prot · ${tots.carb}g carb · ${tots.fat}g gord</strong>`,
         actions: [
-          { label: '➕ Somar ao registro anterior', value: 'merge',   cls: 'btn-primary' },
-          { label: '♻️ Substituir pelo tracking',   value: 'replace', cls: 'btn-ghost'   },
+          { label: '+ Somar ao registro anterior', value: 'merge',   cls: 'btn-primary' },
+          { label: 'Substituir pelo tracking',   value: 'replace', cls: 'btn-ghost'   },
           { label: 'Cancelar',                       value: 'cancel',  cls: 'btn-ghost'   },
         ]
       });
@@ -539,7 +545,7 @@ function setupDtTrackExtraPanel() {
   toggleBtn.addEventListener('click', () => {
     const open = panel.style.display !== 'none';
     panel.style.display = open ? 'none' : '';
-    toggleBtn.textContent = open ? '+ Alimento extra' : '✕ Fechar';
+    toggleBtn.textContent = open ? '+ Alimento extra' : 'X Fechar';
     if (!open) {
       // reset state on open
       dtExtraCat  = null;
@@ -749,7 +755,7 @@ function openMealAdd(mealId) {
   }
   dtActiveMeal = mealId;
   const meal   = MEALS.find(m => m.id === mealId);
-  document.getElementById('dtFoodCalcMealLabel').textContent = `${meal.icon} ${meal.label}`;
+  document.getElementById('dtFoodCalcMealLabel').innerHTML = `${meal.icon} ${meal.label}`;
 
   dtSelectedFood  = null;
   dtActiveFoodCat = null;

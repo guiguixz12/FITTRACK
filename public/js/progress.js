@@ -114,7 +114,12 @@ function renderPgStreak(data) {
   const valEl   = document.getElementById('progStreakVal');
   const longEl  = document.getElementById('progStreakLongest');
 
-  if (flameEl) flameEl.textContent = streak >= 30 ? '🔥🔥🔥' : streak >= 14 ? '🔥🔥' : streak >= 3 ? '🔥' : '💧';
+  if (flameEl) {
+    const flameSvg = `<svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 3z"/></svg>`;
+    const dropSvg  = `<svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>`;
+    flameEl.style.color = streak >= 3 ? 'var(--accent-warm)' : 'var(--text-3)';
+    flameEl.innerHTML = streak >= 3 ? flameSvg : dropSvg;
+  }
   if (valEl)   valEl.textContent   = streak;
   if (longEl)  longEl.textContent  = longest > 0 ? `Recorde: ${longest} dias` : '';
 }

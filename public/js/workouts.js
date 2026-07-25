@@ -922,7 +922,7 @@ function renderWaFocus() {
   if (waCurrentExIdx >= waExercises.length) {
     body.innerHTML = `
       <div class="wa-done-all">
-        <div class="wa-done-all-icon">🏆</div>
+        <div class="wa-done-all-icon"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2z"/></svg></div>
         <div class="wa-done-all-title">Treino concluído!</div>
         <div class="wa-done-all-sub">Todos os exercícios finalizados.<br>Toque em Finalizar para salvar.</div>
       </div>`;
@@ -935,7 +935,7 @@ function renderWaFocus() {
 
   const dots = Array.from({ length: totalSets }, (_, i) => {
     const cls = i < doneSets ? 'done' : i === doneSets ? 'active' : 'pending';
-    return `<div class="wa-set-dot ${cls}">${i < doneSets ? '✓' : i + 1}</div>`;
+    return `<div class="wa-set-dot ${cls}">${i < doneSets ? '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>' : i + 1}</div>`;
   }).join('');
 
   const prescription = [
@@ -945,9 +945,9 @@ function renderWaFocus() {
 
   const miniList = waExercises.map((e, idx) => {
     const cls       = e.done ? 'done' : idx === waCurrentExIdx ? 'active' : 'pending';
-    const icon      = e.done ? '✓' : idx === waCurrentExIdx ? '▶' : idx + 1;
+    const icon      = e.done ? '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>' : idx === waCurrentExIdx ? '&#9654;' : idx + 1;
     const setsLabel = e.done
-      ? `${e.sets}/${e.sets} ✓`
+      ? `${e.sets}/${e.sets} <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`
       : idx === waCurrentExIdx
         ? `${e.setsCompleted}/${e.sets || 3}`
         : `0/${e.sets || 3}`;
@@ -983,7 +983,7 @@ function renderWaFocus() {
         </div>
       </div>
       <button class="btn btn-primary wa-complete-set-btn" onclick="completeSet()">
-        ✓ &nbsp;Concluí a Série ${doneSets + 1}
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> &nbsp;Concluí a Série ${doneSets + 1}
       </button>
       <div class="wa-mini-section-label">Todos os exercícios</div>
       <div class="wa-mini-ex-list">${miniList}</div>
