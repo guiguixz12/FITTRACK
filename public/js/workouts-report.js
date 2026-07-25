@@ -52,16 +52,22 @@ async function finishActiveWorkout(state) {
       if (logs.length > 0) bodyWeightKg = logs[logs.length - 1].weight_kg;
     } catch (_) {}
 
-    // MET-based calorie estimate (compound≥3 muscles=6.0, isolated=3.5, cardio=8.0)
+    // MET-based calorie estimate — weighted by actual sets completed per exercise
+    // compound(≥3 muscles)=6.0, isolated=3.5, cardio/unknown=8.0
+    // weightedMET = Σ(MET_ex × setsCompleted_ex) / Σ(setsCompleted_ex)
+    // Applied to actual elapsed time so total stays realistic
     let estimatedKcal = null;
     if (bodyWeightKg && elapsed > 0) {
-      let totalMET = 0;
+      let metSetSum = 0, totalSetsSum = 0;
       for (const ex of toSave) {
-        const n = (EX_META[ex.name] && EX_META[ex.name].muscles.length) || 0;
-        totalMET += n === 0 ? 8.0 : n >= 3 ? 6.0 : 3.5;
+        const n    = (EX_META[ex.name] && EX_META[ex.name].muscles.length) || 0;
+        const met  = n === 0 ? 8.0 : n >= 3 ? 6.0 : 3.5;
+        const sets = ex.setsCompleted || 1;
+        metSetSum    += met * sets;
+        totalSetsSum += sets;
       }
-      const avgMET = toSave.length > 0 ? totalMET / toSave.length : 6.0;
-      estimatedKcal = Math.round(avgMET * bodyWeightKg * (elapsed / 3600));
+      const weightedMET = totalSetsSum > 0 ? metSetSum / totalSetsSum : 6.0;
+      estimatedKcal = Math.round(weightedMET * bodyWeightKg * (elapsed / 3600));
     }
 
     // Persist summary columns
