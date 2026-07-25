@@ -66,6 +66,19 @@ function renderWaFocus() {
 
   const weightDisplay = (ex.weight_kg && ex.weight_kg > 0) ? ex.weight_kg + 'kg' : '—';
 
+  // Exercise images (start + end position)
+  const imgs    = EX_IMAGES[ex.name];
+  const imgsHtml = imgs
+    ? `<div class="wa-ex-images">
+         <div class="wa-ex-img-wrap"><img src="${escHtml(imgs.imgStart)}" alt="Início" loading="lazy"><span class="wa-ex-img-lbl">Início</span></div>
+         <div class="wa-ex-img-wrap"><img src="${escHtml(imgs.imgEnd)}"   alt="Fim"   loading="lazy"><span class="wa-ex-img-lbl">Fim</span></div>
+       </div>`
+    : '';
+
+  // Muscle diagram placeholder (populated after innerHTML)
+  const exMeta     = EX_META[ex.name];
+  const muscleHtml = exMeta ? '<div id="waExMuscleChip" class="wa-ex-muscle-inline"></div>' : '';
+
   const miniList = waExercises.map((e, idx) => {
     const cls       = e.done ? 'done' : idx === waCurrentExIdx ? 'active' : 'pending';
     const numIcon   = e.done
@@ -112,10 +125,18 @@ function renderWaFocus() {
             <button class="wa-weight-btn" onclick="waWeightStep(2.5)">+</button>
           </div>
         </div>
+        ${imgsHtml}
+        ${muscleHtml}
       </div>
       <div class="wa-mini-section-label">Todos os exercícios</div>
       <div class="wa-mini-ex-list">${miniList}</div>
     </div>`;
+
+  // Render muscle diagram chip (must run after innerHTML is set)
+  if (exMeta && typeof renderChipMap === 'function') {
+    const chipEl = document.getElementById('waExMuscleChip');
+    if (chipEl) renderChipMap(chipEl, exMeta.muscles, autoView(exMeta.muscles));
+  }
 
   // Update footer CTA
   const completeBtn = document.getElementById('waCompleteBtn');

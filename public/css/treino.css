@@ -375,4 +375,26 @@
   border-radius: 20px;
   color: var(--text-3);
 }
+
+/* ── Exercise images + muscle map inline (active workout focus) ── */
+.wa-ex-images {
+  display: flex; gap: 10px; justify-content: center;
+  margin-top: 20px; width: 100%;
+}
+.wa-ex-img-wrap {
+  flex: 1; display: flex; flex-direction: column; align-items: center; gap: 5px;
+}
+.wa-ex-img-wrap img {
+  width: 100%; border-radius: 12px; object-fit: cover;
+  aspect-ratio: 4/3; background: var(--surface); display: block;
+}
+.wa-ex-img-lbl {
+  font-size: 10px; font-weight: 700; color: var(--text-3);
+  text-transform: uppercase; letter-spacing: .07em;
+}
+.wa-ex-muscle-inline {
+  margin: 18px auto 0; width: 88px; overflow: hidden;
+}
+.wa-ex-muscle-inline .rbh-wrapper { display: block; }
+.wa-ex-muscle-inline .rbh-wrapper svg { display: block; width: 100%; }
 .hist-more { font-style: italic; }
