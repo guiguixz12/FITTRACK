@@ -49,8 +49,8 @@ router.get('/', (req, res) => {
 router.get('/file/:userId/:filename', (req, res) => {
   const { userId, filename } = req.params;
 
-  // Reject any path traversal attempts in the segments
-  if (!/^\d+$/.test(userId) || /[/\\.]/.test(filename)) {
+  // Reject path traversal: block slashes and ".." sequences; single dots (extensions) are fine
+  if (!/^\d+$/.test(userId) || /[/\\]|\.\./.test(filename)) {
     return res.status(400).json({ error: 'Invalid request' });
   }
 
