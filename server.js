@@ -27,18 +27,20 @@ initDB();
 
 // ── Security headers ──────────────────────────────────────────────────────────
 app.use(helmet({
-  // CSP in report-only mode — won't break the app but will log violations
-  // Review /csp-report logs before switching to enforce mode
   contentSecurityPolicy: {
-    reportOnly: true,
+    reportOnly: false,
     directives: {
       defaultSrc:     ["'self'"],
-      scriptSrc:      ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://cdn.jsdelivr.net"],
+      // unsafe-inline required: app.html has inline onclick handlers throughout.
+      // Removing it needs a full refactor of the HTML event handlers.
+      scriptSrc:      ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net"],
       styleSrc:       ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
       fontSrc:        ["'self'", "https://fonts.gstatic.com"],
       imgSrc:         ["'self'", "data:", "blob:"],
       connectSrc:     ["'self'"],
       workerSrc:      ["'self'"],
+      objectSrc:      ["'none'"],
+      frameAncestors: ["'self'"],
       reportUri:      ["/csp-report"],
     },
   },
