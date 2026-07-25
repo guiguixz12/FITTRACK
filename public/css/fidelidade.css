@@ -1112,6 +1112,21 @@ input::placeholder, textarea::placeholder { color: var(--text-3); }
 /* Remove old top-line indicator; pill is the active signal */
 .nav-btn::after { display: none; }
 
+/* FAB — slightly larger, more prominent */
+.nav-fab {
+  width: 54px;
+  height: 54px;
+  border-radius: 17px;
+  margin-top: -30px;
+}
+
+/* Dashboard — vertical rhythm between cards */
+#tab-dashboard .v2-hero    { margin-top: 4px; }
+#tab-dashboard .v2-stats-row { margin-top: 18px; }
+#tab-dashboard .pg-card    { margin-top: 18px; margin-bottom: 0; }
+#tab-dashboard .v2-card    { margin-top: 18px; }
+#tab-dashboard .v2-ai-banner { margin-top: 18px; }
+
 /* Buttons — 13px standard, weight 600 */
 .btn { font-size: 13px; font-weight: 600; }
 .btn-sm { font-size: 12px; padding: 6px 11px; }
