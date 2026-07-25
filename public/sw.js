@@ -1,5 +1,5 @@
 /* FitTracker Service Worker */
-const CACHE  = 'fittracker-v38';
+const CACHE  = 'fittracker-v39';
 const STATIC = [
   '/icons/icon-192.png',
   '/icons/icon-512.png',

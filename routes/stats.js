@@ -110,17 +110,29 @@ router.get('/range', (req, res) => {
   for (let i = days - 1; i >= 0; i--) {
     dates.push(new Date(Date.now() - i * 86400000).toISOString().slice(0, 10));
   }
+  const dateFrom = dates[0];
+  const dateTo   = dates[dates.length - 1];
 
   const dietLogs = db.prepare(
     `SELECT date, calories, protein FROM diet_logs WHERE user_id=? AND date>=? AND date<=?`
-  ).all(uid, dates[0], dates[dates.length - 1]);
+  ).all(uid, dateFrom, dateTo);
 
   const workouts = db.prepare(
     `SELECT DISTINCT date FROM workouts WHERE user_id=? AND date>=? AND date<=?`
-  ).all(uid, dates[0], dates[dates.length - 1]);
+  ).all(uid, dateFrom, dateTo);
 
-  const dietMap = Object.fromEntries(dietLogs.map(d => [d.date, d]));
-  const wkSet   = new Set(workouts.map(w => w.date));
+  const waterLogs = db.prepare(
+    `SELECT date, SUM(amount_ml) as total_ml FROM water_logs WHERE user_id=? AND date>=? AND date<=? GROUP BY date`
+  ).all(uid, dateFrom, dateTo);
+  const waterGoal    = req.user.water_goal_ml || 2000;
+  const waterDaysMet = waterLogs.filter(w => w.total_ml >= waterGoal).length;
+  const waterAvgMl   = waterLogs.length
+    ? Math.round(waterLogs.reduce((s, w) => s + w.total_ml, 0) / waterLogs.length)
+    : 0;
+
+  const dietMap    = Object.fromEntries(dietLogs.map(d => [d.date, d]));
+  const wkSet      = new Set(workouts.map(w => w.date));
+  const trainedDays = workouts.length;
 
   const report = dates.map(date => ({
     date,
@@ -138,17 +150,20 @@ router.get('/range', (req, res) => {
   for (let i = days * 2 - 1; i >= days; i--) {
     prevDates.push(new Date(Date.now() - i * 86400000).toISOString().slice(0, 10));
   }
-  const prevDiet   = db.prepare(
+  const prevDiet = db.prepare(
     `SELECT calories FROM diet_logs WHERE user_id=? AND date>=? AND date<=? AND calories>0`
   ).all(uid, prevDates[0], prevDates[prevDates.length - 1]);
   const prevAvgCal = prevDiet.length
     ? Math.round(prevDiet.reduce((s, d) => s + d.calories, 0) / prevDiet.length)
     : 0;
+  const prevTrainedDays = db.prepare(
+    `SELECT COUNT(DISTINCT date) as n FROM workouts WHERE user_id=? AND date>=? AND date<=?`
+  ).get(uid, prevDates[0], prevDates[prevDates.length - 1]).n;
 
   res.json({
     days: report,
-    summary:     { loggedDays, avgCalories },
-    prevSummary: { avgCalories: prevAvgCal },
+    summary:     { loggedDays, avgCalories, trainedDays, waterAvgMl, waterDaysMet, waterGoal },
+    prevSummary: { avgCalories: prevAvgCal, trainedDays: prevTrainedDays },
   });
 });
 

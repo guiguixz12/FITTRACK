@@ -17,15 +17,14 @@ function initProgress(state) {
 
 async function loadProgress(state) {
   pgState = state;
-  const today = new Date().toISOString().slice(0, 10);
   try {
-    const [statsData, weightData, waterData] = await Promise.all([
+    const [statsData, weightData] = await Promise.all([
       api.get(`/api/stats/range?days=${pgPeriodDays}`),
       api.get(`/api/diet/weight?days=${pgPeriodDays}`),
-      api.get(`/api/water?date=${today}`),
     ]);
     renderPgCalories(statsData);
-    renderPgWater(waterData);
+    renderPgWorkouts(statsData);
+    renderPgWater(statsData.summary);
     renderPgWeight(weightData);
   } catch (err) {
     console.error('loadProgress error', err);
@@ -97,7 +96,6 @@ function renderPgCalories(data) {
   }).join('');
 
   const avgPct = avg > 0 ? Math.round(avg / maxCal * 100) : 0;
-
   container.innerHTML = `<div class="pg-bars-inner" style="--avg-top:${100 - avgPct}%">${barsHtml}</div>`;
 }
 
@@ -139,50 +137,97 @@ function pgAggregateByMonth(days) {
   }));
 }
 
-// ── Water card ────────────────────────────────────────────────────────────────
+// ── Workouts mini card ────────────────────────────────────────────────────────
 
-function renderPgWater(data) {
-  const total = data.total_ml || 0;
-  const goal  = data.goal_ml  || 2000;
-  const pct   = Math.min(Math.round(total / goal * 100), 100);
+function renderPgWorkouts(data) {
+  const { summary, prevSummary } = data;
+  const count = summary.trainedDays || 0;
+  const prev  = prevSummary.trainedDays || 0;
 
-  document.getElementById('pgWaterFrac').textContent = `${(total / 1000).toFixed(1)}L / ${(goal / 1000).toFixed(1)}L`;
-  document.getElementById('pgWaterFill').style.width = pct + '%';
+  const countEl = document.getElementById('pgWorkoutsCount');
+  const subEl   = document.getElementById('pgWorkoutsSub');
+
+  if (countEl) countEl.textContent = count;
+  if (subEl) {
+    if (count === 0) {
+      subEl.textContent = 'nenhum treino';
+      subEl.style.color = 'var(--text-dim)';
+    } else if (prev > 0) {
+      const diff = count - prev;
+      if (diff === 0) {
+        subEl.textContent = 'igual ao ant.';
+        subEl.style.color = 'var(--text-dim)';
+      } else {
+        subEl.textContent = (diff > 0 ? '+' : '') + diff + ' vs ant.';
+        subEl.style.color = diff > 0 ? 'var(--accent)' : 'var(--text-dim)';
+      }
+    } else {
+      subEl.textContent = '';
+    }
+  }
 }
 
-async function pgAddWater() {
-  const today = new Date().toISOString().slice(0, 10);
-  try {
-    await api.post('/api/water', { date: today, amount_ml: 250 });
-    const data = await api.get(`/api/water?date=${today}`);
-    renderPgWater(data);
-    if (typeof renderWater === 'function') renderWater(data, today);
-  } catch (e) { toast(e.message, 'error'); }
+// ── Water mini card ───────────────────────────────────────────────────────────
+
+function renderPgWater(summary) {
+  const avg  = summary.waterAvgMl   || 0;
+  const met  = summary.waterDaysMet || 0;
+  const goal = summary.waterGoal    || 2000;
+
+  const avgEl = document.getElementById('pgWaterAvg');
+  const lblEl = document.getElementById('pgWaterLabel');
+  const subEl = document.getElementById('pgWaterSub');
+
+  if (avgEl) {
+    if (avg === 0) {
+      avgEl.textContent = '—';
+      if (lblEl) lblEl.textContent = 'sem registros';
+    } else if (avg >= 1000) {
+      avgEl.textContent = (avg / 1000).toFixed(1);
+      if (lblEl) lblEl.textContent = 'L/dia méd.';
+    } else {
+      avgEl.textContent = avg;
+      if (lblEl) lblEl.textContent = 'ml/dia méd.';
+    }
+  }
+
+  if (subEl) {
+    subEl.textContent = met > 0 ? `meta atingida ${met}/${pgPeriodDays}d` : '';
+    subEl.style.color = met > 0 ? '#5BB8F5' : 'var(--text-dim)';
+  }
 }
-window.pgAddWater = pgAddWater;
 
 // ── Weight trend chart ────────────────────────────────────────────────────────
 
 function renderPgWeight(logs) {
-  const canvas = document.getElementById('pgWeightChart');
+  const canvas    = document.getElementById('pgWeightChart');
+  const emptyEl   = document.getElementById('pgWeightEmpty');
+  const chartWrap = document.getElementById('pgWeightChartWrap');
   if (!canvas) return;
   if (pgWeightChartInst) { pgWeightChartInst.destroy(); pgWeightChartInst = null; }
 
   const weights = (logs || []).filter(l => l.weight_kg > 0);
   const badge   = document.getElementById('pgWeightBadge');
   const cmpText = document.getElementById('pgWeightCompareText');
+  const unitEl  = document.getElementById('pgWeightUnit');
 
   if (!weights.length) {
     document.getElementById('pgWeightAvg').textContent = '—';
+    if (unitEl)  unitEl.textContent = '';
     badge.style.display   = 'none';
     cmpText.style.display = 'none';
+    if (chartWrap) chartWrap.style.display = 'none';
+    if (emptyEl)   emptyEl.style.display   = '';
     return;
   }
+
+  if (chartWrap) chartWrap.style.display = '';
+  if (emptyEl)   emptyEl.style.display   = 'none';
+  if (unitEl)    unitEl.textContent       = ' kg méd.';
 
   const avg = (weights.reduce((s, l) => s + l.weight_kg, 0) / weights.length).toFixed(1);
   document.getElementById('pgWeightAvg').textContent = avg;
 
-  // Compare first vs second half for trend
   const half = Math.floor(weights.length / 2);
   if (half > 0 && weights.length > 1) {
     const avgFirst = weights.slice(0, half).reduce((s, l) => s + l.weight_kg, 0) / half;
