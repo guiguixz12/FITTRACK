@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const cookieParser = require('cookie-parser');
+const { rateLimit, ipKeyGenerator } = require('express-rate-limit');
 const path = require('path');
 const fs = require('fs');
 
@@ -19,6 +20,37 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 // /uploads intentionally NOT served statically — photos require auth via /api/photos/file/*
+
+// ── Rate limiting ─────────────────────────────────────────────────────────────
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 min
+  max: 5,
+  keyGenerator: (req) => `${ipKeyGenerator(req)}:${(req.body?.name || '').toLowerCase()}`,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Muitas tentativas. Tente novamente em 15 minutos.' },
+  skipSuccessfulRequests: true,
+});
+
+const registerLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  max: 3,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Limite de cadastros atingido. Tente novamente em 1 hora.' },
+});
+
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 300,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Muitas requisições. Tente novamente em breve.' },
+});
+
+app.use('/api/auth/login',    loginLimiter);
+app.use('/api/auth/register', registerLimiter);
+app.use('/api',               apiLimiter);
 
 app.use('/api/admin', require('./routes/admin'));
 app.use('/api/auth', require('./routes/auth'));
