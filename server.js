@@ -105,8 +105,13 @@ app.get('/admin', (req, res) => res.sendFile(path.join(__dirname, 'public', 'adm
 app.get('/', (req, res) => res.redirect('/login'));
 
 app.use((err, req, res, next) => {
-  console.error(err.message);
-  res.status(500).json({ error: err.message || 'Erro interno do servidor' });
+  // Log full error server-side (stack trace, context) — never sent to client
+  console.error(`[${new Date().toISOString()}] ${req.method} ${req.path}`, err);
+  if (res.headersSent) return next(err);
+  const status = err.status || err.statusCode || 500;
+  // Validation/client errors (4xx) keep their message; server errors get generic response
+  const message = status < 500 ? (err.message || 'Requisição inválida') : 'Erro interno do servidor';
+  res.status(status).json({ error: message });
 });
 
 app.listen(PORT, () => console.log(`FitTracker rodando na porta ${PORT}`));
