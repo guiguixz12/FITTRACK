@@ -30,60 +30,61 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 40px 24px;
-      padding-top: max(40px, env(safe-area-inset-top, 0px));
-      padding-bottom: max(40px, env(safe-area-inset-bottom, 0px));
+      padding: 32px 20px;
+      padding-top: max(32px, env(safe-area-inset-top, 0px));
+      padding-bottom: max(32px, env(safe-area-inset-bottom, 0px));
     }
 
-    .lp-wrap { width: 100%; max-width: 390px; }
+    .lp-wrap { width: 100%; max-width: 380px; }
 
-    /* ── Logo ── */
+    /* ── Logo — same mark as app header ── */
     .lp-logo {
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 14px;
-      margin-bottom: 14px;
+      gap: 11px;
+      margin-bottom: 10px;
     }
     .lp-logo-mark {
-      width: 58px; height: 58px;
+      width: 42px; height: 42px;
       background: #C4E538;
-      border-radius: 18px;
+      border-radius: 12px;
       display: flex; align-items: center; justify-content: center;
       flex-shrink: 0;
     }
     .lp-logo-name {
-      font-size: 38px;
+      font-size: 26px;
       font-weight: 800;
       color: #F2F2F0;
-      letter-spacing: -0.5px;
+      letter-spacing: -0.3px;
       line-height: 1;
     }
     .lp-tagline {
       text-align: center;
       color: #8A8A8E;
-      font-size: 15px;
+      font-size: 13px;
       font-weight: 500;
-      margin-bottom: 40px;
+      margin-bottom: 32px;
     }
 
-    /* ── Form fields ── */
-    .lp-field { margin-bottom: 20px; }
+    /* ── Field ── */
+    .lp-field { margin-bottom: 16px; }
     .lp-label {
       display: block;
-      font-size: 11px;
+      font-size: 10.5px;
       font-weight: 700;
       color: #8A8A8E;
       letter-spacing: 0.09em;
       text-transform: uppercase;
-      margin-bottom: 9px;
+      margin-bottom: 7px;
     }
     .lp-input {
       width: 100%;
       background: #1A1A1C;
       border: 1.5px solid transparent;
-      border-radius: 14px;
-      padding: 17px 18px;
+      border-radius: 12px;
+      padding: 13px 15px;
+      /* 16px prevents iOS auto-zoom */
       font-size: 16px;
       font-weight: 500;
       color: #F2F2F0;
@@ -91,6 +92,8 @@
       outline: none;
       transition: border-color .15s;
       -webkit-appearance: none;
+      /* visually scale down while keeping 16px for iOS */
+      transform-origin: left center;
     }
     .lp-input::placeholder { color: #44444A; }
     .lp-input:focus { border-color: #C4E538; }
@@ -98,12 +101,12 @@
     /* ── Forgot ── */
     .lp-forgot {
       text-align: right;
-      margin-top: 10px;
-      margin-bottom: 30px;
+      margin-top: 8px;
+      margin-bottom: 24px;
     }
     .lp-forgot a {
       color: #C4E538;
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 600;
       text-decoration: underline;
       cursor: pointer;
@@ -115,9 +118,9 @@
       background: #C4E538;
       color: #0D0D0D;
       border: none;
-      border-radius: 16px;
-      padding: 18px;
-      font-size: 17px;
+      border-radius: 13px;
+      padding: 15px;
+      font-size: 15px;
       font-weight: 800;
       font-family: inherit;
       cursor: pointer;
@@ -132,12 +135,12 @@
     .lp-divider {
       display: flex;
       align-items: center;
-      gap: 14px;
-      margin: 30px 0;
+      gap: 12px;
+      margin: 22px 0;
     }
     .lp-divider-line { flex: 1; height: 1px; background: #26262A; }
     .lp-divider-text {
-      font-size: 13px;
+      font-size: 12px;
       color: #5A5A60;
       font-weight: 500;
       white-space: nowrap;
@@ -147,31 +150,31 @@
     .lp-social-row {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin-bottom: 34px;
+      gap: 10px;
+      margin-bottom: 26px;
     }
     .lp-social-btn {
       background: #1A1A1C;
       border: 1.5px solid #26262A;
-      border-radius: 14px;
-      padding: 15px 12px;
+      border-radius: 12px;
+      padding: 13px 10px;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 10px;
-      font-size: 15px;
+      gap: 8px;
+      font-size: 13px;
       font-weight: 700;
       color: #F2F2F0;
       font-family: inherit;
       cursor: pointer;
-      transition: border-color .15s, opacity .15s;
+      transition: opacity .15s;
     }
     .lp-social-btn:active { opacity: 0.7; }
 
     /* ── Footer ── */
     .lp-footer {
       text-align: center;
-      font-size: 14px;
+      font-size: 13px;
       color: #6A6A6E;
       font-weight: 500;
     }
@@ -185,13 +188,13 @@
     /* ── Error ── */
     .lp-error {
       color: #ff7070;
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 600;
       text-align: center;
-      margin-top: 14px;
-      padding: 12px 14px;
+      margin-top: 12px;
+      padding: 10px 14px;
       background: rgba(255,80,80,0.10);
-      border-radius: 12px;
+      border-radius: 10px;
       border: 1px solid rgba(255,80,80,0.18);
     }
 
@@ -202,13 +205,13 @@
     /* ── Toast ── */
     #lp-toast {
       position: fixed;
-      bottom: 32px; left: 50%;
-      transform: translateX(-50%) translateY(12px);
+      bottom: 28px; left: 50%;
+      transform: translateX(-50%) translateY(10px);
       background: #2A2A2C;
       color: #F2F2F0;
       font-size: 13px;
       font-weight: 600;
-      padding: 12px 20px;
+      padding: 11px 18px;
       border-radius: 99px;
       border: 1px solid #36363A;
       opacity: 0;
@@ -218,21 +221,18 @@
       z-index: 999;
       font-family: 'Manrope', system-ui, sans-serif;
     }
-    #lp-toast.show {
-      opacity: 1;
-      transform: translateX(-50%) translateY(0);
-    }
+    #lp-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
   </style>
 </head>
 <body>
 <div class="lp">
   <div class="lp-wrap">
 
-    <!-- Logo -->
+    <!-- Logo — same barbell mark as app header -->
     <div class="lp-logo">
       <div class="lp-logo-mark">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#0D0D0D" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0D0D0D" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M6 4v16M18 4v16M3 8h3M3 16h3M21 8h-3M21 16h-3M9 12h6"/>
         </svg>
       </div>
       <span class="lp-logo-name">FitX</span>
@@ -242,8 +242,8 @@
     <!-- ── Login panel ── -->
     <div class="lp-panel active" id="panelLogin">
       <div class="lp-field">
-        <label class="lp-label" for="loginName">E-MAIL</label>
-        <input class="lp-input" type="text" id="loginName" placeholder="seuemail@exemplo.com"
+        <label class="lp-label" for="loginName">USUÁRIO</label>
+        <input class="lp-input" type="text" id="loginName" placeholder="seu usuário"
                autocomplete="username" spellcheck="false" autocapitalize="none">
       </div>
       <div class="lp-field" style="margin-bottom:0">
@@ -265,14 +265,14 @@
 
       <div class="lp-social-row">
         <button class="lp-social-btn" onclick="lpToast('Em breve')">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <rect width="20" height="16" x="2" y="4" rx="2"/>
             <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
           </svg>
           Apple
         </button>
         <button class="lp-social-btn" onclick="lpToast('Em breve')">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="10"/>
             <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/>
             <path d="M2 12h20"/>
@@ -292,7 +292,7 @@
                autocomplete="username" spellcheck="false" autocapitalize="none">
       </div>
       <div class="lp-field">
-        <label class="lp-label" for="regEmail">E-MAIL <span style="color:#5A5A60;font-weight:500;text-transform:none;letter-spacing:0">(opcional)</span></label>
+        <label class="lp-label" for="regEmail">E-MAIL <span style="color:#5A5A60;font-weight:500;text-transform:none;letter-spacing:0;font-size:11px">(opcional)</span></label>
         <input class="lp-input" type="email" id="regEmail" placeholder="seu@email.com"
                autocomplete="email">
       </div>
@@ -301,15 +301,14 @@
         <input class="lp-input" type="password" id="regPassword" placeholder="Mínimo 6 caracteres"
                autocomplete="new-password">
       </div>
-      <div class="lp-field" style="margin-bottom:30px">
+      <div class="lp-field" style="margin-bottom:24px">
         <label class="lp-label" for="regConfirm">CONFIRMAR SENHA</label>
         <input class="lp-input" type="password" id="regConfirm" placeholder="••••••••"
                autocomplete="new-password">
       </div>
       <button class="lp-btn" id="registerBtn" onclick="doRegister()">Criar conta</button>
       <div class="lp-error" id="registerError" style="display:none"></div>
-
-      <p class="lp-footer" style="margin-top:28px">Já tem conta? <a onclick="showLogin()">Entrar</a></p>
+      <p class="lp-footer" style="margin-top:22px">Já tem conta? <a onclick="showLogin()">Entrar</a></p>
     </div>
 
   </div>
@@ -318,7 +317,6 @@
 <div id="lp-toast"></div>
 
 <script>
-  // Redirect if already logged in
   fetch('/api/auth/me').then(async r => {
     if (!r.ok) return;
     const d = await r.json();
@@ -331,7 +329,6 @@
     document.getElementById('panelRegister').classList.add('active');
     document.getElementById('regName').focus();
   }
-
   function showLogin() {
     document.getElementById('panelRegister').classList.remove('active');
     document.getElementById('panelLogin').classList.add('active');
@@ -341,18 +338,17 @@
   async function doLogin() {
     const btn   = document.getElementById('loginBtn');
     const errEl = document.getElementById('loginError');
-    const name  = document.getElementById('loginName').value.trim();
-    const pass  = document.getElementById('loginPassword').value;
-
     errEl.style.display = 'none';
     btn.textContent = '...';
     btn.disabled = true;
-
     try {
       const res  = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, password: pass }),
+        body: JSON.stringify({
+          name:     document.getElementById('loginName').value.trim(),
+          password: document.getElementById('loginPassword').value,
+        }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Usuário ou senha inválidos');
@@ -369,27 +365,25 @@
   async function doRegister() {
     const btn     = document.getElementById('registerBtn');
     const errEl   = document.getElementById('registerError');
-    const name    = document.getElementById('regName').value.trim();
-    const email   = document.getElementById('regEmail').value.trim();
     const pass    = document.getElementById('regPassword').value;
     const confirm = document.getElementById('regConfirm').value;
-
     errEl.style.display = 'none';
-
     if (pass !== confirm) {
       errEl.textContent = 'As senhas não conferem';
       errEl.style.display = 'block';
       return;
     }
-
     btn.textContent = '...';
     btn.disabled = true;
-
     try {
       const res  = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, password: pass, email: email || undefined }),
+        body: JSON.stringify({
+          name:     document.getElementById('regName').value.trim(),
+          password: pass,
+          email:    document.getElementById('regEmail').value.trim() || undefined,
+        }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Erro ao criar conta');
@@ -402,21 +396,19 @@
     }
   }
 
-  // Enter key submits
   document.addEventListener('keydown', e => {
     if (e.key !== 'Enter') return;
     if (document.getElementById('panelLogin').classList.contains('active')) doLogin();
     else doRegister();
   });
 
-  // Simple toast
-  let _toastTimer;
+  let _t;
   function lpToast(msg) {
     const el = document.getElementById('lp-toast');
     el.textContent = msg;
     el.classList.add('show');
-    clearTimeout(_toastTimer);
-    _toastTimer = setTimeout(() => el.classList.remove('show'), 2200);
+    clearTimeout(_t);
+    _t = setTimeout(() => el.classList.remove('show'), 2200);
   }
 </script>
 </body>
