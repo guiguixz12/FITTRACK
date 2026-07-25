@@ -287,6 +287,10 @@ function renderDietWeekGrid() {
         </div>
       </div>`;
   }).join('');
+
+  const anyPlan = Object.values(dtTemplates).some(t => t && (t.name || t.foods?.length));
+  const suggestEl = document.getElementById('dietPlanSuggest');
+  if (suggestEl) suggestEl.style.display = anyPlan ? 'none' : '';
 }
 
 async function copyDtTemplate(fromDow) {

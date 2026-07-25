@@ -77,6 +77,44 @@ async function initApp() {
     btn.addEventListener('click', () => switchTab(btn.dataset.tab));
   });
 
+  // FAB "+" quick-action panel
+  const fab   = document.getElementById('navFab');
+  const panel = document.getElementById('quickActionPanel');
+
+  function closeFab() {
+    panel.classList.remove('open');
+    fab.classList.remove('open');
+  }
+
+  fab.addEventListener('click', e => {
+    e.stopPropagation();
+    const isOpen = panel.classList.contains('open');
+    isOpen ? closeFab() : (panel.classList.add('open'), fab.classList.add('open'));
+  });
+
+  document.addEventListener('click', e => {
+    if (!panel.contains(e.target) && e.target !== fab) closeFab();
+  });
+
+  document.getElementById('qaAddFood').addEventListener('click', () => {
+    closeFab();
+    switchTab('diet');
+    // Switch to "Registrar" sub-tab after diet loads
+    setTimeout(() => {
+      const btn = document.querySelector('[data-dtview="registrar"]');
+      if (btn) btn.click();
+    }, 150);
+  });
+
+  document.getElementById('qaStartWorkout').addEventListener('click', () => {
+    closeFab();
+    switchTab('workouts');
+    setTimeout(() => {
+      const btn = document.querySelector('[data-view="registrar"]');
+      if (btn) btn.click();
+    }, 150);
+  });
+
   // Init dashboard (always the first tab)
   initDashboard(AppState);
   loadDashboard(AppState);

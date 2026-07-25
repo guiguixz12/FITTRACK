@@ -20,7 +20,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/style.css?v=19">
+  <link rel="stylesheet" href="/css/style.css?v=20">
 
   <!-- SVG gradient for calorie ring (must live in DOM) -->
   <svg width="0" height="0" style="position:absolute">
@@ -234,7 +234,7 @@
 
       <!-- VIEW: Programa Semanal -->
       <div id="dtViewPrograma">
-        <div class="plan-suggest-bar">
+        <div class="plan-suggest-bar" id="dietPlanSuggest">
           <div class="plan-suggest-bar-text">
             <strong>Não sabe por onde começar?</strong>
             Gere um plano de dieta personalizado em segundos.
@@ -476,7 +476,7 @@
 
       <!-- VIEW: Programa Semanal -->
       <div id="wkViewPrograma">
-        <div class="plan-suggest-bar">
+        <div class="plan-suggest-bar" id="wkPlanSuggest">
           <div class="plan-suggest-bar-text">
             <strong>Não sabe montar seu treino?</strong>
             Responda 4 perguntas e gere um plano personalizado.
@@ -912,7 +912,24 @@
 
   </main>
 
-  <!-- ── Bottom Nav (5 tabs) ─────────────────────────────── -->
+  <!-- ── Quick Action Panel (above nav, toggled by FAB) ───── -->
+  <div id="quickActionPanel" class="quick-action-panel">
+    <button class="quick-action-item" id="qaAddFood">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/>
+        <path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3zm0 0v7"/>
+      </svg>
+      Registrar alimento
+    </button>
+    <button class="quick-action-item" id="qaStartWorkout">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M6 4v6a6 6 0 0 0 12 0V4"/><line x1="4" y1="20" x2="20" y2="20"/>
+      </svg>
+      Iniciar treino
+    </button>
+  </div>
+
+  <!-- ── Bottom Nav (4 tabs + FAB) ────────────────────────── -->
   <nav class="bottom-nav">
     <button class="nav-btn active" data-tab="dashboard">
       <span class="nav-icon">
@@ -933,6 +950,11 @@
       </span>
       <span class="nav-label">Dieta</span>
     </button>
+    <button class="nav-fab" id="navFab" aria-label="Ações rápidas">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+      </svg>
+    </button>
     <button class="nav-btn" data-tab="workouts">
       <span class="nav-icon">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -950,15 +972,6 @@
         </svg>
       </span>
       <span class="nav-label">Progresso</span>
-    </button>
-    <button class="nav-btn" data-tab="settings">
-      <span class="nav-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="3"/>
-          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
-        </svg>
-      </span>
-      <span class="nav-label">Config</span>
     </button>
   </nav>
 
@@ -1005,19 +1018,19 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
-<script src="/js/vendor/body-highlighter.iife.js?v=19"></script>
-<script src="/js/muscle-map.js?v=19"></script>
-<script src="/js/api.js?v=19"></script>
-<script src="/js/scanner.js?v=19"></script>
-<script src="/js/dashboard.js?v=19"></script>
-<script src="/js/diet.js?v=19"></script>
-<script src="/js/workouts.js?v=19"></script>
-<script src="/js/evolution.js?v=19"></script>
-<script src="/js/photos.js?v=19"></script>
-<script src="/js/progress.js?v=19"></script>
-<script src="/js/settings.js?v=19"></script>
-<script src="/js/app.js?v=19"></script>
-<script src="/js/plans.js?v=19"></script>
+<script src="/js/vendor/body-highlighter.iife.js?v=20"></script>
+<script src="/js/muscle-map.js?v=20"></script>
+<script src="/js/api.js?v=20"></script>
+<script src="/js/scanner.js?v=20"></script>
+<script src="/js/dashboard.js?v=20"></script>
+<script src="/js/diet.js?v=20"></script>
+<script src="/js/workouts.js?v=20"></script>
+<script src="/js/evolution.js?v=20"></script>
+<script src="/js/photos.js?v=20"></script>
+<script src="/js/progress.js?v=20"></script>
+<script src="/js/settings.js?v=20"></script>
+<script src="/js/app.js?v=20"></script>
+<script src="/js/plans.js?v=20"></script>
 <script>
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/sw.js').catch(() => {});

@@ -599,6 +599,10 @@ function renderWeekGrid() {
         </div>
       </div>`;
   }).join('');
+
+  const anyPlan = Object.values(wkTemplates).some(t => t && t.name);
+  const suggestEl = document.getElementById('wkPlanSuggest');
+  if (suggestEl) suggestEl.style.display = anyPlan ? 'none' : '';
 }
 
 function toggleWkCard(dow) {
