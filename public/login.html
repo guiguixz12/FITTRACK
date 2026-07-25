@@ -133,7 +133,7 @@
           <path d="M6 4v16M18 4v16M3 8h3M3 16h3M21 8h-3M21 16h-3M9 12h6"/>
         </svg>
       </div>
-      <h1>FIT<span>TRACKER</span></h1>
+      <h1>FIT</h1>
       <p class="login-tagline">Seu progresso. Seus resultados.</p>
     </div>
 
@@ -198,7 +198,12 @@
   </div>
 
   <script>
-    fetch('/api/auth/me').then(r => { if (r.ok) location.href = '/app'; }).catch(() => {});
+    fetch('/api/auth/me').then(async r => {
+      if (!r.ok) return;
+      const d = await r.json();
+      const role = d.user?.role;
+      location.href = (role === 'admin' || role === 'super_admin') ? '/admin' : '/app';
+    }).catch(() => {});
 
     function showRegister() {
       document.getElementById('loginCard').style.display    = 'none';
@@ -235,7 +240,8 @@
         });
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || 'Usuário ou senha inválidos');
-        location.href = '/app';
+        const role = data.user?.role;
+        location.href = (role === 'admin' || role === 'super_admin') ? '/admin' : '/app';
       } catch (err) {
         errEl.textContent = err.message;
         errEl.style.display = 'block';
@@ -271,7 +277,7 @@
         });
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || 'Erro ao criar conta');
-        location.href = '/app';
+        location.href = '/app'; // register always creates role='user'
       } catch (err) {
         errEl.textContent = err.message;
         errEl.style.display = 'block';

@@ -210,10 +210,15 @@ function initDB() {
     "ALTER TABLE workouts ADD COLUMN estimated_kcal INTEGER",
     "ALTER TABLE workouts ADD COLUMN duration_seconds INTEGER",
     "ALTER TABLE workouts ADD COLUMN muscles_worked TEXT",
+    "ALTER TABLE users ADD COLUMN role TEXT DEFAULT 'user'",
+    "ALTER TABLE users ADD COLUMN admin_id INTEGER",
   ];
   for (const sql of migrations) {
     try { database.exec(sql); } catch (_) { /* column already exists */ }
   }
+
+  // Ensure Guilherme is always super_admin
+  database.prepare("UPDATE users SET role='super_admin' WHERE name='Guilherme' AND (role IS NULL OR role='user')").run();
 
   // Seed diet and workout templates for guixz and anabutti
   seedDietTemplates(database);

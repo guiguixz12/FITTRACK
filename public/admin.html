@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>FIT · ADMIN</title>
+  <link rel="manifest" href="/manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #0F0F10;
+      --card:     #1C1C1E;
+      --card2:    #252527;
+      --border:   #2C2C2E;
+      --orange:   #FF6B35;
+      --orange-dim: rgba(255,107,53,.12);
+      --text:     #F5F5F7;
+      --text-2:   #AEAEB2;
+      --text-3:   #636366;
+      --red:      #FF453A;
+      --red-dim:  rgba(255,69,58,.12);
+      --green:    #32D74B;
+      --green-dim:rgba(50,215,75,.12);
+      --radius:   14px;
+      --radius-sm: 9px;
+    }
+
+    html, body { height: 100%; background: var(--bg); color: var(--text); font-family: 'Inter', system-ui, sans-serif; }
+
+    /* ── Header ─────────────────────────────────────────────── */
+    .adm-header {
+      position: sticky; top: 0; z-index: 50;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 20px;
+      padding-top: max(14px, env(safe-area-inset-top));
+      background: rgba(15,15,16,.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+    .adm-brand { display: flex; align-items: center; gap: 10px; }
+    .adm-brand-mark {
+      width: 36px; height: 36px; border-radius: 10px;
+      background: var(--orange-dim); border: 1px solid rgba(255,107,53,.3);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--orange);
+    }
+    .adm-brand-text { font-size: 1rem; font-weight: 800; letter-spacing: .12em; }
+    .adm-brand-text span { color: var(--orange); }
+    .adm-badge {
+      font-size: .6rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
+      background: var(--orange-dim); color: var(--orange);
+      border: 1px solid rgba(255,107,53,.3); border-radius: 5px; padding: 2px 7px;
+      margin-left: 4px; vertical-align: middle;
+    }
+    .adm-actions { display: flex; align-items: center; gap: 10px; }
+    .adm-user-name { font-size: .82rem; color: var(--text-2); }
+    .btn-logout {
+      font-size: .78rem; font-weight: 600;
+      padding: 7px 14px; border-radius: var(--radius-sm);
+      background: transparent; border: 1px solid var(--border);
+      color: var(--text-2); cursor: pointer;
+    }
+    .btn-logout:hover { background: var(--card); }
+
+    /* ── Tabs ────────────────────────────────────────────────── */
+    .adm-tabs {
+      display: flex; gap: 6px;
+      padding: 14px 20px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .adm-tab {
+      padding: 9px 18px; font-size: .82rem; font-weight: 600;
+      border: none; background: transparent; color: var(--text-3); cursor: pointer;
+      border-bottom: 2px solid transparent; margin-bottom: -1px;
+    }
+    .adm-tab.active { color: var(--orange); border-color: var(--orange); }
+
+    /* ── Page body ──────────────────────────────────────────── */
+    .adm-body {
+      padding: 20px;
+      padding-bottom: max(20px, env(safe-area-inset-bottom));
+      max-width: 760px; margin: 0 auto;
+    }
+
+    /* ── Section header (title + Novo btn) ───────────────────── */
+    .adm-section-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .adm-section-title { font-size: 1rem; font-weight: 700; }
+    .btn-new {
+      display: flex; align-items: center; gap: 6px;
+      padding: 9px 16px; border-radius: var(--radius-sm);
+      background: var(--orange); color: #fff;
+      font-size: .82rem; font-weight: 700; border: none; cursor: pointer;
+    }
+    .btn-new:hover { opacity: .9; }
+
+    /* ── Client / Admin cards ─────────────────────────────────── */
+    .adm-grid { display: flex; flex-direction: column; gap: 10px; }
+
+    .adm-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      display: flex; align-items: center; gap: 14px;
+    }
+    .adm-avatar {
+      width: 44px; height: 44px; border-radius: 50%;
+      background: var(--orange-dim); border: 1.5px solid rgba(255,107,53,.3);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem; font-weight: 800; color: var(--orange);
+      flex-shrink: 0;
+    }
+    .adm-card-info { flex: 1; min-width: 0; }
+    .adm-card-name { font-size: .95rem; font-weight: 700; }
+    .adm-card-meta {
+      font-size: .76rem; color: var(--text-3); margin-top: 2px;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .adm-card-sub { font-size: .72rem; color: var(--text-3); margin-top: 1px; }
+
+    .adm-card-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+    .btn-enter {
+      padding: 8px 14px; border-radius: var(--radius-sm);
+      background: var(--orange-dim); border: 1px solid rgba(255,107,53,.3);
+      color: var(--orange); font-size: .8rem; font-weight: 700; cursor: pointer;
+    }
+    .btn-enter:hover { background: rgba(255,107,53,.22); }
+    .btn-delete {
+      width: 34px; height: 34px; border-radius: var(--radius-sm);
+      background: transparent; border: 1px solid var(--border);
+      color: var(--text-3); font-size: .9rem; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .btn-delete:hover { background: var(--red-dim); border-color: rgba(255,69,58,.3); color: var(--red); }
+
+    /* ── Empty state ──────────────────────────────────────────── */
+    .adm-empty {
+      text-align: center; padding: 40px 20px;
+      color: var(--text-3); font-size: .88rem;
+    }
+
+    /* ── Modal overlay ────────────────────────────────────────── */
+    .adm-overlay {
+      position: fixed; inset: 0; z-index: 200;
+      background: rgba(0,0,0,.7); backdrop-filter: blur(6px);
+      display: flex; align-items: flex-end;
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+    .adm-overlay.hidden { display: none; }
+    .adm-modal {
+      width: 100%; max-width: 480px; margin: 0 auto;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: var(--radius) var(--radius) 0 0;
+      padding: 24px 20px 28px;
+    }
+    @media (min-width: 520px) {
+      .adm-overlay { align-items: center; }
+      .adm-modal { border-radius: var(--radius); }
+    }
+    .adm-modal-title {
+      font-size: 1rem; font-weight: 800; margin-bottom: 18px;
+    }
+    .adm-modal .form-row { display: flex; gap: 12px; }
+    .adm-modal .form-row .form-group { flex: 1; }
+    .form-group { margin-bottom: 14px; }
+    .form-group label {
+      display: block; font-size: .76rem; font-weight: 600; color: var(--text-2);
+      margin-bottom: 5px; text-transform: uppercase; letter-spacing: .06em;
+    }
+    .form-group input, .form-group select {
+      width: 100%; padding: 10px 12px;
+      background: var(--card2); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); color: var(--text);
+      font-size: .9rem; font-family: inherit; outline: none;
+    }
+    .form-group input:focus, .form-group select:focus { border-color: var(--orange); }
+    .adm-modal-btns { display: flex; gap: 10px; margin-top: 20px; }
+    .btn-cancel {
+      flex: 1; padding: 12px; border-radius: var(--radius-sm);
+      background: transparent; border: 1px solid var(--border);
+      color: var(--text-2); font-size: .9rem; font-weight: 600; cursor: pointer;
+    }
+    .btn-cancel:hover { background: var(--card2); }
+    .btn-save {
+      flex: 2; padding: 12px; border-radius: var(--radius-sm);
+      background: var(--orange); border: none;
+      color: #fff; font-size: .9rem; font-weight: 700; cursor: pointer;
+    }
+    .btn-save:hover { opacity: .9; }
+    .btn-save:disabled { opacity: .5; cursor: not-allowed; }
+
+    .adm-modal-error {
+      font-size: .8rem; color: var(--red); background: var(--red-dim);
+      border: 1px solid rgba(255,69,58,.2); border-radius: var(--radius-sm);
+      padding: 8px 12px; margin-top: 10px;
+    }
+
+    /* ── Spinner / loading ────────────────────────────────────── */
+    .adm-loading {
+      text-align: center; padding: 40px; color: var(--text-3); font-size: .88rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── Header ──────────────────────────────────────────────── -->
+  <header class="adm-header">
+    <div class="adm-brand">
+      <div class="adm-brand-mark">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M6 4v16M18 4v16M3 8h3M3 16h3M21 8h-3M21 16h-3M9 12h6"/>
+        </svg>
+      </div>
+      <span class="adm-brand-text">FIT <span id="admBadgeRole" class="adm-badge">ADMIN</span></span>
+    </div>
+    <div class="adm-actions">
+      <span class="adm-user-name" id="admUserName"></span>
+      <button class="btn-logout" onclick="logout()">Sair</button>
+    </div>
+  </header>
+
+  <!-- ── Tabs ─────────────────────────────────────────────────── -->
+  <div class="adm-tabs" id="admTabs">
+    <button class="adm-tab active" onclick="switchTab('clients')" id="tabClients">Clientes</button>
+    <button class="adm-tab" onclick="switchTab('admins')" id="tabAdmins" style="display:none">Admins</button>
+  </div>
+
+  <!-- ── Body ─────────────────────────────────────────────────── -->
+  <div class="adm-body">
+
+    <!-- Clients section -->
+    <div id="sectionClients">
+      <div class="adm-section-header">
+        <span class="adm-section-title">Clientes</span>
+        <button class="btn-new" onclick="openNewClientModal()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Novo
+        </button>
+      </div>
+      <div id="clientsGrid" class="adm-grid">
+        <div class="adm-loading">Carregando...</div>
+      </div>
+    </div>
+
+    <!-- Admins section (super_admin only) -->
+    <div id="sectionAdmins" style="display:none">
+      <div class="adm-section-header">
+        <span class="adm-section-title">Administradores</span>
+        <button class="btn-new" onclick="openNewAdminModal()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Novo
+        </button>
+      </div>
+      <div id="adminsGrid" class="adm-grid">
+        <div class="adm-loading">Carregando...</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── Modal: novo cliente ────────────────────────────────────── -->
+  <div class="adm-overlay hidden" id="newClientOverlay" onclick="closeModalOnBackdrop(event,'newClientOverlay')">
+    <div class="adm-modal" onclick="event.stopPropagation()">
+      <div class="adm-modal-title">Novo cliente</div>
+      <form id="newClientForm" novalidate>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Usuário</label>
+            <input type="text" id="ncName" placeholder="Nome único" required autocapitalize="none">
+          </div>
+          <div class="form-group">
+            <label>Senha</label>
+            <input type="password" id="ncPwd" placeholder="Mín. 6 caracteres" required>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Idade</label>
+            <input type="number" id="ncAge" placeholder="Ex: 28" min="10" max="99">
+          </div>
+          <div class="form-group">
+            <label>Sexo</label>
+            <select id="ncSex">
+              <option value="">—</option>
+              <option value="M">Masculino</option>
+              <option value="F">Feminino</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Altura (cm)</label>
+            <input type="number" id="ncHeight" placeholder="Ex: 175">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Kcal/dia</label>
+            <input type="number" id="ncKcal" placeholder="2000">
+          </div>
+          <div class="form-group">
+            <label>Proteína (g)</label>
+            <input type="number" id="ncProt" placeholder="150">
+          </div>
+        </div>
+        <p class="adm-modal-error" id="newClientErr" style="display:none"></p>
+        <div class="adm-modal-btns">
+          <button type="button" class="btn-cancel" onclick="closeModal('newClientOverlay')">Cancelar</button>
+          <button type="submit" class="btn-save" id="newClientSaveBtn">Criar cliente</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ── Modal: novo admin ─────────────────────────────────────── -->
+  <div class="adm-overlay hidden" id="newAdminOverlay" onclick="closeModalOnBackdrop(event,'newAdminOverlay')">
+    <div class="adm-modal" onclick="event.stopPropagation()">
+      <div class="adm-modal-title">Novo administrador</div>
+      <form id="newAdminForm" novalidate>
+        <div class="form-group">
+          <label>Usuário</label>
+          <input type="text" id="naName" placeholder="Nome único" required autocapitalize="none">
+        </div>
+        <div class="form-group">
+          <label>E-mail <span style="color:var(--text-3);font-weight:400">(opcional)</span></label>
+          <input type="email" id="naEmail" placeholder="personal@email.com">
+        </div>
+        <div class="form-group">
+          <label>Senha</label>
+          <input type="password" id="naPwd" placeholder="Mín. 6 caracteres" required>
+        </div>
+        <p class="adm-modal-error" id="newAdminErr" style="display:none"></p>
+        <div class="adm-modal-btns">
+          <button type="button" class="btn-cancel" onclick="closeModal('newAdminOverlay')">Cancelar</button>
+          <button type="submit" class="btn-save" id="newAdminSaveBtn">Criar admin</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="/js/admin.js?v=1"></script>
+</body>
+</html>

@@ -2,7 +2,7 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { getDB } = require('../db/init');
-const { requireAuth } = require('../middleware/auth');
+const { requireAuth, requireAdmin } = require('../middleware/auth');
 
 const router = express.Router();
 
@@ -60,7 +60,7 @@ router.post('/login', (req, res) => {
   }
 
   const token = jwt.sign(
-    { id: user.id, name: user.name },
+    { id: user.id, name: user.name, role: user.role || 'user' },
     process.env.JWT_SECRET || 'dev_secret_change_me',
     { expiresIn: '30d' }
   );
@@ -78,11 +78,48 @@ router.post('/logout', (req, res) => {
 });
 
 router.get('/me', requireAuth, (req, res) => {
-  const user = getDB()
-    .prepare('SELECT id, name, email, target_calories, target_protein, target_carbs, target_fat, height_cm, age, sex, target_weight, theme, plan FROM users WHERE id = ?')
+  const db   = getDB();
+  const user = db
+    .prepare('SELECT id, name, email, target_calories, target_protein, target_carbs, target_fat, height_cm, age, sex, target_weight, theme, plan, role FROM users WHERE id = ?')
     .get(req.user.id);
   if (!user) return res.status(404).json({ error: 'Usuário não encontrado' });
-  res.json({ user });
+
+  const resp = { user };
+  if (req.user._impersonatedBy) {
+    const admin = db.prepare('SELECT id, name FROM users WHERE id=?').get(req.user._impersonatedBy);
+    if (admin) resp.impersonatedBy = { id: admin.id, name: admin.name };
+  }
+  res.json(resp);
+});
+
+router.post('/impersonate/:clientId', requireAdmin, (req, res) => {
+  const db     = getDB();
+  const client = db.prepare('SELECT id, name, role, admin_id FROM users WHERE id=?').get(req.params.clientId);
+  if (!client) return res.status(404).json({ error: 'Cliente não encontrado' });
+  if (client.role !== 'user') return res.status(403).json({ error: 'Só é possível visualizar contas de usuário' });
+  if (req.user.role === 'admin' && client.admin_id !== req.user.id) {
+    return res.status(403).json({ error: 'Este cliente não pertence a você' });
+  }
+
+  const clientToken = jwt.sign(
+    { id: client.id, name: client.name, role: 'user', _impersonatedBy: req.user.id },
+    process.env.JWT_SECRET || 'dev_secret_change_me',
+    { expiresIn: '8h' }
+  );
+
+  if (process.env.NODE_ENV === 'production') COOKIE_OPTS.secure = true;
+  res.cookie('adminToken', req.cookies.token, COOKIE_OPTS);
+  res.cookie('token', clientToken, COOKIE_OPTS);
+  res.json({ success: true });
+});
+
+router.post('/stop-impersonate', (req, res) => {
+  const adminToken = req.cookies?.adminToken;
+  if (!adminToken) return res.status(400).json({ error: 'Não está em modo de visualização' });
+  if (process.env.NODE_ENV === 'production') COOKIE_OPTS.secure = true;
+  res.cookie('token', adminToken, COOKIE_OPTS);
+  res.clearCookie('adminToken');
+  res.json({ success: true });
 });
 
 module.exports = router;

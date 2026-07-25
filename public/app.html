@@ -35,6 +35,12 @@
 <body>
 <div id="app">
 
+  <!-- ── Impersonation banner ─────────────────────────────── -->
+  <div id="impersonateBanner" style="display:none;background:#3A3000;border-bottom:1px solid #7A6000;padding:9px 16px;align-items:center;justify-content:space-between;gap:12px;font-size:.8rem;font-family:'Inter',system-ui,sans-serif;">
+    <span id="impersonateLabel" style="color:#FFD60A;font-weight:600;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span>
+    <button onclick="stopImpersonate()" style="flex-shrink:0;background:#7A6000;border:1px solid #A08000;color:#FFD60A;font-size:.78rem;font-weight:700;padding:5px 12px;border-radius:7px;cursor:pointer;">Voltar ao painel</button>
+  </div>
+
   <!-- ── Header ──────────────────────────────────────────── -->
   <header class="app-header">
     <span class="brand">FIT</span>

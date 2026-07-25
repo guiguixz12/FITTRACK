@@ -31,13 +31,31 @@ function switchTab(tab) {
   loaders[tab]?.();
 }
 
-async function initApp() {
+async function stopImpersonate() {
   try {
-    const { user } = await api.get('/api/auth/me');
-    AppState.user = user;
+    await api.post('/api/auth/stop-impersonate', {});
+    location.href = '/admin';
+  } catch { location.href = '/admin'; }
+}
+window.stopImpersonate = stopImpersonate;
+
+async function initApp() {
+  let meData;
+  try {
+    meData = await api.get('/api/auth/me');
+    AppState.user = meData.user;
   } catch {
     location.href = '/login';
     return;
+  }
+
+  if (meData.impersonatedBy) {
+    const banner = document.getElementById('impersonateBanner');
+    if (banner) {
+      document.getElementById('impersonateLabel').textContent =
+        `Visualizando como ${AppState.user.name} (sessão do admin ${meData.impersonatedBy.name})`;
+      banner.style.display = 'flex';
+    }
   }
 
   // Set avatar button initial with first letter

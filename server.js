@@ -32,7 +32,8 @@ app.use('/api/water', require('./routes/water'));
 app.use('/api/stats', require('./routes/stats'));
 
 app.get('/login', (req, res) => res.sendFile(path.join(__dirname, 'public', 'login.html')));
-app.get('/app', (req, res) => res.sendFile(path.join(__dirname, 'public', 'app.html')));
+app.get('/app',   (req, res) => res.sendFile(path.join(__dirname, 'public', 'app.html')));
+app.get('/admin', (req, res) => res.sendFile(path.join(__dirname, 'public', 'admin.html')));
 app.get('/', (req, res) => res.redirect('/login'));
 
 app.use((err, req, res, next) => {
