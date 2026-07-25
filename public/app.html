@@ -43,7 +43,14 @@
 
   <!-- ── Header ──────────────────────────────────────────── -->
   <header class="app-header">
-    <span class="brand">FIT</span>
+    <div class="brand-logo">
+      <div class="brand-mark">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M6 4v16M18 4v16M3 8h3M3 16h3M21 8h-3M21 16h-3M9 12h6"/>
+        </svg>
+      </div>
+      <span class="brand">FIT</span>
+    </div>
     <div class="header-right">
       <span class="streak-chip" id="headerStreakChip">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="var(--accent-warm)" stroke="none"><path d="M12 2C8.5 6 6 9.5 6 13a6 6 0 0 0 12 0c0-3.5-2.5-7-6-11zM10 17.5c-1.1 0-2-.9-2-2 0-1.6 2-4 2-4s2 2.4 2 4a2 2 0 0 1-2 2z"/></svg>
@@ -136,7 +143,10 @@
           <div class="qstat-label"><span id="dashWaterPct">0%</span> água</div>
         </div>
         <div class="qstat">
-          <div class="qstat-icon" id="dashStreakFlame">💧</div>
+          <div class="qstat-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent-warm)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>
+            <span id="dashStreakFlame" style="display:none" aria-hidden="true"></span>
+          </div>
           <div class="qstat-val" id="dashStreakVal">0</div>
           <div class="qstat-label">dias seguidos</div>
         </div>

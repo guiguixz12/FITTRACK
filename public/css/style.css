@@ -466,9 +466,9 @@ input[type="file"] {
   border-radius: 50%;
   flex-shrink: 0;
 }
-.mcdot-g { background: var(--green); }
-.mcdot-b { background: var(--blue); }
-.mcdot-y { background: var(--yellow); }
+.mcdot-g { background: var(--accent); }
+.mcdot-b { background: #7BC9E8; }
+.mcdot-y { background: var(--accent-warm); }
 
 .mclabel {
   font-size: .68rem;
@@ -490,10 +490,10 @@ input[type="file"] {
   transition: width .5s cubic-bezier(.4,0,.2,1);
   max-width: 100%;
 }
-.fill-green  { background: var(--green); }
-.fill-blue   { background: var(--blue); }
-.fill-yellow { background: var(--yellow); }
-.fill-orange { background: var(--orange); }
+.fill-green  { background: var(--accent); }
+.fill-blue   { background: #7BC9E8; }
+.fill-yellow { background: var(--accent-warm); }
+.fill-orange { background: var(--accent-warm); }
 .fill-over   { background: var(--red); }
 
 .mcval {
@@ -588,9 +588,9 @@ input[type="file"] {
 .water-log-dot {
   display: inline-flex;
   align-items: center;
-  background: var(--blue-dim);
-  color: var(--blue-water);
-  border: 1px solid oklch(0.85 0.06 240);
+  background: var(--accent-dim);
+  color: var(--accent);
+  border: 1px solid rgba(196,229,56,.22);
   border-radius: 20px;
   padding: 3px 9px;
   font-size: .7rem;
@@ -2530,4 +2530,55 @@ input::placeholder, textarea::placeholder { color: var(--text-3); }
 
 /* ── Scrollbar hide global ── */
 ::-webkit-scrollbar { width: 0; height: 0; }
+
+
+/* ── Ajustes finos Etapa 1b ───────────────────────────────── */
+
+/* Header brand logo */
+.brand-logo {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+.brand-mark {
+  width: 34px; height: 34px;
+  background: var(--accent);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  color: #000;
+  flex-shrink: 0;
+}
+.brand {
+  font-family: -apple-system, 'Inter', system-ui, sans-serif;
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: .12em;
+  color: var(--text);
+}
+
+/* Water logs "Hoje:" label via CSS */
+#dashWaterLogs:not(:empty) {
+  padding-top: 10px;
+}
+#dashWaterLogs:not(:empty)::before {
+  content: 'Hoje';
+  display: block;
+  font-size: .62rem;
+  font-weight: 700;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  margin-bottom: 6px;
+  width: 100%;
+}
+
+/* Macro palette: diet tab value colors */
+.diet-day-macro.cal  .diet-day-macro-val { color: var(--accent-warm); }
+.diet-day-macro.prot .diet-day-macro-val { color: var(--accent); }
+.diet-day-macro.carb .diet-day-macro-val { color: #7BC9E8; }
+.diet-day-macro.fat  .diet-day-macro-val { color: var(--accent-warm); }
+
+/* Track food kcal */
+.diet-food-kcal { color: var(--accent-warm); }
+.dt-track-food-kcal { color: var(--accent-warm); }
 
