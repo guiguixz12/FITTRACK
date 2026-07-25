@@ -2973,3 +2973,387 @@ input::placeholder, textarea::placeholder { color: var(--text-3); }
 .wk-hist-name { font-weight: 700; font-size: .95rem; color: var(--text); }
 .wk-hist-meta { font-size: .78rem; color: var(--text-2); margin-top: 4px; }
 
+/* ═══════════════════════════════════════════════════════════════════
+   FIDELIDADE VISUAL — valores extraídos do mockup exato
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ── 1. Font + design tokens ─────────────────────────────────────── */
+body {
+  font-family: 'Manrope', system-ui, sans-serif;
+}
+
+:root {
+  --accent-warm: #FF9142;
+  --orange:      #FF9142;
+  --orange-dim:  rgba(255,145,66,.15);
+  --orange-glow: rgba(255,145,66,0.25);
+  --orange-hi:   #FFA560;
+  --border:      #26262A;
+  --border-hi:   rgba(255,255,255,0.14);
+  --text:        #F2F2F0;
+  --text-2:      #C0C0C6;
+  --text-3:      #6A6A6E;
+}
+
+/* ── 2. Tab section — horizontal breathing room ──────────────────── */
+.tab-section {
+  padding: 16px 20px 20px;
+}
+
+/* ── 3. Tab page header & title ──────────────────────────────────── */
+.tab-page-header {
+  padding: 18px 0 0;
+  margin-bottom: 2px;
+}
+.tab-page-title {
+  font-size: 23px;
+  font-weight: 800;
+  letter-spacing: -0.4px;
+  line-height: 1.1;
+  margin: 0 0 3px;
+}
+.tab-page-sub {
+  font-size: 13px;
+  color: #8A8A8E;
+  font-weight: 500;
+  margin: 0 0 16px;
+}
+
+/* ── 4. Sub-tabs → flat pill buttons (no container background) ───── */
+.sub-tabs {
+  display: flex;
+  gap: 6px;
+  background: none;
+  border-radius: 0;
+  padding: 0;
+  margin-bottom: 16px;
+}
+.sub-tab {
+  flex: 1;
+  padding: 8px 0;
+  border-radius: 999px;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #8A8A8E;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  white-space: nowrap;
+  transition: all .15s;
+}
+.sub-tab.active {
+  background: var(--accent);
+  color: #000;
+  font-weight: 700;
+  box-shadow: none;
+}
+
+/* ── 5. Week section labels ─────────────────────────────────────── */
+.week-section-label {
+  font-size: 11.5px;
+  font-weight: 800;
+  color: #8A8A8E;
+  text-transform: none;
+  letter-spacing: 1px;
+  padding: 22px 0 0;
+  margin-bottom: 12px;
+}
+.week-section-label.today-label {
+  color: var(--accent-warm);
+  text-align: center;
+}
+
+/* ── 6. Day cards ────────────────────────────────────────────────── */
+.day-card {
+  border-radius: 16px;
+  border: 1px solid #26262A;
+  margin-bottom: 10px;
+}
+.day-card.is-today {
+  border-color: var(--accent-warm);
+  background: var(--card);
+  background-image: none;
+}
+.day-header {
+  padding: 16px 18px;
+  gap: 12px;
+}
+.day-dow {
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: none;
+  letter-spacing: 0;
+  width: 34px;
+  min-width: 34px;
+  flex-shrink: 0;
+}
+.day-name-text {
+  font-size: 14.5px;
+  font-weight: 700;
+}
+.day-body { padding: 0 18px 16px; }
+
+/* ── 7. Workout exercise rows inside day card ───────────────────── */
+.wk-ex-row {
+  padding: 10px 0;
+  border-bottom: 1px solid #26262A;
+}
+.wk-ex-name { font-size: 13.5px; font-weight: 600; }
+.wk-ex-meta { font-size: 12.5px; color: #8A8A8E; font-weight: 600; }
+
+/* ── 8. Diet day macro section ──────────────────────────────────── */
+.diet-day-macros {
+  margin-top: 20px;
+  padding-top: 18px;
+  border-top: 1px solid #26262A;
+  margin-bottom: 18px;
+}
+.diet-day-macro {
+  padding: 4px;
+}
+.diet-day-macro-val {
+  font-family: 'Manrope', system-ui, sans-serif;
+  font-size: 19px;
+  font-weight: 800;
+  line-height: 1.15;
+}
+.diet-day-macro-label {
+  font-size: 10.5px;
+  color: #8A8A8E;
+  font-weight: 600;
+  margin-top: 3px;
+}
+.diet-day-macro.cal  .diet-day-macro-val { color: var(--accent-warm); }
+.diet-day-macro.prot .diet-day-macro-val { color: var(--accent); }
+.diet-day-macro.carb .diet-day-macro-val { color: var(--text); }
+.diet-day-macro.fat  .diet-day-macro-val { color: var(--text); }
+.diet-day-macro + .diet-day-macro { border-left: 1px solid #26262A; }
+
+/* ── 9. Meal pills → 4-col flex, icon+kcal dark boxes ───────────── */
+.dt-meal-pills {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 16px;
+  grid-template-columns: unset;
+}
+.dt-meal-pill {
+  flex: 1;
+  background: #0D0D0D;
+  border: none;
+  border-radius: 14px;
+  padding: 12px 6px;
+  font-size: 11.5px;
+  font-weight: 800;
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+}
+
+/* ── 10. "Acompanhar hoje" / CTA buttons ─────────────────────────── */
+.day-card.is-today .day-actions .btn-primary,
+.day-card.is-today .btn-primary {
+  background: var(--accent-warm) !important;
+  color: #0D0D0D !important;
+  font-weight: 800 !important;
+  font-size: 14px !important;
+  padding: 14px !important;
+  border-radius: 14px !important;
+  width: 100%;
+}
+#tab-workouts .day-card.is-today .day-actions .btn-primary {
+  background: var(--accent) !important;
+  color: #000 !important;
+}
+
+/* ── 11. Header avatar → dark card with border (not lime) ────────── */
+.header-avatar {
+  background: #1A1A1C !important;
+  border: 1px solid #26262A !important;
+  color: #F2F2F0 !important;
+  width: 36px !important;
+  height: 36px !important;
+}
+
+/* ── 12. Streak chip ─────────────────────────────────────────────── */
+.streak-chip {
+  background: #1A1A1C;
+  border: 1px solid #26262A;
+  border-radius: 999px;
+  padding: 7px 12px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #F2F2F0;
+  gap: 5px;
+}
+
+/* ── 13. Bottom nav ──────────────────────────────────────────────── */
+.bottom-nav {
+  border-top: 1px solid #26262A;
+}
+.nav-btn { gap: 5px; }
+.nav-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+/* ── 14. Main card padding ───────────────────────────────────────── */
+.card { padding: 20px; }
+.card-sm { padding: 14px 16px; }
+
+/* ── 15. Settings profile card ───────────────────────────────────── */
+.profile-avatar {
+  width: 56px !important;
+  height: 56px !important;
+  border-radius: 50% !important;
+  background: var(--accent) !important;
+  color: #0D0D0D !important;
+  flex-shrink: 0 !important;
+}
+#profileName {
+  font-size: 16px;
+  font-weight: 800;
+}
+#profileEmail {
+  font-size: 12.5px;
+  color: #8A8A8E;
+  font-weight: 500;
+  margin-top: 2px;
+}
+
+/* ── 16. Logout button ───────────────────────────────────────────── */
+.btn-logout {
+  background: transparent !important;
+  color: var(--accent-warm) !important;
+  border: 1px solid rgba(255,145,66,0.35) !important;
+  border-radius: 10px !important;
+  padding: 8px 14px !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  font-family: inherit;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+/* ── 17. Settings section label ──────────────────────────────────── */
+.settings-section-title {
+  font-size: 11.5px;
+  font-weight: 800;
+  color: #8A8A8E;
+  letter-spacing: 1px;
+  margin-bottom: 12px;
+  margin-top: 24px;
+  text-transform: none;
+}
+
+/* ── 18. Progress period tab buttons ─────────────────────────────── */
+.period-tab {
+  flex: 1;
+  border: none;
+  cursor: pointer;
+  font-size: 12.5px;
+  font-weight: 700;
+  padding: 8px 0;
+  border-radius: 999px;
+  background: transparent;
+  color: #8A8A8E;
+  font-family: inherit;
+  transition: all .15s;
+}
+.period-tab.active {
+  background: var(--accent);
+  color: #000;
+}
+.period-tabs-wrap {
+  gap: 6px;
+  flex-wrap: nowrap;
+  margin-bottom: 16px;
+}
+
+/* Progress view sub-tabs (progress-chips) → flat pill style */
+.progress-chips {
+  flex-wrap: nowrap;
+  gap: 6px;
+  padding-bottom: 16px;
+}
+.progress-chip {
+  border: none;
+  background: transparent;
+  color: #8A8A8E;
+  border-radius: 999px;
+  padding: 8px 14px;
+  font-size: 12.5px;
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all .15s;
+  flex-shrink: 0;
+}
+.progress-chip.active {
+  background: var(--accent);
+  color: #000;
+  border-color: var(--accent);
+  font-weight: 700;
+}
+
+/* Period buttons (7D / 30D / 90D / Tudo) in weight chart */
+.period-btns {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+.period-btn {
+  flex: 1;
+  border: none;
+  background: transparent;
+  color: #8A8A8E;
+  font-size: 12.5px;
+  font-weight: 700;
+  padding: 8px 0;
+  border-radius: 999px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all .15s;
+}
+.period-btn.active {
+  background: var(--accent);
+  color: #000;
+  border-color: var(--accent);
+}
+
+/* ── 19. Dash page header to match mockup size ───────────────────── */
+.dash-page-title {
+  font-size: 23px;
+  font-weight: 800;
+  letter-spacing: -0.4px;
+}
+.dash-page-sub {
+  font-size: 13px;
+  color: #8A8A8E;
+  font-weight: 500;
+  margin-top: 3px;
+}
+
+/* ── 20. Progress bar (água, metas) ──────────────────────────────── */
+.qstat-mini-bar,
+.prog-bar-track {
+  height: 6px;
+  border-radius: 3px;
+}
+
+/* ── 21. Compact day card header → diet "next days" ─────────────── */
+.day-card--compact .day-header {
+  padding: 14px 16px;
+}
+.compact-kcal {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #8A8A8E;
+}
+
