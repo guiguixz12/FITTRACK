@@ -14,6 +14,11 @@ const COOKIE_OPTS = {
 };
 
 router.post('/register', async (req, res) => {
+  // Honeypot: bots fill hidden fields; real users leave them blank
+  if (req.body.website || req.body.phone_number) {
+    return res.status(400).json({ error: 'Requisição inválida' });
+  }
+
   const { name, password, email } = req.body;
   if (!name || !password) return res.status(400).json({ error: 'Nome e senha obrigatórios' });
 

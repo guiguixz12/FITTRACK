@@ -286,6 +286,11 @@
 
     <!-- ── Register panel ── -->
     <div class="lp-panel" id="panelRegister">
+      <!-- Honeypot fields: hidden from real users, bots fill them -->
+      <div style="display:none" aria-hidden="true">
+        <input type="text"  id="hp_website"      name="website"      tabindex="-1" autocomplete="off">
+        <input type="text"  id="hp_phone_number" name="phone_number"  tabindex="-1" autocomplete="off">
+      </div>
       <div class="lp-field">
         <label class="lp-label" for="regName">USUÁRIO</label>
         <input class="lp-input" type="text" id="regName" placeholder="Mínimo 3 caracteres"
@@ -380,9 +385,11 @@
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          name:     document.getElementById('regName').value.trim(),
-          password: pass,
-          email:    document.getElementById('regEmail').value.trim() || undefined,
+          name:         document.getElementById('regName').value.trim(),
+          password:     pass,
+          email:        document.getElementById('regEmail').value.trim() || undefined,
+          website:      document.getElementById('hp_website').value,
+          phone_number: document.getElementById('hp_phone_number').value,
         }),
       });
       const data = await res.json();
