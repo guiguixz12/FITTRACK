@@ -1,238 +1,161 @@
-/* Dashboard tab — weekly overview */
+/* Dashboard tab — daily view with calorie ring + macros */
+
 const WEEKDAYS_PT = ['Domingo','Segunda-feira','Terça-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sábado'];
 const MONTHS_PT   = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
-
-let _dashCalChart = null;
-let _dashWtChart  = null;
+const CAL_CIRC    = 2 * Math.PI * 54; // ring circumference (r=54)
 
 function initDashboard(state) {
-  // Period tabs
-  document.querySelectorAll('#dashPeriodTabs .period-tab').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('#dashPeriodTabs .period-tab').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      state.dashPeriod = btn.dataset.period;
-      loadDashboard(state);
-    });
+  document.getElementById('dashPrevDay')?.addEventListener('click', () => {
+    const d = new Date(state.date + 'T12:00:00');
+    d.setDate(d.getDate() - 1);
+    state.date = d.toISOString().slice(0, 10);
+    loadDashboard(state);
   });
 
-  // Full water grid
+  document.getElementById('dashNextDay')?.addEventListener('click', () => {
+    const today = new Date().toISOString().slice(0, 10);
+    if (state.date >= today) return;
+    const d = new Date(state.date + 'T12:00:00');
+    d.setDate(d.getDate() + 1);
+    state.date = d.toISOString().slice(0, 10);
+    loadDashboard(state);
+  });
+
   const grid = document.getElementById('dashWaterGrid');
   if (grid) {
     grid.addEventListener('click', async e => {
       const btn = e.target.closest('[data-ml]');
       if (!btn) return;
-      const today = new Date().toISOString().slice(0, 10);
-      await api.post('/api/water', { date: today, amount_ml: parseInt(btn.dataset.ml) });
-      loadWater(today);
-    });
-  }
-
-  // Mini +250ml button
-  const miniBtn = document.getElementById('dashWaterMiniBtn');
-  if (miniBtn) {
-    miniBtn.addEventListener('click', async () => {
-      const today = new Date().toISOString().slice(0, 10);
-      await api.post('/api/water', { date: today, amount_ml: 250 });
-      loadWater(today);
+      await api.post('/api/water', { date: state.date, amount_ml: parseInt(btn.dataset.ml) });
+      const data = await api.get(`/api/water?date=${state.date}`);
+      renderWater(data, state.date);
     });
   }
 }
 
 async function loadDashboard(state) {
-  const today = new Date().toISOString().slice(0, 10);
-  state.date = today;
+  const date  = state.date || new Date().toISOString().slice(0, 10);
+  state.date  = date;
+  updateDateDisplay(date);
 
-  const [weeklyData, weightData, workoutData, waterData, streakData] = await Promise.all([
-    api.get('/api/stats/weekly'),
+  const [dietData, weightData, workoutData, waterData, streakData] = await Promise.all([
+    api.get(`/api/diet/logs?date=${date}`),
     api.get('/api/diet/weight'),
-    api.get(`/api/workouts?date=${today}`),
-    api.get(`/api/water?date=${today}`),
+    api.get(`/api/workouts?date=${date}`),
+    api.get(`/api/water?date=${date}`),
     api.get('/api/stats/streak'),
   ]);
 
-  renderCalWeek(weeklyData);
-  renderWeightTrend(weightData.logs || []);
+  const log  = dietData.log || {};
+  const user = state.user  || {};
+
+  renderCalRing(log, user);
+  renderMacros(log, user);
+  renderWeight(weightData.logs || []);
   renderWorkoutSummary(workoutData.workout);
-  renderWater(waterData, today);
+  renderWater(waterData, date);
   renderStreak(streakData);
 }
 
-// ── Calorie bar chart ─────────────────────────────────────────────────────────
-function renderCalWeek(data) {
-  const { days = [], summary = {}, prevSummary = {} } = data || {};
+// ── Date display ──────────────────────────────────────────────────────────────
+function updateDateDisplay(date) {
+  const d     = new Date(date + 'T12:00:00');
   const today = new Date().toISOString().slice(0, 10);
-  const DOW   = ['D','S','T','Q','Q','S','S'];
+  const labelEl = document.getElementById('dashDateLabel');
+  const subEl   = document.getElementById('dashDateSub');
+  const nextBtn = document.getElementById('dashNextDay');
 
-  // Big stat
-  const avg = summary.avgCalories || 0;
-  const avgEl = document.getElementById('dashCalAvg');
-  if (avgEl) avgEl.textContent = avg ? avg.toLocaleString('pt-BR') : '—';
-
-  // Delta badge
-  const deltaEl = document.getElementById('dashCalDelta');
-  if (deltaEl) {
-    if (avg && prevSummary.avgCalories) {
-      const pct  = Math.round(((avg - prevSummary.avgCalories) / prevSummary.avgCalories) * 100);
-      const sign = pct >= 0 ? '+' : '';
-      deltaEl.textContent     = `${sign}${pct}% vs sem. anterior`;
-      deltaEl.style.color     = pct > 0 ? 'var(--accent-warm)' : 'var(--accent)';
-      deltaEl.style.display   = '';
+  if (labelEl) {
+    if (date === today) {
+      labelEl.textContent = 'Hoje';
     } else {
-      deltaEl.style.display = 'none';
+      labelEl.textContent = `${d.getDate()} de ${MONTHS_PT[d.getMonth()]}`;
     }
   }
-
-  // Chart
-  const ctx = document.getElementById('dashCalChart');
-  if (!ctx) return;
-
-  const labels = days.map(d => DOW[new Date(d.date + 'T12:00:00').getDay()]);
-  const values = days.map(d => d.calories || 0);
-  const colors = days.map(d =>
-    d.date === today ? '#FF9142'
-    : d.calories > 0 ? '#C4E538'
-    : 'rgba(196,229,56,0.18)'
-  );
-
-  if (_dashCalChart) { _dashCalChart.destroy(); _dashCalChart = null; }
-  _dashCalChart = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels,
-      datasets: [{
-        data: values,
-        backgroundColor: colors,
-        borderRadius: 6,
-        borderSkipped: false,
-        barPercentage: 0.6,
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      animation: { duration: 300 },
-      plugins: { legend: { display: false }, tooltip: { enabled: false } },
-      scales: {
-        x: {
-          grid: { display: false },
-          border: { display: false },
-          ticks: { color: 'rgba(255,255,255,0.3)', font: { size: 11, family: 'Manrope', weight: '600' } },
-        },
-        y: {
-          grid: { color: 'rgba(255,255,255,0.04)', drawTicks: false },
-          border: { display: false },
-          ticks: { display: false },
-          min: 0,
-        }
-      },
-      layout: { padding: { top: 4 } }
-    }
-  });
+  if (subEl) subEl.textContent = WEEKDAYS_PT[d.getDay()];
+  if (nextBtn) nextBtn.disabled = date >= today;
 }
 
-// ── Weight trend line chart ───────────────────────────────────────────────────
-function renderWeightTrend(logs) {
-  const sorted = (logs || []).slice().sort((a, b) => a.date.localeCompare(b.date));
-  const recent = sorted.slice(-14);
+// ── Calorie ring ──────────────────────────────────────────────────────────────
+function renderCalRing(log, user) {
+  const consumed = log.calories || 0;
+  const target   = user.target_calories || 2000;
+  const remain   = Math.max(target - consumed, 0);
+  const pct      = Math.min(consumed / target, 1);
 
-  const latest = recent.length ? recent[recent.length - 1].weight_kg : null;
-  const prev   = recent.length > 1 ? recent[recent.length - 2].weight_kg : null;
+  const ring    = document.getElementById('calRing');
+  const calEl   = document.getElementById('dashCalories');
+  const tgtEl   = document.getElementById('dashCalTarget');
+  const remEl   = document.getElementById('dashCalRemain');
 
-  const valEl   = document.getElementById('dashWtVal');
-  const deltaEl = document.getElementById('dashWtDelta');
-  if (valEl) valEl.textContent = latest ? latest.toFixed(1) : '—';
-  if (deltaEl) {
-    if (latest && prev) {
-      const diff = +(latest - prev).toFixed(1);
-      const sign = diff >= 0 ? '+' : '';
-      deltaEl.textContent   = `${sign}${diff} kg`;
-      deltaEl.style.color   = diff < 0 ? 'var(--accent)' : 'var(--accent-warm)';
-      deltaEl.style.display = '';
-    } else {
-      deltaEl.style.display = 'none';
-    }
-  }
-
-  const wrap = document.getElementById('dashWtChartWrap');
-  const ctx  = document.getElementById('dashWtChart');
-  if (!ctx) return;
-
-  if (recent.length < 2) {
-    if (wrap) wrap.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:12px;color:var(--text-faint)">Registre seu peso para ver a tendência</div>';
-    return;
-  }
-
-  const labels = recent.map(l => { const [, m, d] = l.date.split('-'); return `${d}/${m}`; });
-  const values = recent.map(l => l.weight_kg);
-
-  if (_dashWtChart) { _dashWtChart.destroy(); _dashWtChart = null; }
-  _dashWtChart = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels,
-      datasets: [{
-        data: values,
-        borderColor: '#C4E538',
-        backgroundColor: 'rgba(196,229,56,0.08)',
-        borderWidth: 2,
-        pointRadius: 3,
-        pointBackgroundColor: '#C4E538',
-        fill: true,
-        tension: 0.35,
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      animation: { duration: 300 },
-      plugins: { legend: { display: false }, tooltip: { enabled: false } },
-      scales: {
-        x: {
-          grid: { display: false },
-          border: { display: false },
-          ticks: { color: 'rgba(255,255,255,0.3)', font: { size: 9, family: 'Manrope' }, maxTicksLimit: 7 },
-        },
-        y: {
-          grid: { color: 'rgba(255,255,255,0.04)' },
-          border: { display: false },
-          ticks: { color: 'rgba(255,255,255,0.25)', font: { size: 9 }, callback: v => v + ' kg', maxTicksLimit: 3 },
-        }
-      },
-      layout: { padding: { top: 4 } }
-    }
-  });
+  if (ring)  ring.setAttribute('stroke-dasharray', `${pct * CAL_CIRC} ${CAL_CIRC}`);
+  if (calEl) calEl.textContent = consumed.toLocaleString('pt-BR');
+  if (tgtEl) tgtEl.textContent = `${target.toLocaleString('pt-BR')} kcal`;
+  if (remEl) remEl.textContent = consumed >= target
+    ? `Meta atingida!`
+    : `Faltam ${remain.toLocaleString('pt-BR')} kcal`;
 }
 
-// ── Workout Summary ───────────────────────────────────────────────────────────
+// ── Macros ────────────────────────────────────────────────────────────────────
+function renderMacros(log, user) {
+  const macros = [
+    { fill: 'barProt', val: 'valProt', got: log.protein || 0, target: user.target_protein || 150, unit: 'g' },
+    { fill: 'barCarb', val: 'valCarb', got: log.carbs   || 0, target: user.target_carbs   || 250, unit: 'g' },
+    { fill: 'barFat',  val: 'valFat',  got: log.fat     || 0, target: user.target_fat     || 70,  unit: 'g' },
+  ];
+
+  for (const m of macros) {
+    const pct    = Math.min((m.got / m.target) * 100, 100);
+    const fillEl = document.getElementById(m.fill);
+    const valEl  = document.getElementById(m.val);
+    if (fillEl) fillEl.style.width = pct + '%';
+    if (valEl)  valEl.textContent  = `${Math.round(m.got)}${m.unit}`;
+  }
+}
+
+// ── Weight stat card ──────────────────────────────────────────────────────────
+function renderWeight(logs) {
+  const sorted = (logs || []).slice().sort((a, b) => b.date.localeCompare(a.date));
+  const latest = sorted[0]?.weight_kg;
+  const el = document.getElementById('dashWeight');
+  if (el) el.textContent = latest ? `${parseFloat(latest).toFixed(1)}kg` : '—';
+}
+
+// ── Workout summary ───────────────────────────────────────────────────────────
 function renderWorkoutSummary(workout) {
   const el = document.getElementById('dashWorkout');
   if (!el) return;
-  if (!workout || !workout.exercises?.length) {
+
+  if (!workout?.exercises?.length) {
     el.innerHTML = `
-      <div style="display:flex;flex-direction:column;align-items:center;padding:14px 0;gap:10px">
-        <div style="width:42px;height:42px;border-radius:50%;background:var(--orange-dim);display:flex;align-items:center;justify-content:center">
-          <svg width="20" height="14" viewBox="0 0 22 14"><rect x="7" y="5.5" width="8" height="3" rx="1.5" fill="var(--orange)"/><circle cx="4" cy="7" r="4" fill="var(--orange)"/><circle cx="18" cy="7" r="4" fill="var(--orange)"/></svg>
+      <div class="v2-workout-empty">
+        <div class="v2-workout-icon-wrap">
+          <svg width="20" height="14" viewBox="0 0 22 14" fill="none">
+            <rect x="7" y="5.5" width="8" height="3" rx="1.5" fill="#FF9142"/>
+            <circle cx="4"  cy="7" r="4" fill="#FF9142"/>
+            <circle cx="18" cy="7" r="4" fill="#FF9142"/>
+          </svg>
         </div>
-        <div style="font-size:13px;color:var(--text-3)">Nenhum treino registrado</div>
-        <button onclick="switchTab('workouts')" class="btn btn-primary btn-sm">Ver programa</button>
+        <div class="v2-workout-empty-txt">Nenhum treino registrado</div>
+        <button class="v2-workout-btn" onclick="switchTab('workouts')">Ver programa</button>
       </div>`;
     return;
   }
+
   const volume = workout.exercises.reduce((s, e) => s + (e.sets || 0) * (e.reps || 0) * (e.weight_kg || 0), 0);
-  el.innerHTML = workout.exercises.map(ex => {
+  let html = '<div class="v2-workout-chips">';
+  html += workout.exercises.map(ex => {
     const meta = [
       ex.sets && ex.reps ? `${ex.sets}×${ex.reps}` : '',
-      ex.weight_kg       ? `${ex.weight_kg}kg`      : ''
+      ex.weight_kg       ? `${ex.weight_kg}kg`      : '',
     ].filter(Boolean).join(' @ ');
-    return `<span class="workout-exercise-chip">${ex.name}${meta ? ' · ' + meta : ''}</span>`;
+    return `<span class="v2-workout-chip">${ex.name}${meta ? ' · ' + meta : ''}</span>`;
   }).join('');
+  html += '</div>';
   if (volume > 0) {
-    el.innerHTML += `<div style="margin-top:10px;font-size:.78rem;color:var(--text-muted)">Volume total: <b style="color:var(--orange)">${Math.round(volume).toLocaleString('pt-BR')} kg</b></div>`;
+    html += `<div class="v2-workout-volume">Volume: <b>${Math.round(volume).toLocaleString('pt-BR')} kg</b></div>`;
   }
-  if (workout.notes) {
-    el.innerHTML += `<p style="margin-top:6px;font-size:.82rem;color:var(--text-muted);line-height:1.5">${workout.notes}</p>`;
-  }
+  el.innerHTML = html;
 }
 
 // ── Water ─────────────────────────────────────────────────────────────────────
@@ -244,37 +167,31 @@ async function loadWater(date) {
 function renderWater(data, date) {
   const { total_ml = 0, goal_ml = 2000, logs = [] } = data;
   const pct = Math.min((total_ml / goal_ml) * 100, 100);
+  const fmt = ml => ml >= 1000 ? (ml / 1000).toFixed(1) + ' L' : ml + ' ml';
 
-  // Mini water card
-  const miniValEl = document.getElementById('dashWaterTodayVal');
-  const miniFill  = document.getElementById('dashWaterMiniBar');
-  if (miniValEl) miniValEl.textContent = total_ml >= 1000 ? (total_ml / 1000).toFixed(1) + ' L' : total_ml + ' ml';
-  if (miniFill)  miniFill.style.width  = pct + '%';
-
-  // Full water card
-  const goalEl    = document.getElementById('dashWaterGoal');
-  const fillEl    = document.getElementById('dashWaterProgressFill');
-  if (goalEl) goalEl.textContent = goal_ml >= 1000 ? (goal_ml / 1000).toFixed(1) + ' L' : goal_ml + ' ml';
-  if (fillEl) fillEl.style.width = pct + '%';
-
-  // Legacy compat
+  // Stat card (top row)
   const totalEl = document.getElementById('dashWaterTotal');
   const pctEl   = document.getElementById('dashWaterPct');
-  const barEl   = document.getElementById('dashWaterBar');
-  if (totalEl) totalEl.textContent = total_ml >= 1000 ? (total_ml / 1000).toFixed(1) + ' L' : total_ml + ' ml';
-  if (pctEl)   pctEl.textContent   = Math.round(pct) + '%';
-  if (barEl)   barEl.style.width   = pct + '%';
+  if (totalEl) totalEl.textContent = fmt(total_ml);
+  if (pctEl)   pctEl.textContent   = `${Math.round(pct)}% água`;
 
+  // Water card
+  const goalEl = document.getElementById('dashWaterGoal');
+  const fillEl = document.getElementById('dashWaterProgressFill');
+  if (goalEl) goalEl.textContent = fmt(goal_ml);
+  if (fillEl) fillEl.style.width = pct + '%';
+
+  // Logs
   const logsEl = document.getElementById('dashWaterLogs');
   if (!logsEl) return;
   if (logs.length) {
     logsEl.innerHTML = logs.map(l =>
-      `<span class="water-log-dot" onclick="deleteWaterLog(${l.id},'${date}')" title="Remover ${l.amount_ml}ml">
-        ${l.amount_ml >= 1000 ? (l.amount_ml/1000).toFixed(1)+'L' : l.amount_ml+'ml'}
-      </span>`
+      `<button class="v2-water-log-dot" onclick="deleteWaterLog(${l.id},'${date}')" title="Remover">
+        ${fmt(l.amount_ml)}
+      </button>`
     ).join('');
   } else {
-    logsEl.innerHTML = '<span style="font-size:.75rem;color:var(--text-faint)">Nenhum registro ainda</span>';
+    logsEl.innerHTML = `<span style="font-size:11px;color:var(--v2-faint)">Nenhum registro ainda</span>`;
   }
 }
 
@@ -286,25 +203,12 @@ window.deleteWaterLog = deleteWaterLog;
 
 // ── Streak ────────────────────────────────────────────────────────────────────
 function renderStreak(data) {
-  const { streak = 0, longest = 0 } = data || {};
-
-  const valEl    = document.getElementById('dashStreakVal');
-  const flameEl  = document.getElementById('dashStreakFlame');
-  const longEl   = document.getElementById('dashStreakLongest');
-
-  if (valEl)   valEl.textContent  = streak;
-  if (longEl)  longEl.textContent = longest > 0 ? `Recorde: ${longest} dias` : '';
-
-  if (flameEl) {
-    const flameSvg = `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 3z"/></svg>`;
-    const dropSvg  = `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>`;
-    flameEl.style.color = streak >= 3 ? 'var(--accent-warm)' : 'var(--text-3)';
-    flameEl.innerHTML   = streak >= 3 ? flameSvg : dropSvg;
-  }
+  const { streak = 0 } = data || {};
+  const valEl  = document.getElementById('dashStreakVal');
+  const longEl = document.getElementById('dashStreakLongest');
+  if (valEl)  valEl.textContent  = streak;
+  if (longEl) longEl.textContent = '';
 }
 
-// ── Legacy stubs (kept for any external callers) ──────────────────────────────
-function renderCalRing()     {}
-function renderMacros()      {}
-function renderWeight()      {}
-function renderWeeklyReport(){}
+// renderWeeklyReport: kept as no-op for any legacy external caller
+function renderWeeklyReport() {}

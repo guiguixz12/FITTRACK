@@ -1,0 +1,400 @@
+/* FitTrack v2.css — screen-by-screen rebuild (dark theme)
+   Rule: style.css is NEVER edited. Each migrated screen lives here only.
+   Current scope: Home / Dashboard — v24 */
+
+/* ── CSS tokens ──────────────────────────────────────────────── */
+:root {
+  --v2-bg:         #0D0D0D;
+  --v2-card:       #1A1A1C;
+  --v2-border:     #26262A;
+  --v2-border-hi:  #34343A;
+  --v2-text:       #F2F2F0;
+  --v2-dim:        #8A8A8E;
+  --v2-faint:      #6A6A6E;
+  --v2-accent:     #C4E538;
+  --v2-accent-dim: rgba(196,229,56,0.12);
+  --v2-warm:       #FF9142;
+  --v2-warm-dim:   rgba(255,145,66,0.12);
+}
+
+/* ── Date navigation ─────────────────────────────────────────── */
+.v2-date-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 0 14px;
+}
+
+.v2-date-nav-btn {
+  width: 32px;
+  height: 32px;
+  background: var(--v2-card);
+  border: 1px solid var(--v2-border);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--v2-dim);
+  flex-shrink: 0;
+}
+
+.v2-date-nav-btn:active { background: var(--v2-border-hi); }
+.v2-date-nav-btn:disabled { opacity: 0.35; cursor: default; }
+
+.v2-date-label {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--v2-text);
+  line-height: 1.3;
+  text-align: center;
+}
+
+.v2-date-sub {
+  font-size: 12px;
+  color: var(--v2-dim);
+  margin-top: 1px;
+  text-align: center;
+}
+
+/* ── Hero card (ring + macros) ───────────────────────────────── */
+.v2-hero {
+  background: var(--v2-card);
+  border-radius: 20px;
+  padding: 20px 18px;
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  border: 1px solid var(--v2-border);
+}
+
+.v2-ring-wrap {
+  position: relative;
+  width: 108px;
+  height: 108px;
+  flex-shrink: 0;
+}
+
+.v2-ring-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.v2-ring-cal {
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--v2-text);
+  line-height: 1;
+}
+
+.v2-ring-lbl {
+  font-size: 10px;
+  color: var(--v2-dim);
+  letter-spacing: 0.6px;
+  margin-top: 2px;
+}
+
+.v2-hero-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.v2-hero-meta {
+  font-size: 12px;
+  color: var(--v2-dim);
+  line-height: 1.4;
+}
+
+.v2-hero-meta b {
+  color: var(--v2-text);
+  font-weight: 600;
+}
+
+.v2-hero-remain {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--v2-text);
+  margin: 2px 0 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Macro rows ──────────────────────────────────────────────── */
+.v2-macro-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 7px;
+}
+
+.v2-macro-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  flex-shrink: 0;
+}
+
+.v2-macro-lbl {
+  font-size: 11px;
+  color: rgba(242,242,240,0.7);
+  width: 38px;
+  flex-shrink: 0;
+}
+
+.v2-macro-track {
+  flex: 1;
+  height: 5px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.1);
+  overflow: hidden;
+}
+
+.v2-macro-fill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.4s ease;
+}
+
+.v2-macro-val {
+  font-size: 11px;
+  color: rgba(242,242,240,0.75);
+  width: 52px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+/* ── 3-col stats row ─────────────────────────────────────────── */
+.v2-stats-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.v2-stat-card {
+  background: var(--v2-card);
+  border: 1px solid var(--v2-border);
+  border-radius: 18px;
+  padding: 14px 8px;
+  text-align: center;
+}
+
+.v2-stat-icon {
+  font-size: 18px;
+  line-height: 1;
+}
+
+.v2-stat-val {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--v2-text);
+  margin-top: 4px;
+  line-height: 1.2;
+  word-break: break-all;
+}
+
+.v2-stat-sub {
+  font-size: 10px;
+  color: var(--v2-dim);
+  margin-top: 1px;
+  line-height: 1.3;
+}
+
+/* ── Generic v2 card ─────────────────────────────────────────── */
+.v2-card {
+  background: var(--v2-card);
+  border: 1px solid var(--v2-border);
+  border-radius: 20px;
+  padding: 16px 18px;
+  margin-top: 14px;
+}
+
+.v2-card-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--v2-dim);
+  letter-spacing: 0.5px;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+}
+
+/* ── Water card ──────────────────────────────────────────────── */
+.v2-water-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 10px;
+}
+
+.v2-water-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--v2-dim);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.v2-water-goal-txt {
+  font-size: 12px;
+  color: var(--v2-dim);
+}
+
+.v2-water-bar-track {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--v2-border);
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+
+.v2-water-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: #4EA8DE;
+  transition: width 0.3s ease;
+}
+
+.v2-water-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 7px;
+}
+
+.v2-water-btn {
+  background: var(--v2-accent-dim);
+  color: var(--v2-accent);
+  border: none;
+  border-radius: 11px;
+  padding: 9px 2px;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: 'Manrope', system-ui, sans-serif;
+  line-height: 1;
+}
+
+.v2-water-btn:active { opacity: 0.65; }
+
+.v2-water-logs {
+  margin-top: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  min-height: 22px;
+}
+
+.v2-water-log-dot {
+  background: var(--v2-accent-dim);
+  color: var(--v2-accent);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  border: none;
+  font-family: 'Manrope', system-ui, sans-serif;
+}
+
+.v2-water-log-dot:active { opacity: 0.65; }
+
+/* ── Workout card ────────────────────────────────────────────── */
+.v2-workout-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 14px 0;
+  gap: 10px;
+}
+
+.v2-workout-icon-wrap {
+  width: 42px;
+  height: 42px;
+  border-radius: 999px;
+  background: var(--v2-warm-dim);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.v2-workout-empty-txt {
+  font-size: 13px;
+  color: var(--v2-dim);
+}
+
+.v2-workout-btn {
+  background: var(--v2-accent);
+  color: #0D0D0D;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 10px 22px;
+  border-radius: 12px;
+  cursor: pointer;
+  border: none;
+  font-family: 'Manrope', system-ui, sans-serif;
+}
+
+.v2-workout-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.v2-workout-chip {
+  background: var(--v2-border);
+  color: var(--v2-text);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 5px 10px;
+  border-radius: 8px;
+}
+
+.v2-workout-volume {
+  margin-top: 10px;
+  font-size: 12px;
+  color: var(--v2-dim);
+}
+
+.v2-workout-volume b { color: var(--v2-warm); font-weight: 700; }
+
+/* ── AI banner ───────────────────────────────────────────────── */
+.v2-ai-banner {
+  background: linear-gradient(135deg, #FF9142, #d96720);
+  border-radius: 20px;
+  padding: 16px 18px;
+  margin-top: 14px;
+  margin-bottom: 14px;
+  color: #fff;
+}
+
+.v2-ai-title {
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.v2-ai-sub {
+  font-size: 12.5px;
+  opacity: 0.9;
+  margin-top: 4px;
+  line-height: 1.5;
+}
+
+.v2-ai-btn {
+  margin-top: 12px;
+  background: rgba(255,255,255,0.2);
+  color: #fff;
+  display: inline-block;
+  padding: 9px 18px;
+  border-radius: 11px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  font-family: 'Manrope', system-ui, sans-serif;
+}

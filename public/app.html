@@ -20,7 +20,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/style.css?v=23">
+  <link rel="stylesheet" href="/css/style.css?v=24">
+  <link rel="stylesheet" href="/css/v2.css?v=24">
 
   <!-- SVG gradient for calorie ring (must live in DOM) -->
   <svg width="0" height="0" style="position:absolute">
@@ -65,120 +66,118 @@
     <!-- ════════════════ DASHBOARD ════════════════ -->
     <section class="tab-section active" id="tab-dashboard">
 
-      <!-- Page title -->
-      <div class="dash-page-header">
-        <h1 class="dash-page-title">Seu progresso</h1>
-        <p class="dash-page-sub">Pequenos passos, grandes mudanças.</p>
+      <!-- Date navigation -->
+      <div class="v2-date-nav">
+        <button class="v2-date-nav-btn" id="dashPrevDay" aria-label="Dia anterior">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <div>
+          <div class="v2-date-label" id="dashDateLabel">Hoje</div>
+          <div class="v2-date-sub" id="dashDateSub"></div>
+        </div>
+        <button class="v2-date-nav-btn" id="dashNextDay" aria-label="Próximo dia" disabled>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
       </div>
 
-      <!-- Period selector (visual, wired in Etapa 3) -->
-      <div class="period-tabs-wrap" id="dashPeriodTabs">
-        <button class="period-tab active" data-period="week">Semana</button>
-        <button class="period-tab" data-period="month">Mês</button>
-        <button class="period-tab" data-period="3months">3 Meses</button>
-        <button class="period-tab" data-period="year">Ano</button>
-      </div>
-
-      <!-- Calorie weekly bar chart card -->
-      <div class="card dash-chart-card">
-        <div class="card-label">Calorias consumidas</div>
-        <div class="dash-big-stat">
-          <span class="dash-stat-val" id="dashCalAvg">—</span>
-          <span class="dash-stat-unit">kcal méd.</span>
-          <span class="dash-stat-delta" id="dashCalDelta" style="display:none"></span>
-        </div>
-        <div class="dash-chart-wrap">
-          <canvas id="dashCalChart"></canvas>
-        </div>
-      </div>
-
-      <!-- Weight trend line chart card -->
-      <div class="card dash-chart-card">
-        <div class="card-label">Tendência de peso</div>
-        <div class="dash-big-stat">
-          <span class="dash-stat-val" id="dashWtVal">—</span>
-          <span class="dash-stat-unit">kg</span>
-          <span class="dash-stat-delta" id="dashWtDelta" style="display:none"></span>
-        </div>
-        <div class="dash-chart-wrap" id="dashWtChartWrap">
-          <canvas id="dashWtChart"></canvas>
-        </div>
-      </div>
-
-      <!-- Streak + Water mini row -->
-      <div class="dash-row-2">
-        <div class="card dash-mini-card">
-          <div class="card-label">Sequência</div>
-          <div class="dash-streak-content">
-            <div id="dashStreakFlame" class="dash-streak-icon" aria-hidden="true"></div>
-            <div>
-              <div class="dash-streak-num" id="dashStreakVal">0</div>
-              <div class="dash-streak-label">dias</div>
-            </div>
+      <!-- Hero card: calorie ring + macros -->
+      <div class="v2-hero">
+        <div class="v2-ring-wrap">
+          <svg width="108" height="108" viewBox="0 0 120 120">
+            <circle cx="60" cy="60" r="54" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="11"/>
+            <circle id="calRing" cx="60" cy="60" r="54" fill="none" stroke="#C4E538" stroke-width="11" stroke-linecap="round" stroke-dasharray="0 339.29" transform="rotate(-90 60 60)"/>
+          </svg>
+          <div class="v2-ring-center">
+            <div class="v2-ring-cal" id="dashCalories">0</div>
+            <div class="v2-ring-lbl">KCAL</div>
           </div>
         </div>
-        <div class="card dash-mini-card">
-          <div class="card-label">Água hoje</div>
-          <div class="dash-water-content">
-            <div class="dash-streak-num dash-water-num" id="dashWaterTodayVal">0 ml</div>
-            <div class="dash-water-bar-wrap">
-              <div class="dash-water-bar-fill" id="dashWaterMiniBar" style="width:0%"></div>
-            </div>
-            <button class="water-quick-add-mini" id="dashWaterMiniBtn" data-ml="250">+250ml</button>
+        <div class="v2-hero-info">
+          <div class="v2-hero-meta">Meta: <b id="dashCalTarget">—</b></div>
+          <div class="v2-hero-remain" id="dashCalRemain">Faltam — kcal</div>
+          <div class="v2-macro-row">
+            <div class="v2-macro-dot" style="background:#C4E538"></div>
+            <div class="v2-macro-lbl">Prot</div>
+            <div class="v2-macro-track"><div class="v2-macro-fill" id="barProt" style="background:#C4E538;width:0%"></div></div>
+            <div class="v2-macro-val" id="valProt">0g</div>
+          </div>
+          <div class="v2-macro-row">
+            <div class="v2-macro-dot" style="background:#8A8A8E"></div>
+            <div class="v2-macro-lbl">Carb</div>
+            <div class="v2-macro-track"><div class="v2-macro-fill" id="barCarb" style="background:#8A8A8E;width:0%"></div></div>
+            <div class="v2-macro-val" id="valCarb">0g</div>
+          </div>
+          <div class="v2-macro-row">
+            <div class="v2-macro-dot" style="background:#FF9142"></div>
+            <div class="v2-macro-lbl">Gord</div>
+            <div class="v2-macro-track"><div class="v2-macro-fill" id="barFat" style="background:#FF9142;width:0%"></div></div>
+            <div class="v2-macro-val" id="valFat">0g</div>
           </div>
         </div>
       </div>
 
-      <!-- Full water card -->
-      <div class="card water-card-v2">
-        <div class="water-main-row">
-          <div class="water-icon-sq">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>
-            </svg>
-          </div>
-          <div class="water-content">
-            <div class="water-label-row">
-              <span class="water-label-txt">Água</span>
-              <span class="water-goal-txt">Meta: <span id="dashWaterGoal">2 L</span></span>
-            </div>
-            <div class="water-progress-bar">
-              <div class="water-progress-fill" id="dashWaterProgressFill" style="width:0%"></div>
-            </div>
-          </div>
-          <button class="water-quick-add water-btn" data-ml="250">+250ml</button>
+      <!-- 3-col quick stats -->
+      <div class="v2-stats-row">
+        <div class="v2-stat-card">
+          <div class="v2-stat-icon">💧</div>
+          <div class="v2-stat-val" id="dashWaterTotal">0 ml</div>
+          <div class="v2-stat-sub" id="dashWaterPct">0% água</div>
         </div>
-        <div class="water-grid water-grid-secondary" id="dashWaterGrid">
-          <button class="water-btn" data-ml="150">150</button>
-          <button class="water-btn" data-ml="200">200</button>
-          <button class="water-btn" data-ml="250">250</button>
-          <button class="water-btn" data-ml="350">350</button>
-          <button class="water-btn" data-ml="500">500</button>
-          <button class="water-btn" data-ml="1000">1L</button>
+        <div class="v2-stat-card">
+          <div class="v2-stat-icon">🔥</div>
+          <div class="v2-stat-val" id="dashStreakVal">0</div>
+          <div class="v2-stat-sub">dias seguidos</div>
         </div>
-        <div class="water-logs" id="dashWaterLogs"></div>
+        <div class="v2-stat-card">
+          <div class="v2-stat-icon">⚖️</div>
+          <div class="v2-stat-val" id="dashWeight">—</div>
+          <div class="v2-stat-sub">peso atual</div>
+        </div>
       </div>
 
-      <!-- Workout Summary -->
-      <div class="card">
-        <div class="card-label">Treino de hoje</div>
+      <!-- Water card -->
+      <div class="v2-card">
+        <div class="v2-water-header">
+          <div class="v2-water-title">HIDRATAÇÃO</div>
+          <div class="v2-water-goal-txt">Meta: <span id="dashWaterGoal">2 L</span></div>
+        </div>
+        <div class="v2-water-bar-track">
+          <div class="v2-water-bar-fill" id="dashWaterProgressFill" style="width:0%"></div>
+        </div>
+        <div class="v2-water-grid" id="dashWaterGrid">
+          <button class="v2-water-btn" data-ml="150">150</button>
+          <button class="v2-water-btn" data-ml="200">200</button>
+          <button class="v2-water-btn" data-ml="250">250</button>
+          <button class="v2-water-btn" data-ml="350">350</button>
+          <button class="v2-water-btn" data-ml="500">500</button>
+          <button class="v2-water-btn" data-ml="1000">1L</button>
+        </div>
+        <div class="v2-water-logs" id="dashWaterLogs"></div>
+      </div>
+
+      <!-- Workout card -->
+      <div class="v2-card">
+        <div class="v2-card-title">TREINO DE HOJE</div>
         <div id="dashWorkout"></div>
       </div>
 
-      <!-- Hidden compat elements -->
+      <!-- AI banner -->
+      <div class="v2-ai-banner">
+        <div class="v2-ai-title">Não sabe por onde começar?</div>
+        <div class="v2-ai-sub">Gere um plano de dieta personalizado em segundos.</div>
+        <button class="v2-ai-btn" onclick="openPlanWizard('diet', AppState)">Sugerir plano</button>
+      </div>
+
+      <!-- Hidden compat IDs used by other JS modules -->
       <div style="display:none" aria-hidden="true">
-        <div id="dashCalories"></div><div id="dashCalTarget"></div><div id="dashCalRemain"></div>
-        <div id="barProt"></div><div id="valProt"></div>
-        <div id="barCarb"></div><div id="valCarb"></div>
-        <div id="barFat"></div><div id="valFat"></div>
-        <div id="dashWeight"></div>
-        <div id="dashWaterTotal"></div><div id="dashWaterPct"></div><div id="dashWaterBar"></div>
+        <div id="dashWaterBar"></div>
+        <div id="dashStreakFlame"></div>
+        <div id="dashStreakLongest"></div>
         <div id="dashWeightNoData"></div>
         <div id="dashWeightChangeRow"><span id="dashWeightChange"></span><span id="dashWeightVs"></span></div>
         <div id="dashWeightSparkline"></div>
         <div id="dashWeightRangeRow"><span id="dashWeightMin"></span><span id="dashWeightMax"></span><span id="dashWeightCount"></span></div>
         <div id="dashWeightHint"></div>
-        <div id="dashStreakLongest"></div>
         <div id="dashWeeklyReport"></div>
       </div>
     </section>
@@ -982,19 +981,19 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
-<script src="/js/vendor/body-highlighter.iife.js?v=23"></script>
-<script src="/js/muscle-map.js?v=23"></script>
-<script src="/js/api.js?v=23"></script>
-<script src="/js/scanner.js?v=23"></script>
-<script src="/js/dashboard.js?v=23"></script>
-<script src="/js/diet.js?v=23"></script>
-<script src="/js/workouts.js?v=23"></script>
-<script src="/js/evolution.js?v=23"></script>
-<script src="/js/photos.js?v=23"></script>
-<script src="/js/progress.js?v=23"></script>
-<script src="/js/settings.js?v=23"></script>
-<script src="/js/app.js?v=23"></script>
-<script src="/js/plans.js?v=23"></script>
+<script src="/js/vendor/body-highlighter.iife.js?v=24"></script>
+<script src="/js/muscle-map.js?v=24"></script>
+<script src="/js/api.js?v=24"></script>
+<script src="/js/scanner.js?v=24"></script>
+<script src="/js/dashboard.js?v=24"></script>
+<script src="/js/diet.js?v=24"></script>
+<script src="/js/workouts.js?v=24"></script>
+<script src="/js/evolution.js?v=24"></script>
+<script src="/js/photos.js?v=24"></script>
+<script src="/js/progress.js?v=24"></script>
+<script src="/js/settings.js?v=24"></script>
+<script src="/js/app.js?v=24"></script>
+<script src="/js/plans.js?v=24"></script>
 <script>
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/sw.js').catch(() => {});
@@ -1005,14 +1004,6 @@
       window.location.reload();
     });
   }
-
-  // Period tabs: visual toggle (wired to data in Etapa 3)
-  document.getElementById('dashPeriodTabs')?.addEventListener('click', e => {
-    const tab = e.target.closest('.period-tab');
-    if (!tab) return;
-    document.querySelectorAll('#dashPeriodTabs .period-tab').forEach(t => t.classList.remove('active'));
-    tab.classList.add('active');
-  });
 
   // Sync streak chip in header from quick-stats span (runs after dashboard.js populates it)
   document.addEventListener('DOMContentLoaded', () => {
