@@ -2911,12 +2911,22 @@ input::placeholder, textarea::placeholder { color: var(--text-3); }
 /* Streak card (Records) */
 #progStreakVal { color: var(--accent-warm) !important; }
 
-/* ── Settings: profile avatar → lime ────────────────────────────── */
+/* ── Settings: profile avatar → lime with person icon ───────────── */
 .profile-avatar {
   background: var(--accent) !important;
   color: #000 !important;
-  font-weight: 800;
-  font-size: 1.5rem;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* Header avatar button → lime, person icon */
+.header-avatar {
+  background: var(--accent) !important;
+  color: #000 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
 }
 
 /* ── Settings: logout button → outlined accent-warm ─────────────── */

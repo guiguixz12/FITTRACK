@@ -108,7 +108,7 @@ async function loadSettings(state) {
   const avatarEl = document.getElementById('profileAvatar');
   const nameEl   = document.getElementById('profileName');
   const emailEl  = document.getElementById('profileEmail');
-  if (avatarEl) avatarEl.textContent = (u.name || '?')[0].toUpperCase();
+  if (avatarEl) avatarEl.innerHTML = `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>`;
   if (nameEl)   nameEl.textContent   = u.name  || '—';
   if (emailEl)  emailEl.textContent  = u.email || '—';
 
