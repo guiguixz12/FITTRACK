@@ -8,8 +8,9 @@ const router = express.Router();
 
 const COOKIE_OPTS = {
   httpOnly: true,
+  secure: true,
+  sameSite: 'lax',
   maxAge: 30 * 24 * 60 * 60 * 1000,
-  sameSite: 'lax'
 };
 
 router.post('/register', async (req, res) => {
@@ -45,7 +46,7 @@ router.post('/register', async (req, res) => {
     { expiresIn: '30d' }
   );
 
-  if (process.env.NODE_ENV === 'production') COOKIE_OPTS.secure = true;
+
   res.cookie('token', token, COOKIE_OPTS);
   res.status(201).json({ user });
 });
@@ -65,7 +66,7 @@ router.post('/login', (req, res) => {
     { expiresIn: '30d' }
   );
 
-  if (process.env.NODE_ENV === 'production') COOKIE_OPTS.secure = true;
+
   res.cookie('token', token, COOKIE_OPTS);
 
   const { password_hash, ...safe } = user;
@@ -107,7 +108,7 @@ router.post('/impersonate/:clientId', requireAdmin, (req, res) => {
     { expiresIn: '8h' }
   );
 
-  if (process.env.NODE_ENV === 'production') COOKIE_OPTS.secure = true;
+
   res.cookie('adminToken', req.cookies.token, COOKIE_OPTS);
   res.cookie('token', clientToken, COOKIE_OPTS);
   res.json({ success: true });
