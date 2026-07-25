@@ -48,6 +48,19 @@ router.put('/:id', (req, res) => {
   res.json({ success: true });
 });
 
+router.put('/:id/finalize', (req, res) => {
+  const { total_volume, estimated_kcal, duration_seconds, muscles_worked } = req.body;
+  const db = getDB();
+  const workout = db.prepare('SELECT id FROM workouts WHERE id=? AND user_id=?').get(req.params.id, req.user.id);
+  if (!workout) return res.status(404).json({ error: 'Treino não encontrado' });
+  db.prepare(`
+    UPDATE workouts SET total_volume=?, estimated_kcal=?, duration_seconds=?, muscles_worked=?
+    WHERE id=?
+  `).run(total_volume ?? null, estimated_kcal ?? null, duration_seconds ?? null,
+    muscles_worked ? JSON.stringify(muscles_worked) : null, req.params.id);
+  res.json({ success: true });
+});
+
 router.delete('/:id', (req, res) => {
   getDB().prepare('DELETE FROM workouts WHERE id=? AND user_id=?').run(req.params.id, req.user.id);
   res.json({ success: true });

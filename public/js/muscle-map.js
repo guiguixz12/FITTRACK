@@ -179,9 +179,10 @@
   }
 
   // ── Public API ────────────────────────────────────────────────────────────────
-  window.initMuscleMaps   = initMuscleMaps;
-  window.highlightMuscles = highlightMuscles;
-  window.renderChipMap    = renderChipMap;
+  window.initMuscleMaps    = initMuscleMaps;
+  window.highlightMuscles  = highlightMuscles;
+  window.renderChipMap     = renderChipMap;
+  window.MUSCLE_TOKEN_MAP  = TOKEN_MAP;
 
   document.addEventListener('DOMContentLoaded', initMuscleMaps);
 })();

@@ -20,7 +20,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/style.css?v=13">
+  <link rel="stylesheet" href="/css/style.css?v=14">
 
   <!-- SVG gradient for calorie ring (must live in DOM) -->
   <svg width="0" height="0" style="position:absolute">
@@ -944,19 +944,19 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
-<script src="/js/vendor/body-highlighter.iife.js?v=13"></script>
-<script src="/js/muscle-map.js?v=13"></script>
-<script src="/js/api.js?v=13"></script>
-<script src="/js/scanner.js?v=13"></script>
-<script src="/js/dashboard.js?v=13"></script>
-<script src="/js/diet.js?v=13"></script>
-<script src="/js/workouts.js?v=13"></script>
-<script src="/js/evolution.js?v=13"></script>
-<script src="/js/photos.js?v=13"></script>
-<script src="/js/progress.js?v=13"></script>
-<script src="/js/settings.js?v=13"></script>
-<script src="/js/app.js?v=13"></script>
-<script src="/js/plans.js?v=13"></script>
+<script src="/js/vendor/body-highlighter.iife.js?v=14"></script>
+<script src="/js/muscle-map.js?v=14"></script>
+<script src="/js/api.js?v=14"></script>
+<script src="/js/scanner.js?v=14"></script>
+<script src="/js/dashboard.js?v=14"></script>
+<script src="/js/diet.js?v=14"></script>
+<script src="/js/workouts.js?v=14"></script>
+<script src="/js/evolution.js?v=14"></script>
+<script src="/js/photos.js?v=14"></script>
+<script src="/js/progress.js?v=14"></script>
+<script src="/js/settings.js?v=14"></script>
+<script src="/js/app.js?v=14"></script>
+<script src="/js/plans.js?v=14"></script>
 <script>
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/sw.js').catch(() => {});
@@ -969,6 +969,51 @@
     });
   }
 </script>
+
+<!-- Workout Report Modal -->
+<div id="wkReportModal" style="display:none" class="wkr-overlay">
+  <div class="wkr-sheet">
+    <div class="wkr-header">
+      <div class="wkr-title">Treino concluído 💪</div>
+      <div id="wkrDuration" class="wkr-duration"></div>
+      <div id="wkrDate" class="wkr-date"></div>
+    </div>
+    <div class="wkr-body">
+      <!-- Muscle map -->
+      <div id="wkrMapsWrap" class="wkr-maps-wrap"></div>
+      <!-- Stats row -->
+      <div class="wkr-stats">
+        <div class="wkr-stat" id="wkrStatVolume">
+          <span class="wkr-stat-val" id="wkrVolVal">—</span>
+          <span class="wkr-stat-lbl">Volume total</span>
+        </div>
+        <div class="wkr-stat" id="wkrStatKcal" style="display:none">
+          <span class="wkr-stat-val" id="wkrKcalVal">—</span>
+          <span class="wkr-stat-lbl">Calorias est.</span>
+        </div>
+        <div class="wkr-stat">
+          <span class="wkr-stat-val" id="wkrExVal">—</span>
+          <span class="wkr-stat-lbl">Exercícios</span>
+        </div>
+        <div class="wkr-stat">
+          <span class="wkr-stat-val" id="wkrSetsVal">—</span>
+          <span class="wkr-stat-lbl">Séries</span>
+        </div>
+      </div>
+      <!-- PRs -->
+      <div id="wkrPRsWrap" style="display:none" class="wkr-prs-wrap">
+        <div class="wkr-section-title">🏆 Novos PRs</div>
+        <div id="wkrPRsList" class="wkr-prs-list"></div>
+      </div>
+      <!-- Exercise list -->
+      <div class="wkr-section-title">Exercícios</div>
+      <div id="wkrExList" class="wkr-ex-list"></div>
+    </div>
+    <div class="wkr-footer">
+      <button class="btn btn-primary wkr-close-btn" onclick="closeWorkoutReport()">Fechar</button>
+    </div>
+  </div>
+</div>
 
 <!-- Exercise Info Modal -->
 <div id="exInfoModal" style="display:none" class="ex-info-overlay">

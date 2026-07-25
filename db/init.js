@@ -206,6 +206,10 @@ function initDB() {
     "ALTER TABLE users ADD COLUMN stripe_customer_id TEXT",
     "ALTER TABLE users ADD COLUMN plan TEXT DEFAULT 'free'",
     "ALTER TABLE users ADD COLUMN plan_expires_at TEXT",
+    "ALTER TABLE workouts ADD COLUMN total_volume REAL",
+    "ALTER TABLE workouts ADD COLUMN estimated_kcal INTEGER",
+    "ALTER TABLE workouts ADD COLUMN duration_seconds INTEGER",
+    "ALTER TABLE workouts ADD COLUMN muscles_worked TEXT",
   ];
   for (const sql of migrations) {
     try { database.exec(sql); } catch (_) { /* column already exists */ }

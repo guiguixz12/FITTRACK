@@ -2139,3 +2139,162 @@ input[type="file"] {
 .mm-chip-bh { width: 100%; }
 .mm-chip-bh .rbh { display: block; }
 .mm-chip-bh .rbh polygon { cursor: default; }
+
+/* ── Workout Report Modal ─────────────────────────────────────────────────── */
+.wkr-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 900;
+  background: var(--bg);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+.wkr-sheet {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  max-width: 520px;
+  width: 100%;
+  margin: 0 auto;
+}
+.wkr-header {
+  background: linear-gradient(160deg, #1a1a2e 0%, #16213e 60%, #0f3460 100%);
+  padding: 48px 24px 32px;
+  text-align: center;
+}
+.wkr-title {
+  font-family: 'Sora', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 8px;
+}
+.wkr-duration {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: #D85A30;
+  letter-spacing: -1px;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+.wkr-date {
+  font-size: 0.8rem;
+  color: rgba(255,255,255,0.5);
+  text-transform: uppercase;
+  letter-spacing: .06em;
+}
+.wkr-body {
+  flex: 1;
+  padding: 0 0 16px;
+}
+.wkr-maps-wrap {
+  display: flex;
+  gap: 8px;
+  padding: 16px 20px 8px;
+  justify-content: center;
+  align-items: flex-start;
+}
+.wkr-stats {
+  display: flex;
+  justify-content: center;
+  gap: 0;
+  padding: 12px 16px 8px;
+  border-bottom: 1px solid var(--border);
+}
+.wkr-stat {
+  flex: 1;
+  text-align: center;
+  padding: 8px 4px;
+  border-right: 1px solid var(--border);
+}
+.wkr-stat:last-child { border-right: none; }
+.wkr-stat-val {
+  display: block;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-1);
+}
+.wkr-stat-lbl {
+  display: block;
+  font-size: 0.65rem;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  margin-top: 2px;
+}
+.wkr-section-title {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  padding: 14px 20px 6px;
+}
+.wkr-prs-wrap {
+  border-top: 1px solid var(--border);
+  margin-top: 4px;
+}
+.wkr-prs-list {
+  padding: 0 20px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.wkr-pr-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: var(--text-1);
+}
+.wkr-pr-badge {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #fff;
+  background: #D85A30;
+  border-radius: 4px;
+  padding: 1px 5px;
+  flex-shrink: 0;
+}
+.wkr-ex-list {
+  padding: 0 20px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.wkr-ex-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: var(--surface);
+  border-radius: 10px;
+  gap: 8px;
+}
+.wkr-ex-name {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-1);
+  flex: 1;
+}
+.wkr-ex-meta {
+  font-size: 0.78rem;
+  color: var(--text-3);
+  text-align: right;
+  white-space: nowrap;
+}
+.wkr-ex-vol {
+  font-size: 0.72rem;
+  color: var(--text-3);
+  white-space: nowrap;
+}
+.wkr-footer {
+  padding: 16px 20px 32px;
+}
+.wkr-close-btn {
+  width: 100%;
+  height: 52px;
+  font-size: 1rem;
+  border-radius: 14px;
+}
