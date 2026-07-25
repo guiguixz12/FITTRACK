@@ -2,7 +2,7 @@
    ETAPA 1 — Dark Design System: global fixes
    ═══════════════════════════════════════════ */
 
-/* Form inputs dark */
+/* Form inputs dark + iOS auto-zoom fix (font-size < 16px triggers zoom) */
 .form-group input,
 .form-group select,
 .form-group textarea,
@@ -11,10 +11,13 @@ input[type="number"],
 input[type="text"],
 input[type="password"],
 input[type="email"],
-input[type="file"] {
+input[type="file"],
+select,
+textarea {
   background: var(--card-soft);
   border-color: var(--border);
   color: var(--text);
+  font-size: 16px !important;
 }
 input::placeholder, textarea::placeholder { color: var(--text-3); }
 .form-group input:focus,
