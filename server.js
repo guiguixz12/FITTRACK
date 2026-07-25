@@ -31,9 +31,12 @@ app.use(helmet({
     reportOnly: false,
     directives: {
       defaultSrc:     ["'self'"],
-      // unsafe-inline required: app.html has inline onclick handlers throughout.
-      // Removing it needs a full refactor of the HTML event handlers.
-      scriptSrc:      ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net"],
+      // app.html and login.html use inline onclick handlers throughout —
+      // both scriptSrc and scriptSrcAttr need 'unsafe-inline'.
+      // scriptSrcAttr controls inline event handlers (onclick=…); helmet
+      // defaults it to 'none', which silently blocks every button click.
+      scriptSrc:      ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net", "https://unpkg.com"],
+      scriptSrcAttr:  ["'unsafe-inline'"],
       styleSrc:       ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
       fontSrc:        ["'self'", "https://fonts.gstatic.com"],
       imgSrc:         ["'self'", "data:", "blob:"],
