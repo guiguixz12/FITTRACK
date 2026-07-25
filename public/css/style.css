@@ -1996,11 +1996,9 @@ input[type="file"] {
 
 /* Body diagram container */
 .ex-body-diagram {
-  width: 82px;
-  height: 182px;
+  width: 88px;
   flex-shrink: 0;
-  border-radius: 10px;
-  overflow: hidden;
+  align-self: flex-start;
 }
 
 /* Equipment tag */

@@ -238,12 +238,41 @@
     }
   }
 
+  // ── Chip-level mini map (single view, injected into sidebar el) ──────────────
+  function buildChipMapHTML(view) {
+    const src  = view === 'back' ? '/images/muscle-map/back.png' : '/images/muscle-map/front.png';
+    const data = view === 'back' ? BACK : FRONT;
+    const paths = data.map(([token, d]) =>
+      `<path data-muscle="${token}" d="${d}" fill="transparent" class="mm-path mm-chip-path"/>`
+    ).join('');
+    return `<div style="position:relative;border-radius:8px;overflow:hidden;line-height:0">
+      <img src="${src}" style="display:block;width:100%;height:auto" alt="">
+      <svg style="position:absolute;inset:0;width:100%;height:100%" viewBox="0 0 ${W} ${H}">
+        ${paths}
+      </svg>
+    </div>`;
+  }
+
+  function highlightChipMap(container, muscles) {
+    if (!container) return;
+    const pSet = new Set(muscles.slice(0, 1));
+    const sSet = new Set(muscles.slice(1));
+    container.querySelectorAll('.mm-chip-path').forEach(p => {
+      const m = p.dataset.muscle;
+      if (pSet.has(m))      p.setAttribute('fill', COL_PRIMARY);
+      else if (sSet.has(m)) p.setAttribute('fill', COL_SECONDARY);
+      else                  p.setAttribute('fill', 'transparent');
+    });
+  }
+
   // ── Public API ────────────────────────────────────────────────────────────────
-  window.initMuscleMaps   = initMuscleMaps;
-  window.highlightMuscles = highlightMuscles;
-  window.MM_LABELS        = LABELS;
-  window.MM_FRONT         = FRONT;
-  window.MM_BACK          = BACK;
+  window.initMuscleMaps    = initMuscleMaps;
+  window.highlightMuscles  = highlightMuscles;
+  window.buildChipMapHTML  = buildChipMapHTML;
+  window.highlightChipMap  = highlightChipMap;
+  window.MM_LABELS         = LABELS;
+  window.MM_FRONT          = FRONT;
+  window.MM_BACK           = BACK;
 
   document.addEventListener('DOMContentLoaded', initMuscleMaps);
 })();

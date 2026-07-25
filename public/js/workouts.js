@@ -881,8 +881,14 @@ function renderTplChips(group) {
 
   const diagramEl = document.getElementById('tplBodyDiagram');
   if (diagramEl) {
-    diagramEl.innerHTML     = muscles.length ? buildBodySvg(muscles, view) : '';
-    diagramEl.style.display = muscles.length ? '' : 'none';
+    if (muscles.length) {
+      diagramEl.innerHTML = buildChipMapHTML(view);
+      highlightChipMap(diagramEl, muscles);
+      diagramEl.style.display = '';
+    } else {
+      diagramEl.innerHTML = '';
+      diagramEl.style.display = 'none';
+    }
   }
 
   document.getElementById('tplExChips').innerHTML = (EXERCISE_LIBRARY[group] || []).map(ex =>
@@ -1503,8 +1509,14 @@ function renderExChips(group) {
 
   const diagramEl = document.getElementById('exBodyDiagram');
   if (diagramEl) {
-    diagramEl.innerHTML     = muscles.length ? buildBodySvg(muscles, view) : '';
-    diagramEl.style.display = muscles.length ? '' : 'none';
+    if (muscles.length) {
+      diagramEl.innerHTML = buildChipMapHTML(view);
+      highlightChipMap(diagramEl, muscles);
+      diagramEl.style.display = '';
+    } else {
+      diagramEl.innerHTML = '';
+      diagramEl.style.display = 'none';
+    }
   }
 
   document.getElementById('exChips').innerHTML = (EXERCISE_LIBRARY[group] || []).map(ex =>
