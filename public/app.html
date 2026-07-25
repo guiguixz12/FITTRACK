@@ -7,12 +7,12 @@
 
   <!-- PWA -->
   <link rel="manifest" href="/manifest.json">
-  <meta name="theme-color" content="#F2F2F7">
+  <meta name="theme-color" content="#0D0D0D">
   <meta name="mobile-web-app-capable" content="yes">
 
   <!-- iOS PWA -->
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="FIT">
   <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
 
@@ -20,7 +20,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/style.css?v=15">
+  <link rel="stylesheet" href="/css/style.css?v=16">
 
   <!-- SVG gradient for calorie ring (must live in DOM) -->
   <svg width="0" height="0" style="position:absolute">
@@ -44,13 +44,33 @@
   <!-- ── Header ──────────────────────────────────────────── -->
   <header class="app-header">
     <span class="brand">FIT</span>
-    <button class="header-avatar" id="headerAvatarBtn" aria-label="Perfil"></button>
+    <div class="header-right">
+      <span class="streak-chip" id="headerStreakChip">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="var(--accent-warm)" stroke="none"><path d="M12 2C8.5 6 6 9.5 6 13a6 6 0 0 0 12 0c0-3.5-2.5-7-6-11zM10 17.5c-1.1 0-2-.9-2-2 0-1.6 2-4 2-4s2 2.4 2 4a2 2 0 0 1-2 2z"/></svg>
+        <span id="headerStreakNum">—</span>
+      </span>
+      <button class="header-avatar" id="headerAvatarBtn" aria-label="Perfil"></button>
+    </div>
   </header>
 
   <main class="app-main">
 
     <!-- ════════════════ DASHBOARD ════════════════ -->
     <section class="tab-section active" id="tab-dashboard">
+
+      <!-- Page title -->
+      <div class="dash-page-header">
+        <h1 class="dash-page-title">Seu progresso</h1>
+        <p class="dash-page-sub">Pequenos passos, grandes mudanças.</p>
+      </div>
+
+      <!-- Period selector (visual, wired in Etapa 3) -->
+      <div class="period-tabs-wrap" id="dashPeriodTabs">
+        <button class="period-tab active" data-period="week">Semana</button>
+        <button class="period-tab" data-period="month">Mês</button>
+        <button class="period-tab" data-period="3months">3 Meses</button>
+        <button class="period-tab" data-period="year">Ano</button>
+      </div>
 
       <!-- Date navigation -->
       <div class="date-nav">
@@ -108,7 +128,7 @@
       <!-- Quick Stats Row: Water | Streak | Weight -->
       <div class="quick-stats">
         <div class="qstat">
-          <div class="qstat-icon">💧</div>
+          <div class="qstat-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg></div>
           <div class="qstat-val" id="dashWaterTotal">0ml</div>
           <div class="qstat-mini-bar">
             <div class="mcbar-fill fill-blue" id="dashWaterBar" style="width:0%;height:100%"></div>
@@ -121,27 +141,37 @@
           <div class="qstat-label">dias seguidos</div>
         </div>
         <div class="qstat">
-          <div class="qstat-icon">⚖️</div>
+          <div class="qstat-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--text-3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="7" r="4"/><path d="M5 21v-2a7 7 0 0 1 14 0v2"/><line x1="8" y1="15" x2="16" y2="15"/></svg></div>
           <div class="qstat-val" id="dashWeight">—</div>
           <div class="qstat-label">peso atual</div>
         </div>
       </div>
 
       <!-- Water Card -->
-      <div class="card">
-        <div class="water-card-head">
-          <div class="card-label" style="margin-bottom:0">Hidratação</div>
-          <span class="water-goal-txt">Meta: <span id="dashWaterGoal">2 L</span></span>
+      <div class="card water-card-v2">
+        <div class="water-main-row">
+          <div class="water-icon-sq">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>
+            </svg>
+          </div>
+          <div class="water-content">
+            <div class="water-label-row">
+              <span class="water-label-txt">Água</span>
+              <span class="water-goal-txt">Meta: <span id="dashWaterGoal">2 L</span></span>
+            </div>
+            <div class="water-progress-bar">
+              <div class="water-progress-fill" id="dashWaterProgressFill" style="width:0%"></div>
+            </div>
+          </div>
+          <button class="water-quick-add water-btn" data-ml="250">+250ml</button>
         </div>
-        <div class="water-progress-bar">
-          <div class="water-progress-fill" id="dashWaterProgressFill" style="width:0%"></div>
-        </div>
-        <div class="water-grid" id="dashWaterGrid">
-          <button class="water-btn" data-ml="150">150ml</button>
-          <button class="water-btn" data-ml="200">200ml</button>
-          <button class="water-btn" data-ml="250">250ml</button>
-          <button class="water-btn" data-ml="350">350ml</button>
-          <button class="water-btn" data-ml="500">500ml</button>
+        <div class="water-grid water-grid-secondary" id="dashWaterGrid">
+          <button class="water-btn" data-ml="150">150</button>
+          <button class="water-btn" data-ml="200">200</button>
+          <button class="water-btn" data-ml="250">250</button>
+          <button class="water-btn" data-ml="350">350</button>
+          <button class="water-btn" data-ml="500">500</button>
           <button class="water-btn" data-ml="1000">1L</button>
         </div>
         <div class="water-logs" id="dashWaterLogs"></div>
@@ -950,23 +980,22 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
-<script src="/js/vendor/body-highlighter.iife.js?v=15"></script>
-<script src="/js/muscle-map.js?v=15"></script>
-<script src="/js/api.js?v=15"></script>
-<script src="/js/scanner.js?v=15"></script>
-<script src="/js/dashboard.js?v=15"></script>
-<script src="/js/diet.js?v=15"></script>
-<script src="/js/workouts.js?v=15"></script>
-<script src="/js/evolution.js?v=15"></script>
-<script src="/js/photos.js?v=15"></script>
-<script src="/js/progress.js?v=15"></script>
-<script src="/js/settings.js?v=15"></script>
-<script src="/js/app.js?v=15"></script>
-<script src="/js/plans.js?v=15"></script>
+<script src="/js/vendor/body-highlighter.iife.js?v=16"></script>
+<script src="/js/muscle-map.js?v=16"></script>
+<script src="/js/api.js?v=16"></script>
+<script src="/js/scanner.js?v=16"></script>
+<script src="/js/dashboard.js?v=16"></script>
+<script src="/js/diet.js?v=16"></script>
+<script src="/js/workouts.js?v=16"></script>
+<script src="/js/evolution.js?v=16"></script>
+<script src="/js/photos.js?v=16"></script>
+<script src="/js/progress.js?v=16"></script>
+<script src="/js/settings.js?v=16"></script>
+<script src="/js/app.js?v=16"></script>
+<script src="/js/plans.js?v=16"></script>
 <script>
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/sw.js').catch(() => {});
-    // When a new SW activates, reload so the page gets fresh HTML/JS
     let _swRefreshing = false;
     navigator.serviceWorker.addEventListener('controllerchange', () => {
       if (_swRefreshing) return;
@@ -974,6 +1003,25 @@
       window.location.reload();
     });
   }
+
+  // Period tabs: visual toggle (wired to data in Etapa 3)
+  document.getElementById('dashPeriodTabs')?.addEventListener('click', e => {
+    const tab = e.target.closest('.period-tab');
+    if (!tab) return;
+    document.querySelectorAll('#dashPeriodTabs .period-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+  });
+
+  // Sync streak chip in header from quick-stats span (runs after dashboard.js populates it)
+  document.addEventListener('DOMContentLoaded', () => {
+    const observer = new MutationObserver(() => {
+      const val = document.getElementById('dashStreakVal')?.textContent;
+      const headerNum = document.getElementById('headerStreakNum');
+      if (headerNum && val) headerNum.textContent = val;
+    });
+    const target = document.getElementById('dashStreakVal');
+    if (target) observer.observe(target, { childList: true, subtree: true, characterData: true });
+  });
 </script>
 
 <!-- Workout Report Modal -->
