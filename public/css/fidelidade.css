@@ -1096,9 +1096,21 @@ input::placeholder, textarea::placeholder { color: var(--text-3); }
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-top: 1px solid var(--border);
-  padding: 12px 12px calc(12px + env(safe-area-inset-bottom, 0px));
+  padding: 10px 8px calc(10px + env(safe-area-inset-bottom, 0px));
   align-items: flex-start;
 }
+
+/* Nav icon framing — pill highlight on active */
+.nav-icon {
+  width: 36px;
+  height: 28px;
+  border-radius: 9px;
+  transition: background .15s;
+}
+.nav-icon svg { width: 20px; height: 20px; }
+.nav-btn.active .nav-icon { background: rgba(196,229,56,0.13); }
+/* Remove old top-line indicator; pill is the active signal */
+.nav-btn::after { display: none; }
 
 /* Buttons — 13px standard, weight 600 */
 .btn { font-size: 13px; font-weight: 600; }

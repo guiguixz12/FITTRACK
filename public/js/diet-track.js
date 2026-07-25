@@ -8,9 +8,11 @@ function openDtTrack(dow) {
   const isToday = dow === new Date().getDay();
   const date    = getDateForDow(dow);
 
-  // Build food list with done state restored from localStorage
+  // Restore done state + any extra foods from localStorage
   const saved = loadTrackState(date);
-  dtTrackFoods = (tpl?.foods || []).map((f, i) => ({ ...f, done: saved.includes(i) }));
+  dtTrackFoods = (tpl?.foods || []).map((f, i) => ({ ...f, done: saved.doneIdxs.includes(i) }));
+  // Re-append persisted extra foods
+  (saved.extraFoods || []).forEach(f => dtTrackFoods.push(f));
 
   // Header
   document.getElementById('dtTrackTitle').textContent = tpl?.name || DT_DAYS_FULL[dow];
@@ -85,10 +87,11 @@ function renderDtTrackMeals() {
       </div>`;
   }).join('') || '<p class="empty-state">Nenhum alimento neste plano.</p>';
 
-  // Auto-persist to localStorage
-  const date  = getDateForDow(dtTrackDow);
-  const doneIdxs = dtTrackFoods.map((f, i) => f.done ? i : -1).filter(i => i >= 0);
-  saveTrackState(date, doneIdxs);
+  // Auto-persist to localStorage (done indices + extra foods)
+  const date     = getDateForDow(dtTrackDow);
+  const doneIdxs = dtTrackFoods.map((f, i) => (!f.extra && f.done) ? i : -1).filter(i => i >= 0);
+  const extraFoods = dtTrackFoods.filter(f => f.extra);
+  saveTrackState(date, doneIdxs, extraFoods);
 }
 
 function toggleDtTrackFood(gi) {
@@ -323,11 +326,17 @@ function updateDtExtraPreview() {
 function trackStorageKey(date) {
   return `dt_${dtState?.user?.id || '0'}_${date}`;
 }
-function saveTrackState(date, doneIdxs) {
-  try { localStorage.setItem(trackStorageKey(date), JSON.stringify(doneIdxs)); } catch {}
+function saveTrackState(date, doneIdxs, extraFoods) {
+  try { localStorage.setItem(trackStorageKey(date), JSON.stringify({ doneIdxs, extraFoods: extraFoods || [] })); } catch {}
 }
 function loadTrackState(date) {
-  try { return JSON.parse(localStorage.getItem(trackStorageKey(date))) || []; } catch { return []; }
+  try {
+    const val = JSON.parse(localStorage.getItem(trackStorageKey(date)));
+    if (!val) return { doneIdxs: [], extraFoods: [] };
+    // Backwards compat: old format was a plain array of indices
+    if (Array.isArray(val)) return { doneIdxs: val, extraFoods: [] };
+    return { doneIdxs: val.doneIdxs || [], extraFoods: val.extraFoods || [] };
+  } catch { return { doneIdxs: [], extraFoods: [] }; }
 }
 
 // Returns the ISO date for the current or most recent occurrence of a given DOW
