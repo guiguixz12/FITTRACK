@@ -1360,3 +1360,15 @@ input[type="password"] {
   z-index: auto;
 }
 .app-main { margin-top: 0; }
+
+/* ── Dashboard: workout kcal info line ──────────────────────────────────────── */
+.v2-workout-kcal-info {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  color: var(--text-dim);
+  margin-top: 6px;
+}
+.v2-workout-kcal-info svg { flex-shrink: 0; opacity: .7; }
+.v2-workout-kcal-sub { opacity: .7; }
