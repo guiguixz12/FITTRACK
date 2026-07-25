@@ -1,5 +1,6 @@
 const Database = require('better-sqlite3');
 const bcrypt = require('bcryptjs');
+const crypto = require('crypto');
 const path = require('path');
 const fs = require('fs');
 
@@ -162,10 +163,18 @@ function initDB() {
     );
   `);
 
+  // Seed password: set SEED_PASSWORD env var in production. In dev, a random
+  // password is generated on first boot and printed once to stdout.
+  const seedPassword = process.env.SEED_PASSWORD || (() => {
+    const rand = crypto.randomBytes(12).toString('hex');
+    console.log(`[SEED] Dev seed password (first boot only): ${rand}`);
+    return rand;
+  })();
+
   const seedUsers = [
     {
       name: 'Guilherme',
-      password: 'guilherme123',
+      password: seedPassword,
       target_calories: 2500,
       target_protein: 180,
       target_carbs: 250,
@@ -176,7 +185,7 @@ function initDB() {
     },
     {
       name: 'Ana',
-      password: 'ana123',
+      password: seedPassword,
       target_calories: 1800,
       target_protein: 130,
       target_carbs: 180,
