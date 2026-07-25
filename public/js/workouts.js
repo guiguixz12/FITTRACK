@@ -468,6 +468,8 @@ let activeMg     = null;   // active muscle group in manual session
 let currentWkId  = null;   // current manual session workout id
 
 // Active workout mode
+
+
 let waExercises    = [];
 let waChecked      = 0;
 let waTimerInt     = null;
@@ -880,15 +882,8 @@ function renderTplChips(group) {
   const view     = MG_VIEW[group] || 'front';
 
   const diagramEl = document.getElementById('tplBodyDiagram');
-  if (diagramEl) {
-    if (muscles.length) {
-      diagramEl.innerHTML = buildChipMapHTML(view);
-      highlightChipMap(diagramEl, muscles);
-      diagramEl.style.display = '';
-    } else {
-      diagramEl.innerHTML = '';
-      diagramEl.style.display = 'none';
-    }
+  if (diagramEl && typeof renderChipMap === 'function') {
+    renderChipMap(diagramEl, muscles, view);
   }
 
   document.getElementById('tplExChips').innerHTML = (EXERCISE_LIBRARY[group] || []).map(ex =>
@@ -1508,15 +1503,8 @@ function renderExChips(group) {
   const view     = MG_VIEW[group] || 'front';
 
   const diagramEl = document.getElementById('exBodyDiagram');
-  if (diagramEl) {
-    if (muscles.length) {
-      diagramEl.innerHTML = buildChipMapHTML(view);
-      highlightChipMap(diagramEl, muscles);
-      diagramEl.style.display = '';
-    } else {
-      diagramEl.innerHTML = '';
-      diagramEl.style.display = 'none';
-    }
+  if (diagramEl && typeof renderChipMap === 'function') {
+    renderChipMap(diagramEl, muscles, view);
   }
 
   document.getElementById('exChips').innerHTML = (EXERCISE_LIBRARY[group] || []).map(ex =>

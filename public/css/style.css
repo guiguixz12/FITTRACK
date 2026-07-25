@@ -1994,13 +1994,6 @@ input[type="file"] {
   min-width: 0;
 }
 
-/* Body diagram container */
-.ex-body-diagram {
-  width: 88px;
-  flex-shrink: 0;
-  align-self: flex-start;
-}
-
 /* Equipment tag */
 .equip-tag {
   display: inline-flex;
@@ -2101,55 +2094,48 @@ input[type="file"] {
   aspect-ratio: 4/3;
   background: var(--card-bg);
 }
-/* ── Muscle map overlay ─────────────────────────────────────────────────────── */
+/* ── body-highlighter muscle maps ───────────────────────────────────────────── */
 .ex-info-maps-wrap {
   display: flex;
-  gap: 10px;
-  padding: 4px 14px 12px;
+  gap: 8px;
+  padding: 4px 14px 8px;
   justify-content: center;
+  align-items: flex-start;
 }
-.mm-container {
-  position: relative;
+.mm-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   flex: 1;
-  max-width: 148px;
+  max-width: 140px;
 }
-.mm-img {
-  display: block;
-  width: 100%;
-  height: auto;
-  border-radius: 8px;
-}
-.mm-overlay {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-}
-.mm-path {
-  mix-blend-mode: multiply;
-  cursor: pointer;
-  transition: fill 0.12s ease;
-}
-.mm-path:hover {
-  fill: rgba(0,0,0,0.08) !important;
-}
-.mm-label {
+.mm-view-label {
   display: block;
   text-align: center;
-  font-size: 0.68rem;
+  font-size: 0.65rem;
   color: var(--text-3);
-  margin-top: 4px;
-  letter-spacing: .03em;
+  margin-top: 3px;
+  letter-spacing: .04em;
+  text-transform: uppercase;
 }
-.mm-tooltip {
-  display: none;
-  position: fixed;
-  background: rgba(15,15,25,0.82);
-  color: #fff;
-  padding: 3px 9px;
-  border-radius: 5px;
-  font-size: 12px;
-  pointer-events: none;
-  z-index: 10000;
-  white-space: nowrap;
+.mm-bh { width: 100%; }
+.mm-bh .rbh { display: block; }
+.mm-bh .rbh polygon:hover { opacity: 0.75 !important; }
+.ex-muscle-label {
+  text-align: center;
+  font-size: 0.75rem;
+  color: var(--text-3);
+  min-height: 1.1em;
+  padding: 0 16px 10px;
+  transition: color 0.15s;
 }
+
+/* Chip map (sidebar) */
+.ex-body-diagram {
+  width: 80px;
+  flex-shrink: 0;
+  align-self: flex-start;
+}
+.mm-chip-bh { width: 100%; }
+.mm-chip-bh .rbh { display: block; }
+.mm-chip-bh .rbh polygon { cursor: default; }
