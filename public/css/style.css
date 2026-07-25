@@ -2582,3 +2582,162 @@ input::placeholder, textarea::placeholder { color: var(--text-3); }
 .diet-food-kcal { color: var(--accent-warm); }
 .dt-track-food-kcal { color: var(--accent-warm); }
 
+
+/* ═══════════════════════════════════════════
+   ETAPA 2 — Treino: paleta + CTAs + dots
+   ═══════════════════════════════════════════ */
+
+/* Active workout progress bar → accent */
+.wa-prog-bar {
+  background: linear-gradient(90deg, var(--accent), #d6f040);
+}
+
+/* "Concluí a Série" CTA */
+.wa-complete-set-btn {
+  background: var(--accent) !important;
+  color: #000 !important;
+  border: none !important;
+  font-size: 1.1rem;
+  font-weight: 800;
+}
+.wa-complete-set-btn:active { opacity: .85; }
+
+/* Finalizar treino footer button — also already btn-primary */
+#waFinishBtn { background: var(--accent); color: #000; font-weight: 700; }
+#waToggleExtra { color: var(--text-3); border-color: var(--border); }
+
+/* ── Set dots ─────────────────────────────── */
+.wa-set-dot { position: relative; }
+
+.wa-set-dot.done {
+  background: var(--accent);
+  color: transparent;              /* hide set number */
+  border: 2.5px solid var(--accent);
+  box-shadow: 0 0 0 4px rgba(196,229,56,.15);
+}
+.wa-set-dot.done::after {
+  content: '✓';
+  position: absolute;
+  color: #000;
+  font-size: 1.15rem;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.wa-set-dot.active {
+  background: transparent;
+  color: var(--accent);
+  border: 2.5px solid var(--accent);
+  box-shadow: 0 0 0 5px rgba(196,229,56,.18);
+}
+
+.wa-set-dot.pending {
+  background: transparent;
+  color: var(--text-3);
+  border: 2.5px solid rgba(255,255,255,0.13);
+}
+
+/* ── Mini exercise list: active state → accent ── */
+.wa-mini-ex.active {
+  background: rgba(196,229,56,.07);
+  border-color: rgba(196,229,56,.35);
+}
+.wa-mini-ex.active .wa-mini-icon {
+  background: var(--accent);
+  color: #000;
+}
+.wa-mini-ex.active .wa-mini-sets { color: var(--accent); }
+.wa-mini-ex.done .wa-mini-icon { background: rgba(196,229,56,.18); color: var(--accent); }
+.wa-mini-info-btn:active {
+  color: var(--accent);
+  background: rgba(196,229,56,.1);
+}
+
+/* ── Rest ring → accent ── */
+.wa-ring-track { stroke: rgba(255,255,255,0.08); }
+.wa-ring-arc { stroke: var(--accent); }
+.wa-ring-arc.complete { stroke: var(--accent); }
+.wa-ring-ready { color: var(--accent); }
+.wa-skip-btn.ready {
+  background: var(--accent);
+  color: #000;
+  border-color: var(--accent);
+  font-weight: 700;
+}
+
+/* Weight input focus */
+.wa-weight-input:focus { color: var(--accent); }
+.wa-weight-row {
+  background: var(--card-soft);
+  border-color: var(--border);
+}
+
+/* Workout active header / footer */
+.wa-header { background: var(--card); border-color: rgba(255,255,255,0.07); }
+.wa-footer  { background: var(--card); border-color: rgba(255,255,255,0.07); }
+.wa-timer   { color: var(--text-2); }
+
+/* Exercise focus meta top (série X / Y) → accent-warm for warmth */
+.wa-focus-meta-top { color: var(--accent-warm); }
+
+/* ── Exercise info modal → dark sheet ── */
+.ex-info-sheet {
+  background: var(--card);
+  border-top: 1px solid rgba(255,255,255,0.07);
+}
+.ex-info-header { border-color: rgba(255,255,255,0.07); }
+.ex-info-backdrop { background: rgba(0,0,0,0.65); }
+.ex-info-btn:hover { color: var(--accent); }
+
+/* Muscle tags in modal */
+.muscle-tag {
+  background: var(--card-soft);
+  border-color: var(--border);
+  color: var(--text-3);
+}
+.muscle-tag.primary {
+  background: rgba(232,133,61,.12);
+  border-color: rgba(232,133,61,.25);
+  color: var(--accent-warm);
+}
+
+/* Equipment tags */
+.equip-tag {
+  background: var(--card-soft);
+  color: var(--text-2);
+}
+
+/* Workout editor: exercise number dot */
+.exercise-num { background: var(--card-soft); color: var(--text-3); }
+
+/* ── Workout Report Modal ── */
+.wkr-header {
+  background: linear-gradient(160deg, var(--card) 0%, #141418 100%);
+  border-bottom: 1px solid rgba(196,229,56,.15);
+}
+.wkr-title { font-family: -apple-system,'Inter',sans-serif; }
+.wkr-duration { color: var(--accent); }
+.wkr-date { color: var(--text-3); }
+.wkr-stat-val { color: var(--text); }
+.wkr-pr-badge {
+  background: var(--accent-warm);
+  color: #fff;
+}
+.wkr-pr-item { color: var(--text); }
+.wkr-ex-item { background: var(--card-soft); }
+.wkr-ex-name { color: var(--text); }
+.wkr-close-btn {
+  background: var(--accent) !important;
+  color: #000 !important;
+  font-weight: 700;
+  border: none;
+}
+
+/* Workout history stat badge */
+.hist-stat.vol { background: var(--accent-dim); color: var(--accent-warm); }
+
+/* Workout day card active border */
+.day-card.is-today { border-color: rgba(196,229,56,.22); }
+.day-dow.today { color: var(--accent); }
+.week-section-label.today-label { color: var(--accent); }
+
