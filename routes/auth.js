@@ -41,7 +41,7 @@ router.post('/register', async (req, res) => {
 
   const token = jwt.sign(
     { id: user.id, name: user.name },
-    process.env.JWT_SECRET || 'dev_secret_change_me',
+    process.env.JWT_SECRET,
     { expiresIn: '30d' }
   );
 
@@ -61,7 +61,7 @@ router.post('/login', (req, res) => {
 
   const token = jwt.sign(
     { id: user.id, name: user.name, role: user.role || 'user' },
-    process.env.JWT_SECRET || 'dev_secret_change_me',
+    process.env.JWT_SECRET,
     { expiresIn: '30d' }
   );
 
@@ -103,7 +103,7 @@ router.post('/impersonate/:clientId', requireAdmin, (req, res) => {
 
   const clientToken = jwt.sign(
     { id: client.id, name: client.name, role: 'user', _impersonatedBy: req.user.id },
-    process.env.JWT_SECRET || 'dev_secret_change_me',
+    process.env.JWT_SECRET,
     { expiresIn: '8h' }
   );
 

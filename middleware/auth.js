@@ -1,13 +1,15 @@
 const jwt   = require('jsonwebtoken');
 const { getDB } = require('../db/init');
 
-const SECRET = () => process.env.JWT_SECRET || 'dev_secret_change_me';
+function getSecret() {
+  return process.env.JWT_SECRET;
+}
 
 function requireAuth(req, res, next) {
   const token = req.cookies?.token;
   if (!token) return res.status(401).json({ error: 'Authentication required' });
   try {
-    req.user = jwt.verify(token, SECRET());
+    req.user = jwt.verify(token, getSecret());
     next();
   } catch {
     res.status(401).json({ error: 'Invalid or expired token' });

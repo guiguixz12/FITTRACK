@@ -1,4 +1,13 @@
 require('dotenv').config();
+
+// Fail fast if JWT_SECRET is missing or too weak — never start with a default
+const _secret = process.env.JWT_SECRET;
+if (!_secret || _secret.length < 32) {
+  console.error('FATAL: JWT_SECRET must be set in environment and be at least 32 characters.');
+  console.error('Generate one with: openssl rand -hex 64');
+  process.exit(1);
+}
+
 const express = require('express');
 const cookieParser = require('cookie-parser');
 const { rateLimit, ipKeyGenerator } = require('express-rate-limit');
