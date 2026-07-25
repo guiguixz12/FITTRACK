@@ -217,6 +217,29 @@ function initDB() {
     try { database.exec(sql); } catch (_) { /* column already exists */ }
   }
 
+  // Validation triggers — enforce allowed values for role and plan (idempotent)
+  const validationTriggers = [
+    `CREATE TRIGGER IF NOT EXISTS trg_users_role_insert
+     BEFORE INSERT ON users WHEN NEW.role IS NOT NULL
+     BEGIN SELECT CASE WHEN NEW.role NOT IN ('user','admin','super_admin')
+       THEN RAISE(ABORT,'Invalid role') END; END`,
+    `CREATE TRIGGER IF NOT EXISTS trg_users_role_update
+     BEFORE UPDATE OF role ON users WHEN NEW.role IS NOT NULL
+     BEGIN SELECT CASE WHEN NEW.role NOT IN ('user','admin','super_admin')
+       THEN RAISE(ABORT,'Invalid role') END; END`,
+    `CREATE TRIGGER IF NOT EXISTS trg_users_plan_insert
+     BEFORE INSERT ON users WHEN NEW.plan IS NOT NULL
+     BEGIN SELECT CASE WHEN NEW.plan NOT IN ('free','pro')
+       THEN RAISE(ABORT,'Invalid plan') END; END`,
+    `CREATE TRIGGER IF NOT EXISTS trg_users_plan_update
+     BEFORE UPDATE OF plan ON users WHEN NEW.plan IS NOT NULL
+     BEGIN SELECT CASE WHEN NEW.plan NOT IN ('free','pro')
+       THEN RAISE(ABORT,'Invalid plan') END; END`,
+  ];
+  for (const sql of validationTriggers) {
+    database.exec(sql);
+  }
+
   // Ensure Guilherme is always super_admin
   database.prepare("UPDATE users SET role='super_admin' WHERE name='Guilherme' AND (role IS NULL OR role='user')").run();
 
