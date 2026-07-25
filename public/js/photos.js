@@ -53,8 +53,8 @@ async function loadPhotos(state) {
   }
 
   gallery.innerHTML = photos.map(p => `
-    <div class="photo-card" onclick="openLightbox('/uploads/${p.filename}')">
-      <img src="/uploads/${p.filename}" alt="Foto ${p.date}" loading="lazy">
+    <div class="photo-card" onclick="openLightbox('/api/photos/file/${p.filename}')">
+      <img src="/api/photos/file/${p.filename}" alt="Foto ${p.date}" loading="lazy">
       <div class="photo-overlay">
         <span class="photo-date">${fmtDate(p.date)}</span>
         <button class="photo-delete" onclick="event.stopPropagation(); deletePhoto(${p.id})">Apagar</button>

@@ -9,11 +9,11 @@ const { requireAuth } = require('../middleware/auth');
 const router = express.Router();
 router.use(requireAuth);
 
-const MAX_MB   = 10;
-const MAX_SIDE = 1280;
-const QUALITY  = 75;
+const MAX_MB      = 10;
+const MAX_SIDE    = 1280;
+const QUALITY     = 75;
+const UPLOADS_DIR = path.join(__dirname, '..', 'private-uploads');
 
-// Keep file in memory so sharp can process it before writing to disk
 const upload = multer({
   storage: multer.memoryStorage(),
   limits:  { fileSize: MAX_MB * 1024 * 1024 },
@@ -26,7 +26,6 @@ const upload = multer({
   }
 });
 
-// Multer error handler middleware
 function handleMulterError(err, req, res, next) {
   if (err) {
     if (err.code === 'LIMIT_FILE_SIZE')
@@ -38,6 +37,7 @@ function handleMulterError(err, req, res, next) {
   next();
 }
 
+// ── List photos ───────────────────────────────────────────────────────────────
 router.get('/', (req, res) => {
   const photos = getDB()
     .prepare('SELECT * FROM progress_photos WHERE user_id=? ORDER BY date DESC')
@@ -45,6 +45,37 @@ router.get('/', (req, res) => {
   res.json({ photos });
 });
 
+// ── Serve a photo file — authenticated, ownership-verified, traversal-safe ───
+router.get('/file/:userId/:filename', (req, res) => {
+  const { userId, filename } = req.params;
+
+  // Reject any path traversal attempts in the segments
+  if (!/^\d+$/.test(userId) || /[/\\.]/.test(filename)) {
+    return res.status(400).json({ error: 'Invalid request' });
+  }
+
+  // The stored filename in DB is "<userId>/<filename>", e.g. "3/1234567890.jpg"
+  const storedName = `${userId}/${filename}`;
+
+  // Verify via DB that this photo belongs to the authenticated user
+  const photo = getDB()
+    .prepare('SELECT id FROM progress_photos WHERE filename=? AND user_id=?')
+    .get(storedName, req.user.id);
+
+  if (!photo) return res.status(403).json({ error: 'Acesso negado' });
+
+  // Build absolute path and confirm it stays inside UPLOADS_DIR
+  const filePath = path.resolve(UPLOADS_DIR, String(userId), filename);
+  if (!filePath.startsWith(UPLOADS_DIR + path.sep)) {
+    return res.status(400).json({ error: 'Invalid request' });
+  }
+
+  res.sendFile(filePath, err => {
+    if (err && !res.headersSent) res.status(404).json({ error: 'Arquivo não encontrado' });
+  });
+});
+
+// ── Upload a photo ────────────────────────────────────────────────────────────
 router.post('/', (req, res, next) => {
   upload.single('photo')(req, res, err => {
     if (err) return handleMulterError(err, req, res, next);
@@ -55,7 +86,7 @@ router.post('/', (req, res, next) => {
   const { date } = req.body;
   if (!date) return res.status(400).json({ error: 'Data obrigatória' });
 
-  const dir      = path.join(__dirname, '..', 'uploads', String(req.user.id));
+  const dir = path.join(UPLOADS_DIR, String(req.user.id));
   fs.mkdirSync(dir, { recursive: true });
 
   const filename = `${Date.now()}.jpg`;
@@ -63,11 +94,11 @@ router.post('/', (req, res, next) => {
 
   try {
     await sharp(req.file.buffer)
-      .rotate()                          // auto-orient from EXIF
+      .rotate()
       .resize(MAX_SIDE, MAX_SIDE, { fit: 'inside', withoutEnlargement: true })
       .jpeg({ quality: QUALITY })
       .toFile(outPath);
-  } catch (err) {
+  } catch {
     return res.status(500).json({ error: 'Erro ao processar imagem' });
   }
 
@@ -79,12 +110,13 @@ router.post('/', (req, res, next) => {
   res.json({ id: r.lastInsertRowid, filename: storedName });
 });
 
+// ── Delete a photo ────────────────────────────────────────────────────────────
 router.delete('/:id', (req, res) => {
-  const db = getDB();
+  const db    = getDB();
   const photo = db.prepare('SELECT * FROM progress_photos WHERE id=? AND user_id=?').get(req.params.id, req.user.id);
   if (!photo) return res.status(404).json({ error: 'Foto não encontrada' });
 
-  const filepath = path.join(__dirname, '..', 'uploads', photo.filename);
+  const filepath = path.join(UPLOADS_DIR, photo.filename);
   if (fs.existsSync(filepath)) fs.unlinkSync(filepath);
 
   db.prepare('DELETE FROM progress_photos WHERE id=?').run(req.params.id);

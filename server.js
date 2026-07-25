@@ -9,8 +9,8 @@ const { initDB } = require('./db/init');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Ensure uploads dir exists
-fs.mkdirSync(path.join(__dirname, 'uploads'), { recursive: true });
+// Ensure private uploads dir exists (outside public/, never served statically)
+fs.mkdirSync(path.join(__dirname, 'private-uploads'), { recursive: true });
 
 initDB();
 
@@ -18,7 +18,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+// /uploads intentionally NOT served statically — photos require auth via /api/photos/file/*
 
 app.use('/api/admin', require('./routes/admin'));
 app.use('/api/auth', require('./routes/auth'));
