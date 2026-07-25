@@ -1110,7 +1110,7 @@ input[type="file"] {
   line-height: 1.15; margin-bottom: 8px;
 }
 .wa-focus-prescription {
-  font-size: .85rem; color: var(--text-3); margin-bottom: 30px;
+  font-size: .85rem; color: var(--text-3); margin-bottom: 10px;
 }
 .wa-set-dots {
   display: flex; gap: 10px; justify-content: center;
@@ -1155,8 +1155,27 @@ input[type="file"] {
 .wa-mini-ex.active .wa-mini-icon { background: var(--orange); color: #fff; }
 .wa-mini-ex.pending { color: var(--text-2); }
 .wa-mini-ex.pending .wa-mini-icon { border: 1.5px solid var(--border-hi); color: var(--text-3); }
-.wa-mini-sets { font-size: .68rem; color: var(--text-3); margin-left: auto; white-space: nowrap; }
+.wa-ex-name-mini { flex: 1; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.wa-mini-sets { font-size: .68rem; color: var(--text-3); white-space: nowrap; flex-shrink: 0; }
 .wa-mini-ex.active .wa-mini-sets { color: var(--orange); font-weight: 700; }
+.wa-mini-info-btn {
+  background: none; border: none; color: var(--text-3);
+  font-size: .95rem; line-height: 1; padding: 0;
+  min-width: 40px; min-height: 40px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; cursor: pointer; border-radius: 6px;
+  touch-action: manipulation;
+}
+.wa-mini-info-btn:active { color: var(--orange); background: rgba(216,90,48,.12); }
+/* Compact muscle map in active workout hero block */
+.wa-ex-muscle-map {
+  width: 86px; max-height: 120px; overflow: hidden;
+  margin: 6px auto 10px; cursor: pointer; border-radius: 8px;
+  transition: opacity .15s;
+}
+.wa-ex-muscle-map:active { opacity: .7; }
+.wa-ex-muscle-map .rbh-wrapper { display: block; }
+.wa-ex-muscle-map .rbh-wrapper svg { max-height: 120px; display: block; }
 
 /* ── Weight input during workout ── */
 .wa-weight-row {

@@ -947,10 +947,16 @@ function renderWaFocus() {
       : idx === waCurrentExIdx
         ? `${e.setsCompleted}/${e.sets || 3}`
         : `0/${e.sets || 3}`;
+    const infoBtn = EX_META[e.name]
+      ? `<button type="button" class="wa-mini-info-btn"
+           onclick="event.stopPropagation();showExerciseInfo('${escHtml(e.name).replace(/'/g, "\\'")}')"
+           aria-label="Info ${escHtml(e.name)}">ⓘ</button>`
+      : '';
     return `
-      <div class="wa-mini-ex ${cls}">
+      <div class="wa-mini-ex ${cls}" onclick="jumpToExercise(${idx})">
         <div class="wa-mini-icon">${icon}</div>
         <div class="wa-ex-name-mini">${escHtml(e.name)}</div>
+        ${infoBtn}
         <div class="wa-mini-sets">${setsLabel}</div>
       </div>`;
   }).join('');
@@ -961,6 +967,7 @@ function renderWaFocus() {
         <div class="wa-focus-meta-top">Exercício ${waCurrentExIdx + 1} de ${waExercises.length}</div>
         <div class="wa-focus-name">${escHtml(ex.name)}</div>
         <div class="wa-focus-prescription">${prescription}</div>
+        <div id="waExMuscleMap" class="wa-ex-muscle-map"></div>
         <div class="wa-set-dots">${dots}</div>
         <div class="wa-set-label">Série ${doneSets + 1} de ${totalSets}</div>
         <div class="wa-weight-row">
@@ -977,6 +984,18 @@ function renderWaFocus() {
       <div class="wa-mini-section-label">Todos os exercícios</div>
       <div class="wa-mini-ex-list">${miniList}</div>
     </div>`;
+
+  // Render compact muscle map after innerHTML is set
+  const mapEl  = document.getElementById('waExMuscleMap');
+  const exMeta = EX_META[ex.name];
+  if (mapEl && exMeta && typeof renderChipMap === 'function') {
+    const muscles = exMeta.muscles || [];
+    const view    = autoView(muscles);
+    renderChipMap(mapEl, muscles, view);
+    mapEl.onclick = function() { showExerciseInfo(ex.name); };
+  } else if (mapEl) {
+    mapEl.style.display = 'none';
+  }
 }
 
 function completeSet() {
@@ -1010,6 +1029,16 @@ function completeSet() {
   startRestTimer(90);
 }
 window.completeSet = completeSet;
+
+function jumpToExercise(idx) {
+  if (waPhase !== 'working') return;
+  if (idx === waCurrentExIdx) return;
+  waCurrentExIdx = idx;
+  renderWaFocus();
+  updateWaProgress();
+  waPersist();
+}
+window.jumpToExercise = jumpToExercise;
 
 function updateExWeight(val) {
   const w = parseFloat(val);
