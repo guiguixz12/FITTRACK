@@ -69,18 +69,21 @@
   margin-bottom: 6px;
 }
 .wa-cancel-btn {
-  background: none; border: none;
-  color: var(--text-3); font-size: 13px; font-weight: 600;
-  cursor: pointer; font-family: inherit; padding: 4px 0;
+  background: rgba(255,255,255,0.09); border: none; border-radius: 99px;
+  padding: 8px 14px; color: var(--text); font-size: 13px; font-weight: 600;
+  cursor: pointer; font-family: inherit;
+  display: flex; align-items: center; gap: 6px;
 }
-.wa-cancel-btn:hover { color: var(--accent-warm); }
-.wa-timer {
-  font-family: inherit;
-  font-size: 17px; font-weight: 700; color: var(--text-2);
+.wa-cancel-btn:active { background: rgba(255,255,255,0.15); }
+.wa-timer-pill {
+  background: rgba(255,255,255,0.09); border-radius: 99px;
+  padding: 8px 14px; color: var(--text);
+  font-size: 13px; font-weight: 700;
+  display: flex; align-items: center; gap: 6px;
 }
 .wa-title {
-  font-size: 11.5px; font-weight: 700; color: var(--text-3);
-  letter-spacing: .06em; text-transform: uppercase; margin-bottom: 8px;
+  font-size: 14px; font-weight: 700; color: var(--text);
+  letter-spacing: .01em; text-transform: uppercase; margin-bottom: 8px; margin-top: 10px;
 }
 .wa-prog-wrap {
   height: 3px; background: rgba(255,255,255,0.09);
@@ -110,111 +113,150 @@
 /* ── Working phase: exercise focus ── */
 .wa-focus-view {
   display: flex; flex-direction: column;
-  min-height: 100%; padding: 0 18px;
+  min-height: 100%; padding: 0 18px 24px;
 }
 .wa-ex-hero {
-  flex: 1; display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  text-align: center; padding: 28px 0 18px;
+  display: flex; flex-direction: column;
+  align-items: center; text-align: center; padding: 24px 0 20px;
 }
-.wa-focus-meta-top {
-  font-size: 11px; font-weight: 700; color: var(--orange);
-  text-transform: uppercase; letter-spacing: .1em; margin-bottom: 10px;
+.wa-focus-badge {
+  display: inline-flex; align-items: center;
+  background: rgba(255,145,66,.18); color: var(--orange);
+  border-radius: 99px; padding: 6px 16px;
+  font-size: 11px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .08em;
+  margin-bottom: 16px;
 }
 .wa-focus-name {
-  font-size: 28px; font-weight: 800; color: var(--text);
+  font-size: 32px; font-weight: 800; color: var(--text);
   line-height: 1.15; margin-bottom: 8px;
 }
 .wa-focus-prescription {
-  font-size: 14px; color: var(--text-3); margin-bottom: 10px;
+  font-size: 14px; color: var(--text-3); margin-bottom: 20px;
 }
 .wa-set-dots {
-  display: flex; gap: 10px; justify-content: center;
+  display: flex; gap: 12px; justify-content: center;
   flex-wrap: wrap; margin-bottom: 10px;
 }
 .wa-set-dot {
-  width: 46px; height: 46px; border-radius: 50%;
+  width: 52px; height: 52px; border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
-  font-size: 14px; font-weight: 700; transition: all .25s;
+  font-size: 16px; font-weight: 700; transition: all .2s;
 }
-.wa-set-dot.done { background: var(--accent); color: #fff; border: 2.5px solid var(--accent); }
+.wa-set-dot.done {
+  background: var(--accent); color: #000; border: none;
+}
 .wa-set-dot.active {
-  background: var(--orange); color: #fff; border: 2.5px solid var(--orange);
-  box-shadow: 0 0 0 5px rgba(255,107,53,.2);
+  background: transparent; color: var(--text);
+  border: 2.5px solid var(--accent);
 }
-.wa-set-dot.pending { background: transparent; color: var(--text-3); border: 2.5px solid var(--border-hi); }
-.wa-set-label { font-size: 12px; color: var(--text-3); margin-top: 4px; }
-.wa-complete-set-btn {
-  width: 100%; padding: 19px;
-  font-size: 18px; font-weight: 800; letter-spacing: .02em;
-  margin-bottom: 20px; border-radius: var(--radius);
+.wa-set-dot.pending {
+  background: rgba(255,255,255,0.1); color: var(--text-3); border: none;
 }
+.wa-set-label { font-size: 13px; color: var(--text-3); margin-top: 6px; }
+
+/* ── Weight card ── */
+.wa-weight-card {
+  width: 100%; margin-top: 24px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 16px; padding: 16px 20px;
+}
+.wa-weight-card-label {
+  font-size: 11px; font-weight: 700; color: var(--text-3);
+  text-transform: uppercase; letter-spacing: .08em;
+  text-align: center; margin-bottom: 12px;
+}
+.wa-weight-card-row {
+  display: flex; align-items: center;
+  justify-content: space-between; gap: 12px;
+}
+.wa-weight-btn {
+  width: 52px; height: 52px; border-radius: 12px;
+  background: var(--card); border: 1px solid var(--border);
+  color: var(--text); font-size: 26px; font-weight: 400;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; font-family: inherit; flex-shrink: 0;
+  touch-action: manipulation; line-height: 1;
+}
+.wa-weight-btn:active { background: var(--border); }
+.wa-weight-val {
+  font-size: 38px; font-weight: 800; color: var(--accent);
+  text-align: center; flex: 1;
+}
+
+/* ── Exercise mini list ── */
 .wa-mini-section-label {
-  font-size: 10px; font-weight: 700; color: var(--text-3);
-  text-transform: uppercase; letter-spacing: .1em; margin-bottom: 7px;
+  font-size: 11px; font-weight: 700; color: var(--text-3);
+  text-transform: uppercase; letter-spacing: .1em; margin-bottom: 8px;
 }
-.wa-mini-ex-list { display: flex; flex-direction: column; gap: 4px; margin-bottom: 16px; }
+.wa-mini-ex-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
 .wa-mini-ex {
-  display: flex; align-items: center; gap: 9px;
-  font-size: 13px; padding: 8px 10px;
-  border-radius: var(--radius-sm); border: 1px solid transparent; transition: all .15s;
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 14px; border-radius: 14px;
+  background: var(--card); border: 1px solid var(--border);
+  transition: border-color .15s; cursor: pointer;
 }
 .wa-mini-icon {
-  width: 20px; height: 20px; border-radius: 50%;
+  width: 36px; height: 36px; border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
-  font-size: 10px; font-weight: 700; flex-shrink: 0;
+  font-size: 14px; font-weight: 700; flex-shrink: 0;
+  background: rgba(255,255,255,0.08); color: var(--text-3);
 }
-.wa-mini-ex.done { color: var(--text-3); }
+.wa-mini-body { flex: 1; min-width: 0; }
+.wa-mini-name-row { display: flex; align-items: center; gap: 4px; margin-bottom: 4px; }
+.wa-ex-name-mini {
+  flex: 1; min-width: 0; overflow: hidden; white-space: nowrap;
+  text-overflow: ellipsis; font-size: 14px; font-weight: 600; color: var(--text);
+}
+.wa-mini-prog-track {
+  height: 3px; background: rgba(255,255,255,0.1);
+  border-radius: 99px; overflow: hidden; margin-bottom: 4px;
+}
+.wa-mini-prog-fill { height: 100%; background: var(--accent); border-radius: 99px; transition: width .3s; }
+.wa-mini-sets { font-size: 11px; color: var(--text-3); }
+
+.wa-mini-ex.done { opacity: .55; }
+.wa-mini-ex.done .wa-mini-icon { background: var(--accent); color: #000; }
 .wa-mini-ex.done .wa-ex-name-mini { text-decoration: line-through; }
-.wa-mini-ex.done .wa-mini-icon { background: var(--accent); color: #fff; }
-.wa-mini-ex.active { background: var(--card); border-color: var(--orange); color: var(--text); font-weight: 600; }
-.wa-mini-ex.active .wa-mini-icon { background: var(--orange); color: #fff; }
-.wa-mini-ex.pending { color: var(--text-2); }
-.wa-mini-ex.pending .wa-mini-icon { border: 1.5px solid var(--border-hi); color: var(--text-3); }
-.wa-ex-name-mini { flex: 1; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
-.wa-mini-sets { font-size: 11px; color: var(--text-3); white-space: nowrap; flex-shrink: 0; }
-.wa-mini-ex.active .wa-mini-sets { color: var(--orange); font-weight: 700; }
+.wa-mini-ex.active { border-color: var(--accent); }
+.wa-mini-ex.active .wa-mini-icon { background: var(--accent); color: #000; }
+.wa-mini-ex.active .wa-mini-sets { color: var(--accent); font-weight: 700; }
+
 .wa-mini-info-btn {
   background: none; border: none; color: var(--text-3);
-  font-size: 15px; line-height: 1; padding: 0;
-  min-width: 40px; min-height: 40px;
+  line-height: 1; padding: 0;
+  min-width: 36px; min-height: 36px;
   display: flex; align-items: center; justify-content: center;
   flex-shrink: 0; cursor: pointer; border-radius: 6px;
   touch-action: manipulation;
 }
-.wa-mini-info-btn:active { color: var(--orange); background: rgba(216,90,48,.12); }
-/* Compact muscle map in active workout hero block */
-.wa-ex-muscle-map {
-  width: 86px; max-height: 120px; overflow: hidden;
-  margin: 6px auto 10px; cursor: pointer; border-radius: 8px;
-  transition: opacity .15s;
-}
-.wa-ex-muscle-map:active { opacity: .7; }
-.wa-ex-muscle-map .rbh-wrapper { display: block; }
-.wa-ex-muscle-map .rbh-wrapper svg { max-height: 120px; display: block; }
+.wa-mini-info-btn:active { color: var(--accent); }
 
-/* ── Weight input during workout ── */
-.wa-weight-row {
-  display: flex; align-items: center; gap: 10px;
-  justify-content: center; margin-top: 20px;
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: var(--radius-sm); padding: 10px 20px;
+/* ── Footer buttons ── */
+.wa-footer-btns { display: flex; gap: 8px; align-items: center; }
+.wa-extra-toggle-btn {
+  background: rgba(255,255,255,0.09); border: none; border-radius: 99px;
+  padding: 14px 18px; color: var(--text);
+  font-size: 14px; font-weight: 600;
+  cursor: pointer; font-family: inherit; flex-shrink: 0;
+  touch-action: manipulation;
 }
-.wa-weight-label {
-  font-size: 11.5px; font-weight: 700; color: var(--text-3);
-  text-transform: uppercase; letter-spacing: .07em;
+.wa-extra-toggle-btn:active { background: rgba(255,255,255,0.15); }
+.wa-cta-btn {
+  flex: 1; background: var(--accent); color: #000; border: none;
+  border-radius: 99px; padding: 16px 20px;
+  font-size: 16px; font-weight: 800; font-family: inherit;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  cursor: pointer; touch-action: manipulation;
 }
-.wa-weight-input {
-  width: 80px; border: none; background: transparent;
-  font-family: inherit;
-  font-size: 25px; font-weight: 700; color: var(--text);
-  text-align: center; outline: none; padding: 0;
-  -moz-appearance: textfield;
+.wa-cta-btn:active { opacity: .85; }
+.wa-finish-btn {
+  flex: 1; background: var(--accent); color: #000; border: none;
+  border-radius: 99px; padding: 16px 20px;
+  font-size: 16px; font-weight: 800; font-family: inherit;
+  cursor: pointer; touch-action: manipulation;
 }
-.wa-weight-input::-webkit-outer-spin-button,
-.wa-weight-input::-webkit-inner-spin-button { -webkit-appearance: none; }
-.wa-weight-input:focus { color: var(--orange); }
-.wa-weight-unit { font-size: 14px; font-weight: 600; color: var(--text-3); }
+.wa-finish-btn:active { opacity: .85; }
 
 /* ── Cargas exercise search suggestions ── */
 .cargas-suggestion {

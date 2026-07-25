@@ -20,14 +20,14 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/base.css?v=26">
-  <link rel="stylesheet" href="/css/home.css?v=26">
-  <link rel="stylesheet" href="/css/dieta.css?v=26">
-  <link rel="stylesheet" href="/css/treino.css?v=26">
-  <link rel="stylesheet" href="/css/progresso.css?v=26">
-  <link rel="stylesheet" href="/css/config.css?v=26">
-  <link rel="stylesheet" href="/css/fidelidade.css?v=26">
-  <link rel="stylesheet" href="/css/v2.css?v=26">
+  <link rel="stylesheet" href="/css/base.css?v=27">
+  <link rel="stylesheet" href="/css/home.css?v=27">
+  <link rel="stylesheet" href="/css/dieta.css?v=27">
+  <link rel="stylesheet" href="/css/treino.css?v=27">
+  <link rel="stylesheet" href="/css/progresso.css?v=27">
+  <link rel="stylesheet" href="/css/config.css?v=27">
+  <link rel="stylesheet" href="/css/fidelidade.css?v=27">
+  <link rel="stylesheet" href="/css/v2.css?v=27">
 
   <!-- SVG gradient for calorie ring (must live in DOM) -->
   <svg width="0" height="0" style="position:absolute">
@@ -956,14 +956,20 @@
 <div id="workoutActive" class="wa-overlay" style="display:none">
   <div class="wa-header">
     <div class="wa-top-row">
-      <button class="wa-cancel-btn" id="waCancelBtn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Cancelar</button>
-      <div class="wa-timer mono" id="waTimer">00:00</div>
+      <button class="wa-cancel-btn" id="waCancelBtn">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        Cancelar
+      </button>
+      <div class="wa-timer-pill">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <span id="waTimer">00:00</span>
+      </div>
     </div>
     <div class="wa-title" id="waTitle">TREINO</div>
     <div class="wa-prog-wrap">
       <div class="wa-prog-bar" id="waProgBar" style="width:0%"></div>
     </div>
-    <div class="wa-prog-label" id="waProgLabel">0 / 0 séries</div>
+    <div class="wa-prog-label" id="waProgLabel">0 de 0 séries · 0 exercícios</div>
   </div>
 
   <div class="wa-body" id="waBody"></div>
@@ -975,9 +981,13 @@
         <button class="btn btn-secondary btn-sm" id="waAddExtraBtn">+ Add</button>
       </div>
     </div>
-    <div style="display:flex;gap:8px">
-      <button class="btn btn-ghost btn-sm" id="waToggleExtra">+ Extra</button>
-      <button class="btn btn-primary" style="flex:1" id="waFinishBtn">Finalizar Treino</button>
+    <div class="wa-footer-btns">
+      <button class="wa-extra-toggle-btn" id="waToggleExtra">+ Extra</button>
+      <button class="wa-cta-btn" id="waCompleteBtn" onclick="completeSet()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        <span id="waCompleteBtnLabel">Concluí a Série 1</span>
+      </button>
+      <button class="wa-finish-btn" id="waFinishBtn" style="display:none">Finalizar Treino</button>
     </div>
   </div>
 </div>
@@ -987,29 +997,29 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
-<script src="/js/vendor/body-highlighter.iife.js?v=26"></script>
-<script src="/js/muscle-map.js?v=26"></script>
-<script src="/js/api.js?v=26"></script>
-<script src="/js/scanner.js?v=26"></script>
-<script src="/js/dashboard.js?v=26"></script>
+<script src="/js/vendor/body-highlighter.iife.js?v=27"></script>
+<script src="/js/muscle-map.js?v=27"></script>
+<script src="/js/api.js?v=27"></script>
+<script src="/js/scanner.js?v=27"></script>
+<script src="/js/dashboard.js?v=27"></script>
 <!-- diet.js → módulos -->
-<script src="/js/diet-data.js?v=26"></script>
-<script src="/js/diet-programa.js?v=26"></script>
-<script src="/js/diet-track.js?v=26"></script>
-<script src="/js/diet-editor.js?v=26"></script>
-<script src="/js/diet-manual.js?v=26"></script>
+<script src="/js/diet-data.js?v=27"></script>
+<script src="/js/diet-programa.js?v=27"></script>
+<script src="/js/diet-track.js?v=27"></script>
+<script src="/js/diet-editor.js?v=27"></script>
+<script src="/js/diet-manual.js?v=27"></script>
 <!-- workouts.js → módulos -->
-<script src="/js/workouts-data.js?v=26"></script>
-<script src="/js/workouts-editor.js?v=26"></script>
-<script src="/js/workouts-session.js?v=26"></script>
-<script src="/js/workouts-report.js?v=26"></script>
-<script src="/js/workouts-manual.js?v=26"></script>
-<script src="/js/evolution.js?v=26"></script>
-<script src="/js/photos.js?v=26"></script>
-<script src="/js/progress.js?v=26"></script>
-<script src="/js/settings.js?v=26"></script>
-<script src="/js/app.js?v=26"></script>
-<script src="/js/plans.js?v=26"></script>
+<script src="/js/workouts-data.js?v=27"></script>
+<script src="/js/workouts-editor.js?v=27"></script>
+<script src="/js/workouts-session.js?v=27"></script>
+<script src="/js/workouts-report.js?v=27"></script>
+<script src="/js/workouts-manual.js?v=27"></script>
+<script src="/js/evolution.js?v=27"></script>
+<script src="/js/photos.js?v=27"></script>
+<script src="/js/progress.js?v=27"></script>
+<script src="/js/settings.js?v=27"></script>
+<script src="/js/app.js?v=27"></script>
+<script src="/js/plans.js?v=27"></script>
 <script>
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/sw.js').catch(() => {});

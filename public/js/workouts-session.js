@@ -38,6 +38,10 @@ function renderWaFocus() {
         <div class="wa-done-all-title">Treino concluído!</div>
         <div class="wa-done-all-sub">Todos os exercícios finalizados.<br>Toque em Finalizar para salvar.</div>
       </div>`;
+    const completeBtn = document.getElementById('waCompleteBtn');
+    const finishBtn   = document.getElementById('waFinishBtn');
+    if (completeBtn) completeBtn.style.display = 'none';
+    if (finishBtn)   finishBtn.style.display   = '';
     return;
   }
 
@@ -46,8 +50,13 @@ function renderWaFocus() {
   const doneSets  = ex.setsCompleted;
 
   const dots = Array.from({ length: totalSets }, (_, i) => {
-    const cls = i < doneSets ? 'done' : i === doneSets ? 'active' : 'pending';
-    return `<div class="wa-set-dot ${cls}">${i < doneSets ? '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>' : i + 1}</div>`;
+    const isDone   = i < doneSets;
+    const isActive = i === doneSets;
+    const cls      = isDone ? 'done' : isActive ? 'active' : 'pending';
+    const content  = isDone
+      ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>'
+      : i + 1;
+    return `<div class="wa-set-dot ${cls}">${content}</div>`;
   }).join('');
 
   const prescription = [
@@ -55,64 +64,77 @@ function renderWaFocus() {
     ex.reps ? ex.reps + ' reps' : null
   ].filter(Boolean).join(' × ');
 
+  const weightDisplay = (ex.weight_kg && ex.weight_kg > 0) ? ex.weight_kg + 'kg' : '—';
+
   const miniList = waExercises.map((e, idx) => {
     const cls       = e.done ? 'done' : idx === waCurrentExIdx ? 'active' : 'pending';
-    const icon      = e.done ? '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>' : idx === waCurrentExIdx ? '&#9654;' : idx + 1;
-    const setsLabel = e.done
-      ? `${e.sets}/${e.sets} <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`
-      : idx === waCurrentExIdx
-        ? `${e.setsCompleted}/${e.sets || 3}`
-        : `0/${e.sets || 3}`;
-    const infoBtn = EX_META[e.name]
+    const numIcon   = e.done
+      ? '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>'
+      : idx + 1;
+    const setsDone  = e.setsCompleted || 0;
+    const setsTotal = e.sets || 3;
+    const pct       = Math.round((setsDone / setsTotal) * 100);
+    const setsLabel = `${setsDone}/${setsTotal} séries`;
+    const infoBtn   = EX_META[e.name]
       ? `<button type="button" class="wa-mini-info-btn"
            onclick="event.stopPropagation();showExerciseInfo('${escHtml(e.name).replace(/'/g, "\\'")}')"
-           aria-label="Info ${escHtml(e.name)}">ⓘ</button>`
+           aria-label="Info ${escHtml(e.name)}">
+           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+         </button>`
       : '';
     return `
       <div class="wa-mini-ex ${cls}" onclick="jumpToExercise(${idx})">
-        <div class="wa-mini-icon">${icon}</div>
-        <div class="wa-ex-name-mini">${escHtml(e.name)}</div>
-        ${infoBtn}
-        <div class="wa-mini-sets">${setsLabel}</div>
+        <div class="wa-mini-icon">${numIcon}</div>
+        <div class="wa-mini-body">
+          <div class="wa-mini-name-row">
+            <div class="wa-ex-name-mini">${escHtml(e.name)}</div>
+            ${infoBtn}
+          </div>
+          <div class="wa-mini-prog-track"><div class="wa-mini-prog-fill" style="width:${pct}%"></div></div>
+          <div class="wa-mini-sets">${setsLabel}</div>
+        </div>
       </div>`;
   }).join('');
 
   body.innerHTML = `
     <div class="wa-focus-view">
       <div class="wa-ex-hero">
-        <div class="wa-focus-meta-top">Exercício ${waCurrentExIdx + 1} de ${waExercises.length}</div>
+        <div class="wa-focus-badge">Exercício ${waCurrentExIdx + 1} de ${waExercises.length}</div>
         <div class="wa-focus-name">${escHtml(ex.name)}</div>
         <div class="wa-focus-prescription">${prescription}</div>
-        <div id="waExMuscleMap" class="wa-ex-muscle-map"></div>
         <div class="wa-set-dots">${dots}</div>
         <div class="wa-set-label">Série ${doneSets + 1} de ${totalSets}</div>
-        <div class="wa-weight-row">
-          <span class="wa-weight-label">Carga</span>
-          <input type="number" id="waWeightInput" class="wa-weight-input"
-            value="${ex.weight_kg || ''}" step="0.5" min="0" placeholder="—"
-            inputmode="decimal" onchange="updateExWeight(this.value)">
-          <span class="wa-weight-unit">kg</span>
+        <div class="wa-weight-card">
+          <div class="wa-weight-card-label">CARGA</div>
+          <div class="wa-weight-card-row">
+            <button class="wa-weight-btn" onclick="waWeightStep(-2.5)">−</button>
+            <div class="wa-weight-val" id="waWeightVal">${weightDisplay}</div>
+            <button class="wa-weight-btn" onclick="waWeightStep(2.5)">+</button>
+          </div>
         </div>
       </div>
-      <button class="btn btn-primary wa-complete-set-btn" onclick="completeSet()">
-        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> &nbsp;Concluí a Série ${doneSets + 1}
-      </button>
       <div class="wa-mini-section-label">Todos os exercícios</div>
       <div class="wa-mini-ex-list">${miniList}</div>
     </div>`;
 
-  // Render compact muscle map after innerHTML is set
-  const mapEl  = document.getElementById('waExMuscleMap');
-  const exMeta = EX_META[ex.name];
-  if (mapEl && exMeta && typeof renderChipMap === 'function') {
-    const muscles = exMeta.muscles || [];
-    const view    = autoView(muscles);
-    renderChipMap(mapEl, muscles, view);
-    mapEl.onclick = function() { showExerciseInfo(ex.name); };
-  } else if (mapEl) {
-    mapEl.style.display = 'none';
-  }
+  // Update footer CTA
+  const completeBtn = document.getElementById('waCompleteBtn');
+  const finishBtn   = document.getElementById('waFinishBtn');
+  const label       = document.getElementById('waCompleteBtnLabel');
+  if (completeBtn) completeBtn.style.display = '';
+  if (finishBtn)   finishBtn.style.display   = 'none';
+  if (label)       label.textContent         = `Concluí a Série ${doneSets + 1}`;
 }
+
+function waWeightStep(delta) {
+  const ex = waExercises[waCurrentExIdx];
+  if (!ex) return;
+  ex.weight_kg = Math.max(0, +((ex.weight_kg || 0) + delta).toFixed(2));
+  const display = document.getElementById('waWeightVal');
+  if (display) display.textContent = ex.weight_kg > 0 ? ex.weight_kg + 'kg' : '—';
+  waPersist();
+}
+window.waWeightStep = waWeightStep;
 
 function completeSet() {
   if (waPhase !== 'working') return;
@@ -191,7 +213,7 @@ function updateWaProgress() {
 
   document.getElementById('waProgBar').style.width   = pct + '%';
   document.getElementById('waProgLabel').textContent =
-    `${doneSets}/${totalSets} séries · ${exDone}/${waExercises.length} ex${volume > 0 ? ' · ' + Math.round(volume).toLocaleString('pt-BR') + ' kg' : ''}`;
+    `${doneSets} de ${totalSets} séries · ${waExercises.length} exercícios`;
 }
 
 // ── Rest Timer — circular ring ────────────────────────────────────────────────
@@ -208,6 +230,11 @@ function renderRestScreen() {
     nextLabel = `Série ${(ex?.setsCompleted || 0) + 1} de ${ex?.sets || 3}`;
     nextName  = ex?.name || '';
   }
+
+  const completeBtn = document.getElementById('waCompleteBtn');
+  const finishBtn   = document.getElementById('waFinishBtn');
+  if (completeBtn) completeBtn.style.display = 'none';
+  if (finishBtn)   finishBtn.style.display   = 'none';
 
   document.getElementById('waBody').innerHTML = `
     <div class="wa-rest-screen">
