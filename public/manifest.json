@@ -1,6 +1,6 @@
 {
-  "name": "FitTracker",
-  "short_name": "FitTracker",
+  "name": "FIT",
+  "short_name": "FIT",
   "description": "Acompanhe dieta, treinos e evolução física",
   "start_url": "/app",
   "scope": "/",
