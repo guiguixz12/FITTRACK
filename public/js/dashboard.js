@@ -99,10 +99,10 @@ function renderCalRing(log, user) {
     remainEl.style.color = 'var(--text-muted)';
   } else if (remain < 0) {
     remainEl.textContent = `${Math.abs(remain)} kcal acima da meta`;
-    remainEl.style.color = 'var(--red)';
+    remainEl.style.color = 'var(--accent-warm)';
   } else {
     remainEl.textContent = 'Meta atingida!';
-    remainEl.style.color = 'var(--green)';
+    remainEl.style.color = 'var(--accent)';
   }
 }
 

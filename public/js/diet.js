@@ -647,7 +647,7 @@ function updateDtExtraPreview() {
   const qty = parseFloat(document.getElementById('dtTrackExtraQty').value) || 0;
   const f   = qty / 100;
   document.getElementById('dtTrackExtraQtyPreview').innerHTML = qty > 0
-    ? `${qty}g → <b style="color:var(--orange)">${Math.round(dtExtraFood.cal*f)} kcal</b> · <span style="color:var(--green)">${round1(dtExtraFood.prot*f)}g prot</span> · <span style="color:var(--blue)">${round1(dtExtraFood.carb*f)}g carb</span> · <span style="color:var(--yellow)">${round1(dtExtraFood.fat*f)}g gord</span>`
+    ? `${qty}g → <b style="color:var(--orange)">${Math.round(dtExtraFood.cal*f)} kcal</b> · <span style="color:var(--accent)">${round1(dtExtraFood.prot*f)}g prot</span> · <span style="color:var(--text-2)">${round1(dtExtraFood.carb*f)}g carb</span> · <span style="color:var(--accent-warm)">${round1(dtExtraFood.fat*f)}g gord</span>`
     : '';
 }
 
@@ -889,7 +889,7 @@ function updateDtFoodPreview() {
   const qty = parseFloat(document.getElementById('dtFoodQty').value) || 0;
   const f   = qty / 100;
   document.getElementById('dtFoodQtyPreview').innerHTML = qty > 0
-    ? `${qty}g → <b style="color:var(--orange)">${Math.round(dtSelectedFood.cal*f)} kcal</b> &nbsp;|&nbsp; <span style="color:var(--green)">${round1(dtSelectedFood.prot*f)}g prot</span> &nbsp;|&nbsp; <span style="color:var(--blue)">${round1(dtSelectedFood.carb*f)}g carb</span> &nbsp;|&nbsp; <span style="color:var(--yellow)">${round1(dtSelectedFood.fat*f)}g gord</span>`
+    ? `${qty}g → <b style="color:var(--orange)">${Math.round(dtSelectedFood.cal*f)} kcal</b> &nbsp;|&nbsp; <span style="color:var(--accent)">${round1(dtSelectedFood.prot*f)}g prot</span> &nbsp;|&nbsp; <span style="color:var(--text-2)">${round1(dtSelectedFood.carb*f)}g carb</span> &nbsp;|&nbsp; <span style="color:var(--accent-warm)">${round1(dtSelectedFood.fat*f)}g gord</span>`
     : '';
 }
 
@@ -1038,7 +1038,7 @@ function updateFoodPreview() {
   const qty = parseFloat(document.getElementById('foodQty').value) || 0;
   const f   = qty / 100;
   document.getElementById('foodQtyPreview').innerHTML = qty > 0
-    ? `${qty}g → <b style="color:var(--orange)">${Math.round(selectedFood.cal*f)} kcal</b> &nbsp;|&nbsp; <span style="color:var(--green)">${round1(selectedFood.prot*f)}g prot</span> &nbsp;|&nbsp; <span style="color:var(--blue)">${round1(selectedFood.carb*f)}g carb</span> &nbsp;|&nbsp; <span style="color:var(--yellow)">${round1(selectedFood.fat*f)}g gord</span>`
+    ? `${qty}g → <b style="color:var(--orange)">${Math.round(selectedFood.cal*f)} kcal</b> &nbsp;|&nbsp; <span style="color:var(--accent)">${round1(selectedFood.prot*f)}g prot</span> &nbsp;|&nbsp; <span style="color:var(--text-2)">${round1(selectedFood.carb*f)}g carb</span> &nbsp;|&nbsp; <span style="color:var(--accent-warm)">${round1(selectedFood.fat*f)}g gord</span>`
     : '';
 }
 

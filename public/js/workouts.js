@@ -625,7 +625,7 @@ async function loadWorkoutHistory() {
     const { workouts } = await api.get('/api/workouts');
     renderWorkoutHistory(workouts || []);
   } catch (err) {
-    el.innerHTML = `<p style="color:var(--red);font-size:.85rem">${err.message}</p>`;
+    el.innerHTML = `<p style="color:var(--accent-warm);font-size:.85rem">${err.message}</p>`;
   }
 }
 

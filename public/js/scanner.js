@@ -150,7 +150,7 @@ function showScannedProductModal(product, onAdd) {
   function updatePreview() {
     const qty = parseFloat(qtyInput.value) || 0;
     const f   = qty / 100;
-    preview.innerHTML = `${qty}g → <b style="color:var(--orange)">${Math.round(product.cal100 * f)} kcal</b> · <span style="color:var(--green)">${(product.prot100 * f).toFixed(1)}g prot</span> · <span style="color:var(--blue)">${(product.carb100 * f).toFixed(1)}g carb</span> · <span style="color:var(--yellow)">${(product.fat100 * f).toFixed(1)}g gord</span>`;
+    preview.innerHTML = `${qty}g → <b style="color:var(--orange)">${Math.round(product.cal100 * f)} kcal</b> · <span style="color:var(--accent)">${(product.prot100 * f).toFixed(1)}g prot</span> · <span style="color:var(--text-2)">${(product.carb100 * f).toFixed(1)}g carb</span> · <span style="color:var(--accent-warm)">${(product.fat100 * f).toFixed(1)}g gord</span>`;
   }
   qtyInput.addEventListener('input', updatePreview);
   updatePreview();

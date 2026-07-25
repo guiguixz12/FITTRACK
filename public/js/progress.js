@@ -246,7 +246,7 @@ function renderCargasChart(name, history) {
   statsEl.innerHTML = `
     <div class="stat-box"><div class="stat-label">Atual</div><div class="stat-value mono">${last} kg</div></div>
     <div class="stat-box"><div class="stat-label">Máximo</div><div class="stat-value mono">${max} kg</div></div>
-    <div class="stat-box"><div class="stat-label">Variação</div><div class="stat-value mono" style="color:${diff >= 0 ? 'var(--green)' : 'var(--red)'}">${diffStr}</div></div>`;
+    <div class="stat-box"><div class="stat-label">Variação</div><div class="stat-value mono" style="color:${diff >= 0 ? 'var(--accent)' : 'var(--accent-warm)'}">${diffStr}</div></div>`;
 
   // History list
   histEl.innerHTML = `<div class="card"><div class="card-label">Histórico — ${name}</div>` +
