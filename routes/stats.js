@@ -100,6 +100,58 @@ router.get('/weekly', (req, res) => {
   });
 });
 
+// ── Flexible date-range stats (for progress period tabs) ─────────────────────
+router.get('/range', (req, res) => {
+  const db   = getDB();
+  const uid  = req.user.id;
+  const days = Math.min(parseInt(req.query.days) || 30, 365);
+
+  const dates = [];
+  for (let i = days - 1; i >= 0; i--) {
+    dates.push(new Date(Date.now() - i * 86400000).toISOString().slice(0, 10));
+  }
+
+  const dietLogs = db.prepare(
+    `SELECT date, calories, protein FROM diet_logs WHERE user_id=? AND date>=? AND date<=?`
+  ).all(uid, dates[0], dates[dates.length - 1]);
+
+  const workouts = db.prepare(
+    `SELECT DISTINCT date FROM workouts WHERE user_id=? AND date>=? AND date<=?`
+  ).all(uid, dates[0], dates[dates.length - 1]);
+
+  const dietMap = Object.fromEntries(dietLogs.map(d => [d.date, d]));
+  const wkSet   = new Set(workouts.map(w => w.date));
+
+  const report = dates.map(date => ({
+    date,
+    calories: dietMap[date]?.calories || 0,
+    protein:  dietMap[date]?.protein  || 0,
+    trained:  wkSet.has(date),
+  }));
+
+  const loggedDays  = report.filter(d => d.calories > 0).length;
+  const avgCalories = loggedDays
+    ? Math.round(report.filter(d => d.calories > 0).reduce((s, d) => s + d.calories, 0) / loggedDays)
+    : 0;
+
+  const prevDates = [];
+  for (let i = days * 2 - 1; i >= days; i--) {
+    prevDates.push(new Date(Date.now() - i * 86400000).toISOString().slice(0, 10));
+  }
+  const prevDiet   = db.prepare(
+    `SELECT calories FROM diet_logs WHERE user_id=? AND date>=? AND date<=? AND calories>0`
+  ).all(uid, prevDates[0], prevDates[prevDates.length - 1]);
+  const prevAvgCal = prevDiet.length
+    ? Math.round(prevDiet.reduce((s, d) => s + d.calories, 0) / prevDiet.length)
+    : 0;
+
+  res.json({
+    days: report,
+    summary:     { loggedDays, avgCalories },
+    prevSummary: { avgCalories: prevAvgCal },
+  });
+});
+
 // ── Personal Records ──────────────────────────────────────────────────────────
 router.get('/prs', (req, res) => {
   const prs = getDB().prepare('SELECT * FROM exercise_prs WHERE user_id=? ORDER BY date DESC').all(req.user.id);

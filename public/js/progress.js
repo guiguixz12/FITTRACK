@@ -1,261 +1,227 @@
-/* Progress tab — Peso, Semana, Records, Fotos */
-let currentPgView = 'peso';
+/* Progress tab — period tabs (Semana / Mês / 3 Meses / Ano) */
+let pgPeriodDays    = 7;
+let pgWeightChartInst = null;
+let pgState         = null;
 
 function initProgress(state) {
-  // Sub-tab switching
-  document.querySelectorAll('[data-pgview]').forEach(btn => {
+  pgState = state;
+  document.querySelectorAll('[data-pgperiod]').forEach(btn => {
     btn.addEventListener('click', () => {
-      document.querySelectorAll('[data-pgview]').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('[data-pgperiod]').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
-      currentPgView = btn.dataset.pgview;
-      showPgView(currentPgView, state);
-      loadPgView(currentPgView, state);
+      pgPeriodDays = parseInt(btn.dataset.pgperiod);
+      loadProgress(state);
     });
   });
-
-  // Wire evolution period buttons (they live in pgViewPeso)
-  initEvolution(state);
-
-  // Wire photos form + lightbox (they live in pgViewFotos)
-  initPhotos(state);
 }
 
-function loadProgress(state) {
-  loadPgView(currentPgView, state);
-}
-
-function showPgView(view, state) {
-  const views = ['peso', 'cargas', 'semana', 'records', 'fotos'];
-  views.forEach(v => {
-    const el = document.getElementById(`pgView${v.charAt(0).toUpperCase() + v.slice(1)}`);
-    if (el) el.style.display = v === view ? '' : 'none';
-  });
-}
-
-function loadPgView(view, state) {
-  if (view === 'peso')    loadEvolution(state);
-  if (view === 'cargas')  loadCargas();
-  if (view === 'semana')  loadPgSemana(state);
-  if (view === 'records') loadPgRecords(state);
-  if (view === 'fotos')   loadPhotos(state);
-}
-
-// ── Semana ────────────────────────────────────────────────────────────────────
-async function loadPgSemana(state) {
-  const el = document.getElementById('progWeeklyReport');
-  if (!el) return;
-  el.innerHTML = '<span style="color:var(--text-3);font-size:.82rem">Carregando...</span>';
+async function loadProgress(state) {
+  pgState = state;
+  const today = new Date().toISOString().slice(0, 10);
   try {
-    const data = await api.get('/api/stats/weekly');
-    renderPgWeekly(el, data);
-  } catch {
-    el.innerHTML = '<span style="color:var(--text-3);font-size:.82rem">Não foi possível carregar.</span>';
-  }
-}
-
-function renderPgWeekly(el, data) {
-  if (!data || !data.days) { el.innerHTML = '<span class="empty-state">Sem dados esta semana.</span>'; return; }
-  const { summary, days } = data;
-  const DAY_ABBR = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
-  const maxCal = Math.max(...days.map(d => d.calories), 1);
-
-  el.innerHTML = `
-    <div class="weekly-bars">
-      ${days.map(d => {
-        const dow = new Date(d.date + 'T12:00:00').getDay();
-        const h   = Math.max(Math.round((d.calories / maxCal) * 52), d.calories > 0 ? 4 : 0);
-        return `
-          <div class="weekly-bar-col">
-            <div class="weekly-bar-wrap">
-              <div class="weekly-bar${d.trained ? ' trained' : ''}" style="height:${h}px" title="${d.calories} kcal"></div>
-            </div>
-            <div class="weekly-bar-label">${DAY_ABBR[dow]}</div>
-          </div>`;
-      }).join('')}
-    </div>
-    <div class="weekly-stats">
-      <div class="weekly-stat">
-        <div class="weekly-stat-val">${summary.avgCalories || '—'}</div>
-        <div class="weekly-stat-label">kcal médio</div>
-      </div>
-      <div class="weekly-stat">
-        <div class="weekly-stat-val">${summary.avgProtein || '—'}g</div>
-        <div class="weekly-stat-label">prot médio</div>
-      </div>
-      <div class="weekly-stat">
-        <div class="weekly-stat-val">${summary.trainedDays}</div>
-        <div class="weekly-stat-label">treinos</div>
-      </div>
-      <div class="weekly-stat">
-        <div class="weekly-stat-val">${summary.loggedDays}</div>
-        <div class="weekly-stat-label">dias log</div>
-      </div>
-    </div>`;
-}
-
-// ── Records ───────────────────────────────────────────────────────────────────
-async function loadPgRecords(state) {
-  try {
-    const [streakData, prData] = await Promise.all([
-      api.get('/api/stats/streak'),
-      api.get('/api/stats/prs')
+    const [statsData, weightData, waterData] = await Promise.all([
+      api.get(`/api/stats/range?days=${pgPeriodDays}`),
+      api.get(`/api/diet/weight?days=${pgPeriodDays}`),
+      api.get(`/api/water?date=${today}`),
     ]);
-    renderPgStreak(streakData);
-    renderPgPRs(prData);
+    renderPgCalories(statsData);
+    renderPgWater(waterData);
+    renderPgWeight(weightData);
   } catch (err) {
-    console.error('loadPgRecords error', err);
+    console.error('loadProgress error', err);
   }
 }
 
-function renderPgStreak(data) {
-  const { streak = 0, longest = 0 } = data || {};
+// ── Calories bar chart ────────────────────────────────────────────────────────
 
-  const flameEl = document.getElementById('progStreakFlame');
-  const valEl   = document.getElementById('progStreakVal');
-  const longEl  = document.getElementById('progStreakLongest');
+function renderPgCalories(data) {
+  const { days, summary, prevSummary } = data;
+  const avg = summary.avgCalories;
 
-  if (flameEl) {
-    const flameSvg = `<svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 3z"/></svg>`;
-    const dropSvg  = `<svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>`;
-    flameEl.style.color = streak >= 3 ? 'var(--accent-warm)' : 'var(--text-3)';
-    flameEl.innerHTML = streak >= 3 ? flameSvg : dropSvg;
+  document.getElementById('pgCalAvg').textContent =
+    avg > 0 ? avg.toLocaleString('pt-BR') : '—';
+
+  const badge   = document.getElementById('pgCalBadge');
+  const cmpText = document.getElementById('pgCalCompareText');
+  if (avg > 0 && prevSummary.avgCalories > 0) {
+    const pct = Math.round((avg - prevSummary.avgCalories) / prevSummary.avgCalories * 100);
+    badge.textContent = (pct >= 0 ? '↑' : '↓') + Math.abs(pct) + '%';
+    badge.className = 'pg-badge ' + (pct <= 0 ? 'pg-badge--good' : 'pg-badge--warn');
+    badge.style.display  = '';
+    cmpText.textContent  = pgPeriodDays === 7 ? 'vs sem. passada' : pgPeriodDays === 30 ? 'vs mês passado' : 'vs período ant.';
+    cmpText.style.display = '';
+  } else {
+    badge.style.display   = 'none';
+    cmpText.style.display = 'none';
   }
-  if (valEl)   valEl.textContent   = streak;
-  if (longEl)  longEl.textContent  = longest > 0 ? `Recorde: ${longest} dias` : '';
-}
 
-function renderPgPRs(data) {
-  const el = document.getElementById('progPRList');
-  if (!el) return;
-  const prs = data?.prs || [];
-  if (!prs.length) {
-    el.innerHTML = '<div class="empty-state">Nenhum record registrado ainda.<br>Complete treinos com cargas para criar seus PRs!</div>';
+  const container = document.getElementById('pgCalBars');
+  if (!days || !days.length) {
+    container.innerHTML = '<div class="pg-bars-loading">Nenhum dado ainda</div>';
     return;
   }
-  el.innerHTML = prs.map(pr => {
-    const d = pr.date ? pr.date.split('-') : null;
-    const dateStr = d ? `${d[2]}/${d[1]}/${d[0]}` : '';
-    const sets = pr.sets && pr.reps ? `${pr.sets}×${pr.reps}` : '';
-    return `
-      <div class="pr-item">
-        <div class="pr-badge">PR</div>
-        <div class="pr-name">${pr.exercise_name}</div>
-        <div>
-          <div class="pr-stats">${pr.weight_kg}kg${sets ? ' · ' + sets : ''}</div>
-          <div class="pr-date">${dateStr}</div>
-        </div>
-      </div>`;
+
+  let bars;
+  if (pgPeriodDays <= 30) {
+    bars = days.map(d => ({ ...d }));
+  } else if (pgPeriodDays <= 90) {
+    bars = pgAggregateByWeek(days);
+  } else {
+    bars = pgAggregateByMonth(days);
+  }
+
+  const maxCal = Math.max(...bars.map(b => b.calories), 1);
+  const today  = new Date().toISOString().slice(0, 10);
+  const DOW_ABBR = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
+
+  const barsHtml = bars.map(b => {
+    const pct     = b.calories > 0 ? Math.max(Math.round(b.calories / maxCal * 100), 5) : 0;
+    const isToday = b.date === today;
+    const color   = isToday ? 'var(--orange)' : 'var(--accent)';
+    const opacity = b.calories === 0 ? '0.15' : '1';
+    let label;
+    if (pgPeriodDays <= 7) {
+      label = DOW_ABBR[new Date(b.date + 'T12:00:00').getDay()];
+    } else if (pgPeriodDays <= 30) {
+      const d = new Date(b.date + 'T12:00:00').getDate();
+      label = (d === 1 || d % 5 === 0) ? d : '';
+    } else {
+      label = b.label || '';
+    }
+    return `<div class="pg-bar-col">
+      <div class="pg-bar-wrap">
+        <div class="pg-bar" style="height:${pct}%;background:${color};opacity:${opacity}"></div>
+      </div>
+      <div class="pg-bar-label">${label}</div>
+    </div>`;
   }).join('');
+
+  const avgPct = avg > 0 ? Math.round(avg / maxCal * 100) : 0;
+
+  container.innerHTML = `<div class="pg-bars-inner" style="--avg-top:${100 - avgPct}%">${barsHtml}</div>`;
 }
 
-// ══════════════════════════════════════════
-//  CARGAS — load evolution per exercise
-// ══════════════════════════════════════════
-let cargasChart = null;
-let cargasNames = [];
-
-async function loadCargas() {
-  // Load exercise names if not loaded yet
-  if (!cargasNames.length) {
-    try {
-      const data = await api.get('/api/stats/exercise-history');
-      cargasNames = data.names || [];
-    } catch {}
+function pgAggregateByWeek(days) {
+  const weeks = [];
+  for (let i = 0; i < days.length; i += 7) {
+    const chunk  = days.slice(i, i + 7);
+    const logged = chunk.filter(d => d.calories > 0);
+    const avg    = logged.length
+      ? Math.round(logged.reduce((s, d) => s + d.calories, 0) / logged.length)
+      : 0;
+    const today = new Date().toISOString().slice(0, 10);
+    weeks.push({
+      label: `S${weeks.length + 1}`,
+      calories: avg,
+      date: chunk[chunk.length - 1].date,
+      isToday: chunk.some(d => d.date === today),
+    });
   }
+  return weeks;
 }
 
-function onCargasSearch(val) {
-  const box = document.getElementById('pgCargasSuggestions');
-  if (!val.trim()) { box.style.display = 'none'; return; }
-
-  const matches = cargasNames.filter(n => n.toLowerCase().includes(val.toLowerCase())).slice(0, 8);
-  if (!matches.length) { box.style.display = 'none'; return; }
-
-  box.innerHTML = matches.map(n =>
-    `<div class="cargas-suggestion" onclick="selectCargasEx(${JSON.stringify(n)})">${n}</div>`
-  ).join('');
-  box.style.display = '';
+function pgAggregateByMonth(days) {
+  const MO  = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+  const map = {};
+  days.forEach(d => {
+    const m = d.date.slice(0, 7);
+    if (!map[m]) map[m] = { cals: [], lastDate: d.date };
+    if (d.calories > 0) map[m].cals.push(d.calories);
+    map[m].lastDate = d.date;
+  });
+  return Object.entries(map).map(([m, v]) => ({
+    label:    MO[parseInt(m.slice(5, 7)) - 1],
+    calories: v.cals.length
+      ? Math.round(v.cals.reduce((s, c) => s + c, 0) / v.cals.length)
+      : 0,
+    date:    v.lastDate,
+    isToday: false,
+  }));
 }
-window.onCargasSearch = onCargasSearch;
 
-async function selectCargasEx(name) {
-  document.getElementById('pgCargasSearch').value = name;
-  document.getElementById('pgCargasSuggestions').style.display = 'none';
+// ── Water card ────────────────────────────────────────────────────────────────
 
+function renderPgWater(data) {
+  const total = data.total_ml || 0;
+  const goal  = data.goal_ml  || 2000;
+  const pct   = Math.min(Math.round(total / goal * 100), 100);
+
+  document.getElementById('pgWaterFrac').textContent = `${(total / 1000).toFixed(1)}L / ${(goal / 1000).toFixed(1)}L`;
+  document.getElementById('pgWaterFill').style.width = pct + '%';
+}
+
+async function pgAddWater() {
+  const today = new Date().toISOString().slice(0, 10);
   try {
-    const data = await api.get(`/api/stats/exercise-history?name=${encodeURIComponent(name)}`);
-    renderCargasChart(name, data.history || []);
-  } catch {}
+    await api.post('/api/water', { date: today, amount_ml: 250 });
+    const data = await api.get(`/api/water?date=${today}`);
+    renderPgWater(data);
+    if (typeof renderWater === 'function') renderWater(data, today);
+  } catch (e) { toast(e.message, 'error'); }
 }
-window.selectCargasEx = selectCargasEx;
+window.pgAddWater = pgAddWater;
 
-function renderCargasChart(name, history) {
-  const emptyEl  = document.getElementById('pgCargasEmpty');
-  const chartWrap = document.getElementById('pgCargasChart');
-  const statsEl  = document.getElementById('pgCargasStats');
-  const histEl   = document.getElementById('pgCargasHistory');
+// ── Weight trend chart ────────────────────────────────────────────────────────
 
-  if (!history.length) {
-    emptyEl.textContent = `Nenhum registro com carga encontrado para "${name}".`;
-    emptyEl.style.display = '';
-    chartWrap.style.display = 'none';
-    histEl.innerHTML = '';
+function renderPgWeight(logs) {
+  const canvas = document.getElementById('pgWeightChart');
+  if (!canvas) return;
+  if (pgWeightChartInst) { pgWeightChartInst.destroy(); pgWeightChartInst = null; }
+
+  const weights = (logs || []).filter(l => l.weight_kg > 0);
+  const badge   = document.getElementById('pgWeightBadge');
+  const cmpText = document.getElementById('pgWeightCompareText');
+
+  if (!weights.length) {
+    document.getElementById('pgWeightAvg').textContent = '—';
+    badge.style.display   = 'none';
+    cmpText.style.display = 'none';
     return;
   }
 
-  emptyEl.style.display = 'none';
-  chartWrap.style.display = '';
+  const avg = (weights.reduce((s, l) => s + l.weight_kg, 0) / weights.length).toFixed(1);
+  document.getElementById('pgWeightAvg').textContent = avg;
 
-  const labels  = history.map(h => { const d = h.date.split('-'); return `${d[2]}/${d[1]}`; });
-  const weights = history.map(h => h.weight_kg);
+  // Compare first vs second half for trend
+  const half = Math.floor(weights.length / 2);
+  if (half > 0 && weights.length > 1) {
+    const avgFirst = weights.slice(0, half).reduce((s, l) => s + l.weight_kg, 0) / half;
+    const avgSec   = weights.slice(half).reduce((s, l) => s + l.weight_kg, 0) / (weights.length - half);
+    const diff     = +(avgSec - avgFirst).toFixed(1);
+    if (Math.abs(diff) >= 0.1) {
+      badge.textContent = (diff >= 0 ? '↑' : '↓') + Math.abs(diff) + ' kg';
+      badge.className   = 'pg-badge ' + (diff <= 0 ? 'pg-badge--good' : 'pg-badge--warn');
+      badge.style.display   = '';
+      cmpText.textContent   = 'tendência do período';
+      cmpText.style.display = '';
+    } else {
+      badge.style.display = 'none'; cmpText.style.display = 'none';
+    }
+  } else {
+    badge.style.display = 'none'; cmpText.style.display = 'none';
+  }
 
-  if (cargasChart) { cargasChart.destroy(); cargasChart = null; }
-  const ctx = document.getElementById('cargasChart').getContext('2d');
-  cargasChart = new Chart(ctx, {
+  const ctx = canvas.getContext('2d');
+  pgWeightChartInst = new Chart(ctx, {
     type: 'line',
     data: {
-      labels,
+      labels: weights.map(() => ''),
       datasets: [{
-        label: 'Carga (kg)',
-        data: weights,
-        borderColor: '#C4E538',
-        backgroundColor: 'rgba(196,229,56,.12)',
-        borderWidth: 2.5,
-        pointRadius: 4,
+        data:               weights.map(l => l.weight_kg),
+        borderColor:        '#C4E538',
+        backgroundColor:    'transparent',
+        borderWidth:        2.5,
         pointBackgroundColor: '#C4E538',
-        fill: true,
-        tension: 0.3,
-      }]
+        pointRadius:        weights.length > 20 ? 0 : 4,
+        pointHoverRadius:   5,
+        tension:            0.4,
+      }],
     },
     options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { display: false } },
-      scales: {
-        x: { grid: { display: false }, ticks: { font: { size: 10 }, color: 'rgba(255,255,255,0.35)' } },
-        y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { font: { size: 10 }, color: 'rgba(255,255,255,0.35)', callback: v => v + ' kg' } }
-      }
-    }
+      responsive:          true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false }, tooltip: { enabled: false } },
+      scales:  { x: { display: false }, y: { display: false } },
+    },
   });
-
-  // Stats row
-  const max  = Math.max(...weights);
-  const last = weights[weights.length - 1];
-  const prev = weights.length > 1 ? weights[weights.length - 2] : null;
-  const diff = prev !== null ? (last - prev) : null;
-  const diffStr = diff !== null ? (diff >= 0 ? `+${diff}` : `${diff}`) + ' kg' : '—';
-  statsEl.innerHTML = `
-    <div class="stat-box"><div class="stat-label">Atual</div><div class="stat-value mono">${last} kg</div></div>
-    <div class="stat-box"><div class="stat-label">Máximo</div><div class="stat-value mono">${max} kg</div></div>
-    <div class="stat-box"><div class="stat-label">Variação</div><div class="stat-value mono" style="color:${diff >= 0 ? 'var(--accent)' : 'var(--accent-warm)'}">${diffStr}</div></div>`;
-
-  // History list
-  histEl.innerHTML = `<div class="card"><div class="card-label">Histórico — ${name}</div>` +
-    [...history].reverse().map(h => {
-      const d = h.date.split('-');
-      return `<div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border)">
-        <span style="font-size:.82rem;color:var(--text-2)">${d[2]}/${d[1]}/${d[0]}</span>
-        <span style="font-size:.9rem;font-weight:700;color:var(--text)">${h.weight_kg} kg</span>
-        <span style="font-size:.75rem;color:var(--text-3)">${h.sets || '?'}×${h.reps || '?'}</span>
-      </div>`;
-    }).join('') + '</div>';
 }

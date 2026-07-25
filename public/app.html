@@ -20,14 +20,14 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/base.css?v=29">
-  <link rel="stylesheet" href="/css/home.css?v=29">
-  <link rel="stylesheet" href="/css/dieta.css?v=29">
-  <link rel="stylesheet" href="/css/treino.css?v=29">
-  <link rel="stylesheet" href="/css/progresso.css?v=29">
-  <link rel="stylesheet" href="/css/config.css?v=29">
-  <link rel="stylesheet" href="/css/fidelidade.css?v=29">
-  <link rel="stylesheet" href="/css/v2.css?v=29">
+  <link rel="stylesheet" href="/css/base.css?v=30">
+  <link rel="stylesheet" href="/css/home.css?v=30">
+  <link rel="stylesheet" href="/css/dieta.css?v=30">
+  <link rel="stylesheet" href="/css/treino.css?v=30">
+  <link rel="stylesheet" href="/css/progresso.css?v=30">
+  <link rel="stylesheet" href="/css/config.css?v=30">
+  <link rel="stylesheet" href="/css/fidelidade.css?v=30">
+  <link rel="stylesheet" href="/css/v2.css?v=30">
 
   <!-- SVG gradient for calorie ring (must live in DOM) -->
   <svg width="0" height="0" style="position:absolute">
@@ -616,101 +616,63 @@
         <p class="tab-page-sub">Pequenos passos, grandes mudanças.</p>
       </div>
 
-      <div class="progress-chips">
-        <button class="progress-chip active" data-pgview="peso"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="M7 21h10"/><line x1="12" x2="12" y1="3" y2="21"/><path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/></svg> Peso</button>
-        <button class="progress-chip" data-pgview="cargas"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 6.5h11"/><path d="M6.5 17.5h11"/><path d="M3 6.5a1.5 1.5 0 1 0 3 0 1.5 1.5 0 0 0-3 0z"/><path d="M3 17.5a1.5 1.5 0 1 0 3 0 1.5 1.5 0 0 0-3 0z"/><path d="M18 6.5a1.5 1.5 0 1 0 3 0 1.5 1.5 0 0 0-3 0z"/><path d="M18 17.5a1.5 1.5 0 1 0 3 0 1.5 1.5 0 0 0-3 0z"/><path d="M5 8v8"/><path d="M19 8v8"/></svg> Cargas</button>
-        <button class="progress-chip" data-pgview="semana">Semana</button>
-        <button class="progress-chip" data-pgview="records">Records</button>
-        <button class="progress-chip" data-pgview="fotos">Fotos</button>
+      <!-- Period sub-tabs -->
+      <div class="pg-period-tabs">
+        <button class="pg-period-tab active" data-pgperiod="7">Semana</button>
+        <button class="pg-period-tab" data-pgperiod="30">Mês</button>
+        <button class="pg-period-tab" data-pgperiod="90">3 Meses</button>
+        <button class="pg-period-tab" data-pgperiod="365">Ano</button>
       </div>
 
-      <!-- SUB-VIEW: Peso — weight evolution chart -->
-      <div id="pgViewPeso">
-        <div class="period-btns">
-          <button class="period-btn" data-days="7">7D</button>
-          <button class="period-btn active" data-days="30">30D</button>
-          <button class="period-btn" data-days="90">90D</button>
-          <button class="period-btn" data-days="all">Tudo</button>
+      <!-- Calories bar chart card -->
+      <div class="pg-card">
+        <div class="pg-card-top">
+          <div>
+            <div class="pg-card-label">Calorias consumidas</div>
+            <div class="pg-big-num"><span id="pgCalAvg">—</span><span class="pg-big-unit"> kcal méd.</span></div>
+          </div>
+          <div class="pg-card-badge-wrap">
+            <span class="pg-badge" id="pgCalBadge" style="display:none"></span>
+            <span class="pg-compare-text" id="pgCalCompareText" style="display:none"></span>
+          </div>
         </div>
-        <div class="chart-wrap" style="height:220px">
-          <canvas id="weightChart"></canvas>
-        </div>
-        <div class="chart-stats">
-          <div class="stat-box">
-            <div class="stat-label">Atual</div>
-            <div class="stat-value mono" id="statCurrent">—</div>
-          </div>
-          <div class="stat-box">
-            <div class="stat-label">Mínimo</div>
-            <div class="stat-value mono" id="statMin">—</div>
-          </div>
-          <div class="stat-box">
-            <div class="stat-label">Máximo</div>
-            <div class="stat-value mono" id="statMax">—</div>
-          </div>
+        <div class="pg-bars-container" id="pgCalBars">
+          <div class="pg-bars-loading">—</div>
         </div>
       </div>
 
-      <!-- SUB-VIEW: Cargas — load evolution per exercise -->
-      <div id="pgViewCargas" style="display:none">
-        <div class="card">
-          <div class="card-label">Evolução de Carga</div>
-          <div style="position:relative;margin-bottom:12px">
-            <input type="text" id="pgCargasSearch" placeholder="Buscar exercício..." autocomplete="off"
-              style="width:100%;box-sizing:border-box" oninput="onCargasSearch(this.value)">
-            <div id="pgCargasSuggestions" style="display:none;position:absolute;left:0;right:0;top:100%;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);z-index:20;max-height:200px;overflow-y:auto"></div>
-          </div>
-          <div id="pgCargasEmpty" style="color:var(--text-3);font-size:.85rem;text-align:center;padding:20px 0">
-            Busque um exercício acima para ver a evolução de carga.
-          </div>
-          <div id="pgCargasChart" style="display:none">
-            <div class="chart-wrap" style="height:200px"><canvas id="cargasChart"></canvas></div>
-            <div class="chart-stats" id="pgCargasStats"></div>
+      <!-- Water card -->
+      <div class="pg-card pg-water-card">
+        <div class="pg-water-icon-box">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
+        </div>
+        <div class="pg-water-mid">
+          <div class="pg-water-label">Água</div>
+          <div class="pg-water-bar-wrap">
+            <div class="pg-water-bar-fill" id="pgWaterFill" style="width:0%"></div>
           </div>
         </div>
-        <div id="pgCargasHistory"></div>
-      </div>
-
-      <!-- SUB-VIEW: Semana — weekly report -->
-      <div id="pgViewSemana" style="display:none">
-        <div class="card">
-          <div class="card-label">Esta semana</div>
-          <div id="progWeeklyReport" class="empty-state">Carregando...</div>
+        <div class="pg-water-right">
+          <div class="pg-water-frac" id="pgWaterFrac">—</div>
+          <button class="pg-water-add-btn" onclick="pgAddWater()">+250ml</button>
         </div>
       </div>
 
-      <!-- SUB-VIEW: Records — streak + PRs -->
-      <div id="pgViewRecords" style="display:none">
-        <div class="card" style="text-align:center;padding:20px 18px">
-          <div class="card-label" style="text-align:left">Sequência atual</div>
-          <div id="progStreakFlame" style="font-size:2.2rem;margin-bottom:6px;color:var(--text-3)"></div>
-          <div id="progStreakVal" style="font-family:'Manrope',system-ui,sans-serif;font-size:48px;font-weight:700;color:var(--orange);line-height:1">0</div>
-          <div style="font-size:.82rem;color:var(--text-2);margin-top:6px">dias seguidos</div>
-          <div id="progStreakLongest" style="font-size:.78rem;color:var(--text-3);margin-top:8px"></div>
+      <!-- Weight trend card -->
+      <div class="pg-card">
+        <div class="pg-card-top">
+          <div>
+            <div class="pg-card-label">Tendência de peso</div>
+            <div class="pg-big-num"><span id="pgWeightAvg">—</span><span class="pg-big-unit"> méd.</span></div>
+          </div>
+          <div class="pg-card-badge-wrap">
+            <span class="pg-badge" id="pgWeightBadge" style="display:none"></span>
+            <span class="pg-compare-text" id="pgWeightCompareText" style="display:none"></span>
+          </div>
         </div>
-        <div class="card">
-          <div class="card-label">Records Pessoais</div>
-          <div id="progPRList" class="empty-state">Nenhum record registrado ainda. Complete treinos com cargas para criar seus PRs!</div>
+        <div class="pg-line-wrap">
+          <canvas id="pgWeightChart" height="100"></canvas>
         </div>
-      </div>
-
-      <!-- SUB-VIEW: Fotos — progress photos -->
-      <div id="pgViewFotos" style="display:none">
-        <div class="card">
-          <div class="card-label">Enviar foto</div>
-          <form id="photoForm" enctype="multipart/form-data" novalidate>
-            <div class="form-group">
-              <label for="photoDate">Data</label>
-              <input type="date" id="photoDate" required>
-            </div>
-            <div class="form-group">
-              <label for="photoFile">Selecionar imagem</label>
-              <input type="file" id="photoFile" accept="image/*" required style="padding:8px;cursor:pointer">
-            </div>
-            <button type="submit" class="btn btn-primary btn-full" id="photoUploadBtn">Enviar foto</button>
-          </form>
-        </div>
-        <div id="photoGallery" class="photo-grid"></div>
       </div>
 
     </section>
@@ -1003,29 +965,29 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
-<script src="/js/vendor/body-highlighter.iife.js?v=29"></script>
-<script src="/js/muscle-map.js?v=29"></script>
-<script src="/js/api.js?v=29"></script>
-<script src="/js/scanner.js?v=29"></script>
-<script src="/js/dashboard.js?v=29"></script>
+<script src="/js/vendor/body-highlighter.iife.js?v=30"></script>
+<script src="/js/muscle-map.js?v=30"></script>
+<script src="/js/api.js?v=30"></script>
+<script src="/js/scanner.js?v=30"></script>
+<script src="/js/dashboard.js?v=30"></script>
 <!-- diet.js → módulos -->
-<script src="/js/diet-data.js?v=29"></script>
-<script src="/js/diet-programa.js?v=29"></script>
-<script src="/js/diet-track.js?v=29"></script>
-<script src="/js/diet-editor.js?v=29"></script>
-<script src="/js/diet-manual.js?v=29"></script>
+<script src="/js/diet-data.js?v=30"></script>
+<script src="/js/diet-programa.js?v=30"></script>
+<script src="/js/diet-track.js?v=30"></script>
+<script src="/js/diet-editor.js?v=30"></script>
+<script src="/js/diet-manual.js?v=30"></script>
 <!-- workouts.js → módulos -->
-<script src="/js/workouts-data.js?v=29"></script>
-<script src="/js/workouts-editor.js?v=29"></script>
-<script src="/js/workouts-session.js?v=29"></script>
-<script src="/js/workouts-report.js?v=29"></script>
-<script src="/js/workouts-manual.js?v=29"></script>
-<script src="/js/evolution.js?v=29"></script>
-<script src="/js/photos.js?v=29"></script>
-<script src="/js/progress.js?v=29"></script>
-<script src="/js/settings.js?v=29"></script>
-<script src="/js/app.js?v=29"></script>
-<script src="/js/plans.js?v=29"></script>
+<script src="/js/workouts-data.js?v=30"></script>
+<script src="/js/workouts-editor.js?v=30"></script>
+<script src="/js/workouts-session.js?v=30"></script>
+<script src="/js/workouts-report.js?v=30"></script>
+<script src="/js/workouts-manual.js?v=30"></script>
+<script src="/js/evolution.js?v=30"></script>
+<script src="/js/photos.js?v=30"></script>
+<script src="/js/progress.js?v=30"></script>
+<script src="/js/settings.js?v=30"></script>
+<script src="/js/app.js?v=30"></script>
+<script src="/js/plans.js?v=30"></script>
 <script>
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/sw.js').catch(() => {});

@@ -205,3 +205,221 @@
   cursor: pointer;
 }
 
+/* ═══════════════════════════════════════════
+   PROGRESS v30 — period tabs + 3 stat cards
+   ═══════════════════════════════════════════ */
+
+/* Period sub-tabs */
+.pg-period-tabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+.pg-period-tab {
+  flex: 1;
+  padding: 9px 4px;
+  border-radius: 10px;
+  border: 1.5px solid var(--border);
+  background: var(--card);
+  color: var(--text-3);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all .15s;
+}
+.pg-period-tab.active {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: rgba(196,229,56,0.07);
+}
+
+/* Shared card */
+.pg-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 12px;
+}
+.pg-card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+.pg-card-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--text-3);
+  margin-bottom: 7px;
+}
+.pg-big-num {
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--text);
+  line-height: 1;
+}
+.pg-big-unit {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-3);
+}
+.pg-card-badge-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 3px;
+  padding-top: 2px;
+}
+.pg-badge {
+  font-size: 11px;
+  font-weight: 800;
+  padding: 4px 9px;
+  border-radius: 99px;
+}
+.pg-badge--good {
+  background: rgba(196,229,56,0.14);
+  color: var(--accent);
+}
+.pg-badge--warn {
+  background: rgba(255,100,100,0.12);
+  color: #ff7070;
+}
+.pg-compare-text {
+  font-size: 10px;
+  color: var(--text-3);
+  text-align: right;
+}
+
+/* Calories bar chart */
+.pg-bars-container {
+  height: 110px;
+  position: relative;
+}
+.pg-bars-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--text-3);
+  font-size: 13px;
+}
+.pg-bars-inner {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 88px;
+  position: relative;
+}
+.pg-bars-inner::before {
+  content: '';
+  position: absolute;
+  left: 0; right: 0;
+  top: var(--avg-top, 50%);
+  border-top: 1.5px dashed rgba(255,255,255,0.10);
+  pointer-events: none;
+  z-index: 0;
+}
+.pg-bar-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  height: 100%;
+}
+.pg-bar-wrap {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  align-items: flex-end;
+  position: relative;
+  z-index: 1;
+}
+.pg-bar {
+  width: 100%;
+  border-radius: 4px 4px 0 0;
+  min-height: 3px;
+  transition: height .4s ease;
+}
+.pg-bar-label {
+  font-size: 9.5px;
+  color: var(--text-3);
+  font-weight: 600;
+  white-space: nowrap;
+  height: 14px;
+  display: flex;
+  align-items: center;
+}
+
+/* Water card */
+.pg-water-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 20px;
+}
+.pg-water-icon-box {
+  width: 42px; height: 42px;
+  background: rgba(91,184,245,0.10);
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  color: #5BB8F5;
+  flex-shrink: 0;
+}
+.pg-water-mid {
+  flex: 1;
+  min-width: 0;
+}
+.pg-water-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+.pg-water-bar-wrap {
+  height: 6px;
+  background: rgba(255,255,255,0.07);
+  border-radius: 99px;
+  overflow: hidden;
+}
+.pg-water-bar-fill {
+  height: 100%;
+  background: #5BB8F5;
+  border-radius: 99px;
+  transition: width .4s ease;
+}
+.pg-water-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.pg-water-frac {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-3);
+}
+.pg-water-add-btn {
+  background: var(--accent);
+  color: #0D0D0D;
+  border: none;
+  border-radius: 99px;
+  padding: 6px 13px;
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+  font-family: inherit;
+  white-space: nowrap;
+}
+
+/* Weight line chart */
+.pg-line-wrap {
+  height: 100px;
+  position: relative;
+}
+
