@@ -11,6 +11,7 @@ if (!_secret || _secret.length < 32) {
 const express = require('express');
 const cookieParser = require('cookie-parser');
 const { rateLimit, ipKeyGenerator } = require('express-rate-limit');
+const helmet = require('helmet');
 const path = require('path');
 const fs = require('fs');
 
@@ -23,6 +24,32 @@ const PORT = process.env.PORT || 3000;
 fs.mkdirSync(path.join(__dirname, 'private-uploads'), { recursive: true });
 
 initDB();
+
+// ── Security headers ──────────────────────────────────────────────────────────
+app.use(helmet({
+  // CSP in report-only mode — won't break the app but will log violations
+  // Review /csp-report logs before switching to enforce mode
+  contentSecurityPolicy: {
+    reportOnly: true,
+    directives: {
+      defaultSrc:     ["'self'"],
+      scriptSrc:      ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://cdn.jsdelivr.net"],
+      styleSrc:       ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+      fontSrc:        ["'self'", "https://fonts.gstatic.com"],
+      imgSrc:         ["'self'", "data:", "blob:"],
+      connectSrc:     ["'self'"],
+      workerSrc:      ["'self'"],
+      reportUri:      ["/csp-report"],
+    },
+  },
+  crossOriginEmbedderPolicy: false, // relaxed — PWA needs this
+}));
+
+// CSP violation reporting endpoint (log only — no action)
+app.post('/csp-report', express.json({ type: 'application/csp-report' }), (req, res) => {
+  console.warn('[CSP]', JSON.stringify(req.body));
+  res.status(204).end();
+});
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
