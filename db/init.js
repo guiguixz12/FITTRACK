@@ -212,6 +212,7 @@ function initDB() {
     "ALTER TABLE workouts ADD COLUMN muscles_worked TEXT",
     "ALTER TABLE users ADD COLUMN role TEXT DEFAULT 'user'",
     "ALTER TABLE users ADD COLUMN admin_id INTEGER",
+    "ALTER TABLE users ADD COLUMN token_version INTEGER DEFAULT 0",
   ];
   for (const sql of migrations) {
     try { database.exec(sql); } catch (_) { /* column already exists */ }

@@ -9,7 +9,15 @@ function requireAuth(req, res, next) {
   const token = req.cookies?.token;
   if (!token) return res.status(401).json({ error: 'Authentication required' });
   try {
-    req.user = jwt.verify(token, getSecret());
+    const payload = jwt.verify(token, getSecret());
+    // Token version check: any logout-all increments token_version, invalidating old tokens
+    if (payload.tv !== undefined) {
+      const row = getDB().prepare('SELECT token_version FROM users WHERE id=?').get(payload.id);
+      if (!row || row.token_version !== payload.tv) {
+        return res.status(401).json({ error: 'Sessão revogada. Faça login novamente.' });
+      }
+    }
+    req.user = payload;
     next();
   } catch {
     res.status(401).json({ error: 'Invalid or expired token' });
@@ -38,4 +46,12 @@ function requireSuperAdmin(req, res, next) {
   });
 }
 
-module.exports = { requireAuth, requireAdmin, requireSuperAdmin };
+function requireVerified(req, res, next) {
+  const row = getDB().prepare('SELECT verified FROM users WHERE id=?').get(req.user.id);
+  if (!row?.verified) {
+    return res.status(403).json({ error: 'E-mail não verificado. Confirme seu e-mail para acessar.', code: 'EMAIL_NOT_VERIFIED' });
+  }
+  next();
+}
+
+module.exports = { requireAuth, requireAdmin, requireSuperAdmin, requireVerified };

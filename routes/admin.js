@@ -55,6 +55,18 @@ router.post('/clients', requireAdmin, (req, res) => {
   res.json({ id: r.lastInsertRowid, name: name.trim() });
 });
 
+router.post('/clients/:id/revoke-sessions', requireAdmin, (req, res) => {
+  const db     = getDB();
+  const client = db.prepare('SELECT id, admin_id, role FROM users WHERE id=?').get(req.params.id);
+  if (!client)                return res.status(404).json({ error: 'Usuário não encontrado' });
+  if (client.role !== 'user') return res.status(403).json({ error: 'Somente contas de usuário' });
+  if (req.user.role === 'admin' && client.admin_id !== req.user.id) {
+    return res.status(403).json({ error: 'Este cliente não pertence a você' });
+  }
+  db.prepare('UPDATE users SET token_version = token_version + 1 WHERE id=?').run(req.params.id);
+  res.json({ success: true });
+});
+
 router.delete('/clients/:id', requireAdmin, (req, res) => {
   const db     = getDB();
   const client = db.prepare('SELECT id, admin_id, role FROM users WHERE id=?').get(req.params.id);

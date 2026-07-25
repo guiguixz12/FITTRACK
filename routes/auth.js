@@ -10,7 +10,7 @@ const COOKIE_OPTS = {
   httpOnly: true,
   secure: true,
   sameSite: 'lax',
-  maxAge: 30 * 24 * 60 * 60 * 1000,
+  maxAge: 7 * 24 * 60 * 60 * 1000,
 };
 
 router.post('/register', async (req, res) => {
@@ -46,9 +46,9 @@ router.post('/register', async (req, res) => {
   ).get(result.lastInsertRowid);
 
   const token = jwt.sign(
-    { id: user.id, name: user.name },
+    { id: user.id, name: user.name, tv: user.token_version || 0 },
     process.env.JWT_SECRET,
-    { expiresIn: '30d' }
+    { expiresIn: '7d' }
   );
 
 
@@ -66,9 +66,9 @@ router.post('/login', (req, res) => {
   }
 
   const token = jwt.sign(
-    { id: user.id, name: user.name, role: user.role || 'user' },
+    { id: user.id, name: user.name, role: user.role || 'user', tv: user.token_version || 0 },
     process.env.JWT_SECRET,
-    { expiresIn: '30d' }
+    { expiresIn: '7d' }
   );
 
 
@@ -98,6 +98,13 @@ router.get('/me', requireAuth, (req, res) => {
   res.json(resp);
 });
 
+router.post('/logout-all', requireAuth, (req, res) => {
+  getDB().prepare('UPDATE users SET token_version = token_version + 1 WHERE id=?').run(req.user.id);
+  res.clearCookie('token');
+  res.clearCookie('adminToken');
+  res.json({ success: true });
+});
+
 router.post('/impersonate/:clientId', requireAdmin, (req, res) => {
   const db     = getDB();
   const client = db.prepare('SELECT id, name, role, admin_id FROM users WHERE id=?').get(req.params.clientId);
@@ -107,8 +114,9 @@ router.post('/impersonate/:clientId', requireAdmin, (req, res) => {
     return res.status(403).json({ error: 'Este cliente não pertence a você' });
   }
 
+  const clientRow = db.prepare('SELECT token_version FROM users WHERE id=?').get(client.id);
   const clientToken = jwt.sign(
-    { id: client.id, name: client.name, role: 'user', _impersonatedBy: req.user.id },
+    { id: client.id, name: client.name, role: 'user', _impersonatedBy: req.user.id, tv: clientRow?.token_version || 0 },
     process.env.JWT_SECRET,
     { expiresIn: '8h' }
   );
