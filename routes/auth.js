@@ -113,10 +113,23 @@ router.post('/impersonate/:clientId', requireAdmin, (req, res) => {
   res.json({ success: true });
 });
 
-router.post('/stop-impersonate', (req, res) => {
+router.post('/stop-impersonate', requireAuth, (req, res) => {
   const adminToken = req.cookies?.adminToken;
   if (!adminToken) return res.status(400).json({ error: 'Não está em modo de visualização' });
-  if (process.env.NODE_ENV === 'production') COOKIE_OPTS.secure = true;
+
+  // Verify the adminToken is a valid JWT for an admin — not just any cookie value
+  let payload;
+  try {
+    payload = jwt.verify(adminToken, process.env.JWT_SECRET);
+  } catch {
+    res.clearCookie('adminToken');
+    return res.status(400).json({ error: 'Token de administrador inválido' });
+  }
+  if (!['admin', 'super_admin'].includes(payload.role)) {
+    res.clearCookie('adminToken');
+    return res.status(403).json({ error: 'Token de administrador inválido' });
+  }
+
   res.cookie('token', adminToken, COOKIE_OPTS);
   res.clearCookie('adminToken');
   res.json({ success: true });
