@@ -7,6 +7,7 @@ function initDiet(state) {
   document.querySelectorAll('#tab-diet .sub-tab').forEach(btn => {
     btn.addEventListener('click', () => {
       if (btn.dataset.dtview === 'registrar') switchDtView('registrar');
+      else if (btn.dataset.dtview === 'historico') switchDtView('historico');
       else switchDtView('programa');
     });
   });
@@ -19,14 +20,16 @@ function initDiet(state) {
 }
 
 function switchDtView(view) {
-  ['programa','editDay','track','registrar'].forEach(v => {
-    const id = { programa:'dtViewPrograma', editDay:'dtViewEditDay', track:'dtViewTrack', registrar:'dtViewRegistrar' }[v];
-    document.getElementById(id).style.display = v === view ? '' : 'none';
+  ['programa','editDay','track','registrar','historico'].forEach(v => {
+    const id = { programa:'dtViewPrograma', editDay:'dtViewEditDay', track:'dtViewTrack', registrar:'dtViewRegistrar', historico:'dtViewHistorico' }[v];
+    const el = document.getElementById(id);
+    if (el) el.style.display = v === view ? '' : 'none';
   });
   document.querySelectorAll('#tab-diet .sub-tab').forEach(b => {
     b.classList.toggle('active',
       (b.dataset.dtview === 'programa'  && ['programa','editDay','track'].includes(view)) ||
-      (b.dataset.dtview === 'registrar' && view === 'registrar')
+      (b.dataset.dtview === 'registrar' && view === 'registrar') ||
+      (b.dataset.dtview === 'historico' && view === 'historico')
     );
   });
 }
@@ -51,13 +54,13 @@ function renderDietWeekGrid() {
   const today = new Date().getDay();
   const order = Array.from({ length: 7 }, (_, i) => (today + i) % 7);
   const grid  = document.getElementById('dietWeekGrid');
+  const chevron = `<svg class="dt-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>`;
 
   grid.innerHTML = order.map((dow, idx) => {
     const tpl     = dtTemplates[dow];
     const isToday = dow === today;
     const hasPlan = tpl && (tpl.name || tpl.foods?.length);
 
-    // Section dividers
     const sectionLabel = isToday
       ? `<div class="week-section-label today-label">— Hoje —</div>`
       : idx === 1
@@ -70,46 +73,50 @@ function renderDietWeekGrid() {
           <div class="day-card is-today">
             <div class="day-header">
               <span class="day-dow today">${DT_DAYS[dow]}</span>
-              <span class="day-name-text rest">Dia livre</span>
+              <span class="day-name-text rest" style="flex:1">${DT_DAYS_FULL[dow]} — Descanso</span>
               <button class="btn btn-ghost btn-sm" onclick="openDtEditDay(${dow})">Editar</button>
             </div>
           </div>`;
       }
       return `${sectionLabel}
-        <div class="day-card day-card--compact">
+        <div class="day-card day-card--compact" onclick="openDtEditDay(${dow})">
           <div class="day-header">
             <span class="day-dow">${DT_DAYS[dow]}</span>
-            <span class="day-name-text rest" style="flex:1">Dia livre</span>
-            <button class="btn btn-ghost btn-sm" onclick="openDtEditDay(${dow})">Editar</button>
+            <span class="day-name-text rest" style="flex:1">${DT_DAYS_FULL[dow]} — Descanso</span>
+            ${chevron}
           </div>
         </div>`;
     }
 
-    const tots  = computeTotals(tpl.foods || []);
-    const mealPreviews = MEALS.map(m => {
-      const mf = (tpl.foods || []).filter(f => f.meal === m.id);
-      if (!mf.length) return '';
-      return `<span class="dt-meal-pill">${m.icon} ${computeTotals(mf).cal} kcal</span>`;
+    const tots = computeTotals(tpl.foods || []);
+    const calFmt = tots.cal.toLocaleString('pt-BR');
+
+    const mealCards = MEALS.map(m => {
+      const mf   = (tpl.foods || []).filter(f => f.meal === m.id);
+      const kcal = mf.length ? computeTotals(mf).cal : 0;
+      return `<div class="dt-meal-card">
+        <div class="dt-meal-card-icon">${m.icon}</div>
+        <div class="dt-meal-card-kcal">${kcal} kcal</div>
+      </div>`;
     }).join('');
 
-    // Today: full card with macros and meal pills
     if (isToday) {
       return `${sectionLabel}
         <div class="day-card is-today">
           <div class="day-header">
             <span class="day-dow today">${DT_DAYS[dow]}</span>
-            <span class="day-name-text">${escDiet(tpl.name || 'Sem nome')}</span>
+            <span class="day-name-text" style="flex:1">${DT_DAYS_FULL[dow]} — ${escDiet(tpl.name || 'Descanso')}</span>
             <button class="btn btn-ghost btn-sm" onclick="openDtEditDay(${dow})">Editar</button>
-            <button class="btn btn-ghost btn-sm" onclick="copyDtTemplate(${dow})" title="Copiar">${ICON.copy}</button>
+            <button class="btn btn-ghost btn-sm dt-icon-btn" onclick="copyDtTemplate(${dow})" title="Copiar">${ICON.copy}</button>
           </div>
           <div class="day-body">
             <div class="diet-day-macros">
-              <div class="diet-day-macro cal"><div class="diet-day-macro-val">${tots.cal}</div><div class="diet-day-macro-label">kcal</div></div>
+              <div class="diet-day-macro cal"><div class="diet-day-macro-val">${calFmt}</div><div class="diet-day-macro-label">kcal</div></div>
               <div class="diet-day-macro prot"><div class="diet-day-macro-val">${tots.prot}g</div><div class="diet-day-macro-label">Prot</div></div>
               <div class="diet-day-macro carb"><div class="diet-day-macro-val">${tots.carb}g</div><div class="diet-day-macro-label">Carb</div></div>
               <div class="diet-day-macro fat"><div class="diet-day-macro-val">${tots.fat}g</div><div class="diet-day-macro-label">Gord</div></div>
             </div>
-            ${mealPreviews ? `<div class="dt-meal-pills">${mealPreviews}</div>` : ''}
+            <div class="dt-meal-cards">${mealCards}</div>
             <div class="day-actions">
               <button class="btn btn-primary" style="flex:1" onclick="openDtTrack(${dow})">Acompanhar hoje</button>
             </div>
@@ -117,16 +124,13 @@ function renderDietWeekGrid() {
         </div>`;
     }
 
-    // Other days: compact single row
     return `${sectionLabel}
-      <div class="day-card day-card--compact">
+      <div class="day-card day-card--compact" onclick="openDtTrack(${dow})">
         <div class="day-header">
           <span class="day-dow">${DT_DAYS[dow]}</span>
-          <span class="day-name-text" style="flex:1">${escDiet(tpl.name || 'Sem nome')}</span>
-          <span class="compact-kcal">${tots.cal} kcal</span>
-          <button class="btn btn-ghost btn-sm" onclick="openDtTrack(${dow})">Ver</button>
-          <button class="btn btn-ghost btn-sm" onclick="openDtEditDay(${dow})">Editar</button>
-          <button class="btn btn-ghost btn-sm" onclick="copyDtTemplate(${dow})" title="Copiar">${ICON.copy}</button>
+          <span class="day-name-text" style="flex:1">${DT_DAYS_FULL[dow]} — ${escDiet(tpl.name || 'Descanso')}</span>
+          <span class="compact-kcal">${calFmt} kcal</span>
+          ${chevron}
         </div>
       </div>`;
   }).join('');

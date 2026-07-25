@@ -1,4 +1,24 @@
 /* ═══════════════════════════════════════════
+   DIET — Week grid: meal cards & compact rows
+   ═══════════════════════════════════════════ */
+#tab-diet .day-dow { text-transform: uppercase; }
+.dt-meal-cards {
+  display: flex; gap: 8px; margin-bottom: 16px;
+}
+.dt-meal-card {
+  flex: 1; background: #0D0D0D; border-radius: 12px;
+  padding: 14px 6px;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 7px;
+}
+.dt-meal-card-icon { color: var(--accent); display: flex; }
+.dt-meal-card-icon svg { width: 18px; height: 18px; }
+.dt-meal-card-kcal { font-size: 11.5px; font-weight: 800; color: var(--text); text-align: center; }
+.dt-chevron { color: var(--text-3); flex-shrink: 0; }
+.day-card--compact { cursor: pointer; }
+.dt-icon-btn { width: 34px; padding: 0; display: flex; align-items: center; justify-content: center; }
+
+/* ═══════════════════════════════════════════
    DIET — Meal Sections
    ═══════════════════════════════════════════ */
 .meal-section { margin-bottom: 12px; }
