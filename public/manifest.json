@@ -1,6 +1,6 @@
 {
-  "name": "FIT",
-  "short_name": "FIT",
+  "name": "FitX",
+  "short_name": "FitX",
   "description": "Acompanhe dieta, treinos e evolução física",
   "start_url": "/app",
   "scope": "/",
