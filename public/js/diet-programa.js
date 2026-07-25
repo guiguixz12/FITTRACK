@@ -124,13 +124,31 @@ function renderDietWeekGrid() {
         </div>`;
     }
 
+    const mealShorts = ['Café', 'Almoço', 'Lanche', 'Jantar'];
+    const mealRows = MEALS.map((m, i) => {
+      const mf   = (tpl.foods || []).filter(f => f.meal === m.id);
+      const kcal = mf.length ? computeTotals(mf).cal : 0;
+      return `<div class="dt-expand-meal-row">
+        <div class="dt-expand-meal-icon">${m.icon}</div>
+        <div class="dt-expand-meal-name">${mealShorts[i]}</div>
+        <div class="dt-expand-meal-kcal">${kcal} kcal</div>
+      </div>`;
+    }).join('');
+
     return `${sectionLabel}
-      <div class="day-card day-card--compact" onclick="openDtTrack(${dow})">
-        <div class="day-header">
+      <div class="day-card day-card--compact">
+        <div class="day-header" onclick="toggleDtDay(${dow})">
           <span class="day-dow">${DT_DAYS[dow]}</span>
           <span class="day-name-text" style="flex:1">${DT_DAYS_FULL[dow]} — ${escDiet(tpl.name || 'Descanso')}</span>
           <span class="compact-kcal">${calFmt} kcal</span>
-          ${chevron}
+          <svg id="dtChevron-${dow}" class="dt-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div id="dtDayExpand-${dow}" class="dt-day-expand" style="display:none">
+          ${mealRows}
+          <div class="dt-expand-actions">
+            <button class="btn btn-ghost btn-sm" onclick="openDtEditDay(${dow})">Editar</button>
+            <button class="btn btn-ghost btn-sm dt-icon-btn" onclick="copyDtTemplate(${dow})" title="Copiar">${ICON.copy}</button>
+          </div>
         </div>
       </div>`;
   }).join('');
@@ -139,6 +157,16 @@ function renderDietWeekGrid() {
   const suggestEl = document.getElementById('dietPlanSuggest');
   if (suggestEl) suggestEl.style.display = anyPlan ? 'none' : '';
 }
+
+function toggleDtDay(dow) {
+  const expand  = document.getElementById('dtDayExpand-' + dow);
+  const chevron = document.getElementById('dtChevron-' + dow);
+  if (!expand) return;
+  const isOpen = expand.style.display !== 'none';
+  expand.style.display = isOpen ? 'none' : '';
+  if (chevron) chevron.classList.toggle('open', !isOpen);
+}
+window.toggleDtDay = toggleDtDay;
 
 async function copyDtTemplate(fromDow) {
   const src = dtTemplates[fromDow];

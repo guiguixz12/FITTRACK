@@ -14,9 +14,27 @@
 .dt-meal-card-icon { color: var(--accent); display: flex; }
 .dt-meal-card-icon svg { width: 18px; height: 18px; }
 .dt-meal-card-kcal { font-size: 11.5px; font-weight: 800; color: var(--text); text-align: center; }
-.dt-chevron { color: var(--text-3); flex-shrink: 0; }
+.dt-chevron { color: var(--text-3); flex-shrink: 0; transition: transform .2s; }
+.dt-chevron.open { transform: rotate(180deg); }
 .day-card--compact { cursor: pointer; }
 .dt-icon-btn { width: 34px; padding: 0; display: flex; align-items: center; justify-content: center; }
+
+/* ── Accordion expanded section ── */
+.dt-day-expand {
+  padding: 0 18px 16px;
+  border-top: 1px solid var(--border);
+}
+.dt-expand-meal-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 13px 0;
+  border-bottom: 1px solid var(--border);
+}
+.dt-expand-meal-row:last-of-type { border-bottom: none; }
+.dt-expand-meal-icon { color: var(--text-3); display: flex; flex-shrink: 0; }
+.dt-expand-meal-icon svg { width: 16px; height: 16px; }
+.dt-expand-meal-name { flex: 1; font-size: 14px; font-weight: 600; color: var(--text); }
+.dt-expand-meal-kcal { font-size: 13px; font-weight: 700; color: var(--text-3); white-space: nowrap; }
+.dt-expand-actions { display: flex; gap: 8px; margin-top: 16px; }
 
 /* ═══════════════════════════════════════════
    DIET — Meal Sections
