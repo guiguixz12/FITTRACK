@@ -4,7 +4,17 @@ const WEEKDAYS_PT = ['Domingo','Segunda-feira','Terça-feira','Quarta-feira','Qu
 const MONTHS_PT   = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
 const CAL_CIRC    = 2 * Math.PI * 54; // ring circumference (r=54)
 
+async function checkDashBanner() {
+  try {
+    const { templates } = await api.get('/api/diet-templates');
+    const hasPlan = (templates || []).some(t => t && (t.name || (t.foods && t.foods.length)));
+    const banner = document.getElementById('dashAiBanner');
+    if (banner) banner.style.display = hasPlan ? 'none' : '';
+  } catch {}
+}
+
 function initDashboard(state) {
+  checkDashBanner();
   document.getElementById('dashPrevDay')?.addEventListener('click', () => {
     const d = new Date(state.date + 'T12:00:00');
     d.setDate(d.getDate() - 1);

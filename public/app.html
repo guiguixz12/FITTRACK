@@ -20,14 +20,14 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/base.css?v=30">
-  <link rel="stylesheet" href="/css/home.css?v=30">
-  <link rel="stylesheet" href="/css/dieta.css?v=30">
-  <link rel="stylesheet" href="/css/treino.css?v=30">
-  <link rel="stylesheet" href="/css/progresso.css?v=30">
-  <link rel="stylesheet" href="/css/config.css?v=30">
-  <link rel="stylesheet" href="/css/fidelidade.css?v=30">
-  <link rel="stylesheet" href="/css/v2.css?v=30">
+  <link rel="stylesheet" href="/css/base.css?v=31">
+  <link rel="stylesheet" href="/css/home.css?v=31">
+  <link rel="stylesheet" href="/css/dieta.css?v=31">
+  <link rel="stylesheet" href="/css/treino.css?v=31">
+  <link rel="stylesheet" href="/css/progresso.css?v=31">
+  <link rel="stylesheet" href="/css/config.css?v=31">
+  <link rel="stylesheet" href="/css/fidelidade.css?v=31">
+  <link rel="stylesheet" href="/css/v2.css?v=31">
 
   <!-- SVG gradient for calorie ring (must live in DOM) -->
   <svg width="0" height="0" style="position:absolute">
@@ -125,17 +125,23 @@
       <!-- 3-col quick stats -->
       <div class="v2-stats-row">
         <div class="v2-stat-card">
-          <div class="v2-stat-icon">💧</div>
+          <div class="v2-stat-icon" style="color:var(--accent);display:flex;justify-content:center">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
+          </div>
           <div class="v2-stat-val" id="dashWaterTotal">0 ml</div>
           <div class="v2-stat-sub" id="dashWaterPct">0% água</div>
         </div>
         <div class="v2-stat-card">
-          <div class="v2-stat-icon">🔥</div>
+          <div class="v2-stat-icon" style="color:var(--accent);display:flex;justify-content:center">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 3z"/></svg>
+          </div>
           <div class="v2-stat-val" id="dashStreakVal">0</div>
           <div class="v2-stat-sub">dias seguidos</div>
         </div>
         <div class="v2-stat-card">
-          <div class="v2-stat-icon">⚖️</div>
+          <div class="v2-stat-icon" style="color:var(--accent);display:flex;justify-content:center">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="M7 21h10"/><line x1="12" x2="12" y1="3" y2="21"/><path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/></svg>
+          </div>
           <div class="v2-stat-val" id="dashWeight">—</div>
           <div class="v2-stat-sub">peso atual</div>
         </div>
@@ -167,8 +173,8 @@
         <div id="dashWorkout"></div>
       </div>
 
-      <!-- AI banner -->
-      <div class="v2-ai-banner">
+      <!-- AI banner — only shown when user has no diet plan -->
+      <div class="v2-ai-banner" id="dashAiBanner" style="display:none">
         <div class="v2-ai-title">Não sabe por onde começar?</div>
         <div class="v2-ai-sub">Gere um plano de dieta personalizado em segundos.</div>
         <button class="v2-ai-btn" onclick="openPlanWizard('diet', AppState)">Sugerir plano</button>
@@ -965,29 +971,29 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
-<script src="/js/vendor/body-highlighter.iife.js?v=30"></script>
-<script src="/js/muscle-map.js?v=30"></script>
-<script src="/js/api.js?v=30"></script>
-<script src="/js/scanner.js?v=30"></script>
-<script src="/js/dashboard.js?v=30"></script>
+<script src="/js/vendor/body-highlighter.iife.js?v=31"></script>
+<script src="/js/muscle-map.js?v=31"></script>
+<script src="/js/api.js?v=31"></script>
+<script src="/js/scanner.js?v=31"></script>
+<script src="/js/dashboard.js?v=31"></script>
 <!-- diet.js → módulos -->
-<script src="/js/diet-data.js?v=30"></script>
-<script src="/js/diet-programa.js?v=30"></script>
-<script src="/js/diet-track.js?v=30"></script>
-<script src="/js/diet-editor.js?v=30"></script>
-<script src="/js/diet-manual.js?v=30"></script>
+<script src="/js/diet-data.js?v=31"></script>
+<script src="/js/diet-programa.js?v=31"></script>
+<script src="/js/diet-track.js?v=31"></script>
+<script src="/js/diet-editor.js?v=31"></script>
+<script src="/js/diet-manual.js?v=31"></script>
 <!-- workouts.js → módulos -->
-<script src="/js/workouts-data.js?v=30"></script>
-<script src="/js/workouts-editor.js?v=30"></script>
-<script src="/js/workouts-session.js?v=30"></script>
-<script src="/js/workouts-report.js?v=30"></script>
-<script src="/js/workouts-manual.js?v=30"></script>
-<script src="/js/evolution.js?v=30"></script>
-<script src="/js/photos.js?v=30"></script>
-<script src="/js/progress.js?v=30"></script>
-<script src="/js/settings.js?v=30"></script>
-<script src="/js/app.js?v=30"></script>
-<script src="/js/plans.js?v=30"></script>
+<script src="/js/workouts-data.js?v=31"></script>
+<script src="/js/workouts-editor.js?v=31"></script>
+<script src="/js/workouts-session.js?v=31"></script>
+<script src="/js/workouts-report.js?v=31"></script>
+<script src="/js/workouts-manual.js?v=31"></script>
+<script src="/js/evolution.js?v=31"></script>
+<script src="/js/photos.js?v=31"></script>
+<script src="/js/progress.js?v=31"></script>
+<script src="/js/settings.js?v=31"></script>
+<script src="/js/app.js?v=31"></script>
+<script src="/js/plans.js?v=31"></script>
 <script>
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/sw.js').catch(() => {});
