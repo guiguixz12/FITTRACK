@@ -31,16 +31,6 @@ function initDashboard(state) {
     loadDashboard(state);
   });
 
-  const grid = document.getElementById('dashWaterGrid');
-  if (grid) {
-    grid.addEventListener('click', async e => {
-      const btn = e.target.closest('[data-ml]');
-      if (!btn) return;
-      await api.post('/api/water', { date: state.date, amount_ml: parseInt(btn.dataset.ml) });
-      const data = await api.get(`/api/water?date=${state.date}`);
-      renderWater(data, state.date);
-    });
-  }
 }
 
 async function loadDashboard(state) {
@@ -186,10 +176,10 @@ function renderWater(data, date) {
   if (pctEl)   pctEl.textContent   = `${Math.round(pct)}% água`;
 
   // Water card
-  const goalEl = document.getElementById('dashWaterGoal');
   const fillEl = document.getElementById('dashWaterProgressFill');
-  if (goalEl) goalEl.textContent = fmt(goal_ml);
+  const fracEl = document.getElementById('dashWaterFrac');
   if (fillEl) fillEl.style.width = pct + '%';
+  if (fracEl) fracEl.textContent = `${fmt(total_ml)} / ${fmt(goal_ml)}`;
 
   // Logs
   const logsEl = document.getElementById('dashWaterLogs');
@@ -210,6 +200,13 @@ async function deleteWaterLog(id, date) {
   loadWater(date);
 }
 window.deleteWaterLog = deleteWaterLog;
+
+async function dashAddWater(ml) {
+  const date = AppState?.date || new Date().toISOString().slice(0, 10);
+  await api.post('/api/water', { date, amount_ml: ml });
+  loadWater(date);
+}
+window.dashAddWater = dashAddWater;
 
 // ── Streak ────────────────────────────────────────────────────────────────────
 function renderStreak(data) {

@@ -20,14 +20,14 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/base.css?v=32">
-  <link rel="stylesheet" href="/css/home.css?v=32">
-  <link rel="stylesheet" href="/css/dieta.css?v=32">
-  <link rel="stylesheet" href="/css/treino.css?v=32">
-  <link rel="stylesheet" href="/css/progresso.css?v=32">
-  <link rel="stylesheet" href="/css/config.css?v=32">
-  <link rel="stylesheet" href="/css/fidelidade.css?v=32">
-  <link rel="stylesheet" href="/css/v2.css?v=32">
+  <link rel="stylesheet" href="/css/base.css?v=33">
+  <link rel="stylesheet" href="/css/home.css?v=33">
+  <link rel="stylesheet" href="/css/dieta.css?v=33">
+  <link rel="stylesheet" href="/css/treino.css?v=33">
+  <link rel="stylesheet" href="/css/progresso.css?v=33">
+  <link rel="stylesheet" href="/css/config.css?v=33">
+  <link rel="stylesheet" href="/css/fidelidade.css?v=33">
+  <link rel="stylesheet" href="/css/v2.css?v=33">
 
   <!-- SVG gradient for calorie ring (must live in DOM) -->
   <svg width="0" height="0" style="position:absolute">
@@ -148,24 +148,22 @@
       </div>
 
       <!-- Water card -->
-      <div class="v2-card">
-        <div class="v2-water-header">
-          <div class="v2-water-title">HIDRATAÇÃO</div>
-          <div class="v2-water-goal-txt">Meta: <span id="dashWaterGoal">2 L</span></div>
+      <div class="pg-card pg-water-card">
+        <div class="pg-water-icon-box">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
         </div>
-        <div class="v2-water-bar-track">
-          <div class="v2-water-bar-fill" id="dashWaterProgressFill" style="width:0%"></div>
+        <div class="pg-water-mid">
+          <div class="pg-water-label">Água</div>
+          <div class="pg-water-bar-wrap">
+            <div class="pg-water-bar-fill" id="dashWaterProgressFill" style="width:0%"></div>
+          </div>
         </div>
-        <div class="v2-water-grid" id="dashWaterGrid">
-          <button class="v2-water-btn" data-ml="150">150</button>
-          <button class="v2-water-btn" data-ml="200">200</button>
-          <button class="v2-water-btn" data-ml="250">250</button>
-          <button class="v2-water-btn" data-ml="350">350</button>
-          <button class="v2-water-btn" data-ml="500">500</button>
-          <button class="v2-water-btn" data-ml="1000">1L</button>
+        <div class="pg-water-right">
+          <div class="pg-water-frac" id="dashWaterFrac">—</div>
+          <button class="pg-water-add-btn" onclick="dashAddWater(250)">+250ml</button>
         </div>
-        <div class="v2-water-logs" id="dashWaterLogs"></div>
       </div>
+      <div class="v2-water-logs" id="dashWaterLogs" style="margin-top:-4px;margin-bottom:12px"></div>
 
       <!-- Workout card -->
       <div class="v2-card">
@@ -977,29 +975,29 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
-<script src="/js/vendor/body-highlighter.iife.js?v=32"></script>
-<script src="/js/muscle-map.js?v=32"></script>
-<script src="/js/api.js?v=32"></script>
-<script src="/js/scanner.js?v=32"></script>
-<script src="/js/dashboard.js?v=32"></script>
+<script src="/js/vendor/body-highlighter.iife.js?v=33"></script>
+<script src="/js/muscle-map.js?v=33"></script>
+<script src="/js/api.js?v=33"></script>
+<script src="/js/scanner.js?v=33"></script>
+<script src="/js/dashboard.js?v=33"></script>
 <!-- diet.js → módulos -->
-<script src="/js/diet-data.js?v=32"></script>
-<script src="/js/diet-programa.js?v=32"></script>
-<script src="/js/diet-track.js?v=32"></script>
-<script src="/js/diet-editor.js?v=32"></script>
-<script src="/js/diet-manual.js?v=32"></script>
+<script src="/js/diet-data.js?v=33"></script>
+<script src="/js/diet-programa.js?v=33"></script>
+<script src="/js/diet-track.js?v=33"></script>
+<script src="/js/diet-editor.js?v=33"></script>
+<script src="/js/diet-manual.js?v=33"></script>
 <!-- workouts.js → módulos -->
-<script src="/js/workouts-data.js?v=32"></script>
-<script src="/js/workouts-editor.js?v=32"></script>
-<script src="/js/workouts-session.js?v=32"></script>
-<script src="/js/workouts-report.js?v=32"></script>
-<script src="/js/workouts-manual.js?v=32"></script>
-<script src="/js/evolution.js?v=32"></script>
-<script src="/js/photos.js?v=32"></script>
-<script src="/js/progress.js?v=32"></script>
-<script src="/js/settings.js?v=32"></script>
-<script src="/js/app.js?v=32"></script>
-<script src="/js/plans.js?v=32"></script>
+<script src="/js/workouts-data.js?v=33"></script>
+<script src="/js/workouts-editor.js?v=33"></script>
+<script src="/js/workouts-session.js?v=33"></script>
+<script src="/js/workouts-report.js?v=33"></script>
+<script src="/js/workouts-manual.js?v=33"></script>
+<script src="/js/evolution.js?v=33"></script>
+<script src="/js/photos.js?v=33"></script>
+<script src="/js/progress.js?v=33"></script>
+<script src="/js/settings.js?v=33"></script>
+<script src="/js/app.js?v=33"></script>
+<script src="/js/plans.js?v=33"></script>
 <script>
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/sw.js').catch(() => {});
