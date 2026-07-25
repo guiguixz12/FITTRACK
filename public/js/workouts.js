@@ -445,25 +445,9 @@ function showExerciseInfo(name) {
     imgWrap.style.display = 'none';
   }
 
-  const svgWrap = document.getElementById('exInfoDiagram');
-  svgWrap.innerHTML = buildBodySvg(muscles, view);
-
-  // Show back/front toggle only if there are muscles on both sides
-  const hasFront = muscles.some(m => MUSCLE_VIEW[m] === 'front' || m === 'traps' || m === 'calves');
-  const hasBack  = muscles.some(m => MUSCLE_VIEW[m] === 'back'  || m === 'traps' || m === 'calves');
-  const toggleEl = document.getElementById('exInfoViewToggle');
-  if (hasFront && hasBack) {
-    toggleEl.style.display = '';
-    toggleEl.dataset.view  = view;
-    toggleEl.textContent   = view === 'front' ? 'Ver costas' : 'Ver frente';
-    toggleEl.onclick = () => {
-      const next = toggleEl.dataset.view === 'front' ? 'back' : 'front';
-      toggleEl.dataset.view = next;
-      toggleEl.textContent  = next === 'front' ? 'Ver costas' : 'Ver frente';
-      svgWrap.innerHTML     = buildBodySvg(muscles, next);
-    };
-  } else {
-    toggleEl.style.display = 'none';
+  // Muscle map highlight (PNG overlay system)
+  if (typeof highlightMuscles === 'function') {
+    highlightMuscles({ primary: muscles.slice(0, 1), secondary: muscles.slice(1) });
   }
 
   el.style.display = '';
