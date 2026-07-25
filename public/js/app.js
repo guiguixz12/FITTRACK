@@ -25,7 +25,7 @@ function switchTab(tab) {
     dashboard: () => { AppState.date = new Date().toISOString().slice(0, 10); loadDashboard(AppState); },
     diet:      () => { if (!AppState.tabInited.diet)     { initDiet(AppState);     AppState.tabInited.diet     = true; } loadDiet(AppState); },
     workouts:  () => { if (!AppState.tabInited.workouts) { initWorkouts(AppState); AppState.tabInited.workouts = true; } loadWorkouts(AppState); },
-    progress:  () => { if (!AppState.tabInited.progress) { initProgress(AppState); AppState.tabInited.progress = true; } loadProgress(AppState); },
+    progress:  () => { if (!AppState.tabInited.progress) { initProgress(AppState); initPhotos(AppState); AppState.tabInited.progress = true; } loadProgress(AppState); loadPhotos(AppState); },
     settings:  () => { if (!AppState.tabInited.settings) { initSettings(AppState); AppState.tabInited.settings = true; } loadSettings(AppState); }
   };
   loaders[tab]?.();
