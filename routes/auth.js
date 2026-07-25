@@ -95,7 +95,7 @@ router.post('/logout', (req, res) => {
 router.get('/me', requireAuth, (req, res) => {
   const db   = getDB();
   const user = db
-    .prepare('SELECT id, name, email, target_calories, target_protein, target_carbs, target_fat, height_cm, age, sex, target_weight, theme, plan, role FROM users WHERE id = ?')
+    .prepare('SELECT id, name, email, target_calories, target_protein, target_carbs, target_fat, height_cm, age, sex, target_weight, theme, plan, role, activity_factor, goal_diff, targets_auto FROM users WHERE id = ?')
     .get(req.user.id);
   if (!user) return res.status(404).json({ error: 'Usuário não encontrado' });
 

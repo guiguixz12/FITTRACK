@@ -233,6 +233,9 @@ function initDB() {
     "ALTER TABLE users ADD COLUMN admin_id INTEGER",
     "ALTER TABLE users ADD COLUMN token_version INTEGER DEFAULT 0",
     "ALTER TABLE users ADD COLUMN verified INTEGER DEFAULT 1",
+    "ALTER TABLE users ADD COLUMN activity_factor REAL DEFAULT 1.55",
+    "ALTER TABLE users ADD COLUMN goal_diff INTEGER DEFAULT -300",
+    "ALTER TABLE users ADD COLUMN targets_auto INTEGER DEFAULT 1",
   ];
   for (const sql of migrations) {
     try { database.exec(sql); } catch (_) { /* column already exists */ }
@@ -260,6 +263,13 @@ function initDB() {
   for (const sql of validationTriggers) {
     database.exec(sql);
   }
+
+  // Existing accounts already have target_calories set manually — honour them.
+  // targets_auto=0 means "do not overwrite on weight change".
+  // New users (no target_calories) keep the column DEFAULT (1 = auto mode).
+  database.prepare(
+    'UPDATE users SET targets_auto=0 WHERE target_calories IS NOT NULL AND targets_auto=1'
+  ).run();
 
   // Ensure Guilherme is always super_admin
   database.prepare("UPDATE users SET role='super_admin' WHERE name='Guilherme' AND (role IS NULL OR role='user')").run();

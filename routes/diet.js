@@ -1,6 +1,7 @@
 const express = require('express');
 const { getDB } = require('../db/init');
 const { requireAuth, requireVerified } = require('../middleware/auth');
+const { computeTargets } = require('../utils/targets');
 
 const router = express.Router();
 router.use(requireAuth);
@@ -97,11 +98,24 @@ router.post('/weight', (req, res) => {
   const { date, weight_kg } = req.body;
   if (!date || weight_kg == null) return res.status(400).json({ error: 'Data e peso obrigatórios' });
 
-  getDB().prepare(`
+  const db = getDB();
+  db.prepare(`
     INSERT INTO weight_logs (user_id, date, weight_kg) VALUES (?,?,?)
     ON CONFLICT(user_id, date) DO UPDATE SET weight_kg=excluded.weight_kg
   `).run(req.user.id, date, weight_kg);
 
+  // Auto-recalculate targets if user is in auto mode
+  const userRow = db.prepare('SELECT targets_auto FROM users WHERE id=?').get(req.user.id);
+  if (userRow?.targets_auto) {
+    const targets = computeTargets(req.user.id);
+    if (targets) {
+      db.prepare(`
+        UPDATE users SET target_calories=?, target_protein=?, target_carbs=?, target_fat=?
+        WHERE id=?
+      `).run(targets.target_calories, targets.target_protein, targets.target_carbs, targets.target_fat, req.user.id);
+      return res.json({ success: true, targetsUpdated: true, targets, notification: targets.notification });
+    }
+  }
   res.json({ success: true });
 });
 

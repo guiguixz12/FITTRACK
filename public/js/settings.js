@@ -10,12 +10,22 @@ function initSettings(state) {
     if (!val || val < 20) { toast('Informe um peso válido (kg)', 'error'); return; }
     const today = new Date().toISOString().slice(0, 10);
     try {
-      await api.post('/api/diet/weight', { date: today, weight_kg: val });
-      toast(`Peso ${val} kg salvo!`);
+      const resp = await api.post('/api/diet/weight', { date: today, weight_kg: val });
       // sync with TDEE calculator field
       document.getElementById('calcWeight').value = val;
+      if (resp?.targetsUpdated && resp.targets) {
+        // Auto mode: update state with new targets and notify
+        state.user = { ...state.user, ...resp.targets };
+        document.getElementById('setCalories').value = resp.targets.target_calories;
+        document.getElementById('setProt').value      = resp.targets.target_protein;
+        document.getElementById('setCarb').value      = resp.targets.target_carbs;
+        document.getElementById('setFat').value       = resp.targets.target_fat;
+        toast(resp.notification || `Peso ${val} kg salvo — meta recalculada!`);
+        if (typeof loadDashboard === 'function') loadDashboard(state);
+      } else {
+        toast(`Peso ${val} kg salvo!`);
+      }
       await loadWeightInfo();
-      // refresh dashboard if it was loaded
       if (typeof loadDashboard === 'function') loadDashboard(state);
     } catch (err) { toast(err.message, 'error'); }
   });
@@ -47,29 +57,27 @@ function initSettings(state) {
 
   document.getElementById('calcApplyBtn').addEventListener('click', async () => {
     if (!_calcValues) return;
-    const { calories, protein, carbs, fat } = _calcValues;
 
-    // Fill goals form
-    document.getElementById('setCalories').value = calories;
-    document.getElementById('setProt').value      = protein;
-    document.getElementById('setCarb').value      = carbs;
-    document.getElementById('setFat').value       = fat;
-
-    // Save immediately
+    // Send the calculator parameters (not the final numbers) so the backend
+    // computes from the latest weight and keeps auto mode active
+    const activity_factor = parseFloat(document.getElementById('calcActivity').value);
+    const goal_diff       = parseInt(document.getElementById('calcGoal').value);
     try {
-      await api.put('/api/users/me', {
-        target_calories: calories,
-        target_protein:  protein,
-        target_carbs:    carbs,
-        target_fat:      fat,
-        height_cm:       parseFloat(document.getElementById('setHeight').value)       || null,
-        age:             parseInt(document.getElementById('setAge').value)             || null,
-        sex:             document.getElementById('setSex').value                       || null,
-        target_weight:   parseFloat(document.getElementById('setTargetWeight').value) || null,
+      const resp = await api.post('/api/users/me/auto-targets', {
+        activity_factor,
+        goal_diff,
+        height_cm: parseFloat(document.getElementById('setHeight').value) || null,
+        age:       parseInt(document.getElementById('setAge').value)      || null,
+        sex:       document.getElementById('setSex').value                || null,
       });
-      const { user } = await api.get('/api/auth/me');
-      state.user = user;
-      toast('Meta aplicada! Dashboard atualizado.');
+      state.user = resp.user;
+      // Reflect in goals form
+      document.getElementById('setCalories').value = resp.user.target_calories;
+      document.getElementById('setProt').value      = resp.user.target_protein;
+      document.getElementById('setCarb').value      = resp.user.target_carbs;
+      document.getElementById('setFat').value       = resp.user.target_fat;
+      toast(resp.notification || 'Meta aplicada! Recalculará com cada novo peso.');
+      if (typeof loadDashboard === 'function') loadDashboard(state);
     } catch (err) { toast(err.message, 'error'); }
   });
 
@@ -103,6 +111,16 @@ async function loadSettings(state) {
   document.getElementById('setAge').value            = u.age             || '';
   document.getElementById('setSex').value            = u.sex             || '';
   document.getElementById('setTargetWeight').value   = u.target_weight   || '';
+
+  // Pre-populate calculator with saved activity/goal preferences
+  if (u.activity_factor) {
+    const actSel = document.getElementById('calcActivity');
+    if (actSel) actSel.value = String(u.activity_factor);
+  }
+  if (u.goal_diff != null) {
+    const goalSel = document.getElementById('calcGoal');
+    if (goalSel) goalSel.value = String(u.goal_diff);
+  }
 
   // Populate profile card
   const avatarEl = document.getElementById('profileAvatar');
