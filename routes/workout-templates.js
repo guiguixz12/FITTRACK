@@ -67,7 +67,7 @@ router.delete('/:dow', (req, res) => {
     'SELECT id FROM workout_templates WHERE user_id = ? AND day_of_week = ?'
   ).get(req.user.id, dow);
 
-  if (tpl) db.prepare('DELETE FROM workout_templates WHERE id = ?').run(tpl.id);
+  if (tpl) db.prepare('DELETE FROM workout_templates WHERE id = ? AND user_id = ?').run(tpl.id, req.user.id);
   res.json({ success: true });
 });
 

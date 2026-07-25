@@ -39,19 +39,19 @@ router.post('/logs', (req, res) => {
     if (mode === 'merge') {
       db.prepare(`UPDATE diet_logs
         SET calories=?, protein=?, carbs=?, fat=?, notes=?, updated_at=?
-        WHERE id=?`).run(
+        WHERE id=? AND user_id=?`).run(
           (existing.calories || 0) + (calories || 0),
           round1((existing.protein || 0) + (protein || 0)),
           round1((existing.carbs   || 0) + (carbs   || 0)),
           round1((existing.fat     || 0) + (fat     || 0)),
           notes || existing.notes || '',
-          now, existing.id
+          now, existing.id, req.user.id
       );
     } else {
       // mode='replace' or legacy call — overwrite
       db.prepare(`UPDATE diet_logs
         SET calories=?, protein=?, carbs=?, fat=?, notes=?, updated_at=?
-        WHERE id=?`).run(calories || 0, protein || 0, carbs || 0, fat || 0, notes || '', now, existing.id);
+        WHERE id=? AND user_id=?`).run(calories || 0, protein || 0, carbs || 0, fat || 0, notes || '', now, existing.id, req.user.id);
     }
     return res.json({ id: existing.id, updated: true, mode: mode || 'replace' });
   }

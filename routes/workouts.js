@@ -34,7 +34,7 @@ router.post('/', (req, res) => {
   const existing = db.prepare('SELECT id FROM workouts WHERE user_id=? AND date=?').get(req.user.id, date);
 
   if (existing) {
-    if (notes !== undefined) db.prepare('UPDATE workouts SET notes=? WHERE id=?').run(notes, existing.id);
+    if (notes !== undefined) db.prepare('UPDATE workouts SET notes=? WHERE id=? AND user_id=?').run(notes, existing.id, req.user.id);
     return res.json({ id: existing.id });
   }
 
@@ -55,9 +55,9 @@ router.put('/:id/finalize', (req, res) => {
   if (!workout) return res.status(404).json({ error: 'Treino não encontrado' });
   db.prepare(`
     UPDATE workouts SET total_volume=?, estimated_kcal=?, duration_seconds=?, muscles_worked=?
-    WHERE id=?
+    WHERE id=? AND user_id=?
   `).run(total_volume ?? null, estimated_kcal ?? null, duration_seconds ?? null,
-    muscles_worked ? JSON.stringify(muscles_worked) : null, req.params.id);
+    muscles_worked ? JSON.stringify(muscles_worked) : null, req.params.id, req.user.id);
   res.json({ success: true });
 });
 

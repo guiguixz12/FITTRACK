@@ -119,7 +119,7 @@ router.delete('/:id', (req, res) => {
   const filepath = path.join(UPLOADS_DIR, photo.filename);
   if (fs.existsSync(filepath)) fs.unlinkSync(filepath);
 
-  db.prepare('DELETE FROM progress_photos WHERE id=?').run(req.params.id);
+  db.prepare('DELETE FROM progress_photos WHERE id=? AND user_id=?').run(req.params.id, req.user.id);
   res.json({ success: true });
 });
 
