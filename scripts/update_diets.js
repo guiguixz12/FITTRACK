@@ -213,12 +213,22 @@ function applyDiet(userId, days) {
   }
 }
 
-const run = db.transaction(() => {
-  console.log('\n=== Guilherme (user 1) ===');
-  applyDiet(1, DIETA_GUIXZ);
+const findUser = db.prepare(`SELECT id, name FROM users WHERE name = ?`);
 
-  console.log('\n=== Ana (user 2) ===');
-  applyDiet(2, DIETA_ANA);
+function getUserId(name) {
+  const row = findUser.get(name);
+  if (!row) throw new Error(`Utilizador "${name}" não encontrado`);
+  return row.id;
+}
+
+const run = db.transaction(() => {
+  const guixzId = getUserId('guixz');
+  console.log(`\n=== guixz (user ${guixzId}) ===`);
+  applyDiet(guixzId, DIETA_GUIXZ);
+
+  const anaId = getUserId('anabutti');
+  console.log(`\n=== anabutti (user ${anaId}) ===`);
+  applyDiet(anaId, DIETA_ANA);
 });
 
 run();
