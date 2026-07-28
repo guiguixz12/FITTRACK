@@ -1,4 +1,169 @@
 /* ═══════════════════════════════════════════
+   DIET — Macro hero (ring + bars)
+   ═══════════════════════════════════════════ */
+.dt-macro-hero {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+.dt-macro-ring-wrap {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  flex-shrink: 0;
+}
+.dt-macro-ring-svg {
+  width: 80px;
+  height: 80px;
+  display: block;
+}
+.dt-ring-track {
+  fill: none;
+  stroke: rgba(255,255,255,0.08);
+  stroke-width: 7;
+}
+.dt-ring-fill {
+  fill: none;
+  stroke: var(--accent-warm);
+  stroke-width: 7;
+  stroke-linecap: round;
+  transition: stroke-dashoffset .7s cubic-bezier(.4,0,.2,1);
+}
+.dt-ring-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+}
+.dt-ring-cal {
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--text);
+  line-height: 1;
+}
+.dt-ring-unit {
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: .08em;
+}
+
+/* macro bars beside ring */
+.dt-macro-bars {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.dt-mbar-row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.dt-mbar-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.dt-mbar-dot--prot { background: var(--accent); }
+.dt-mbar-dot--carb { background: #7BC9E8; }
+.dt-mbar-dot--fat  { background: var(--accent-warm); }
+
+.dt-mbar-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-3);
+  width: 30px;
+  flex-shrink: 0;
+}
+.dt-mbar-track {
+  flex: 1;
+  height: 5px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 99px;
+  overflow: hidden;
+}
+.dt-mbar-fill {
+  height: 100%;
+  border-radius: 99px;
+  transition: width .5s ease;
+}
+.dt-mbar-fill--prot { background: var(--accent); }
+.dt-mbar-fill--carb { background: #7BC9E8; }
+.dt-mbar-fill--fat  { background: var(--accent-warm); }
+
+.dt-mbar-val {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-2);
+  white-space: nowrap;
+  min-width: 32px;
+  text-align: right;
+}
+
+/* ═══════════════════════════════════════════
+   DIET — Meal tiles 2×2 grid
+   ═══════════════════════════════════════════ */
+.dt-meal-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 7px;
+  margin-bottom: 12px;
+}
+.dt-meal-tile {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+.dt-meal-tile-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+.dt-meal-tile-icon svg { width: 18px; height: 18px; }
+
+.dt-meal-tile--cafe_manha  .dt-meal-tile-icon { background: rgba(255,196,50,0.12); color: #FFCC33; }
+.dt-meal-tile--almoco      .dt-meal-tile-icon { background: rgba(196,229,56,0.12); color: var(--accent); }
+.dt-meal-tile--cafe_tarde  .dt-meal-tile-icon { background: rgba(122,201,232,0.12); color: #7BC9E8; }
+.dt-meal-tile--janta       .dt-meal-tile-icon { background: rgba(200,150,255,0.12); color: #C896FF; }
+
+.dt-meal-tile-name {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  display: block;
+  line-height: 1.2;
+}
+.dt-meal-tile-kcal {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--text);
+  display: block;
+  line-height: 1.2;
+}
+.dt-meal-tile > :not(.dt-meal-tile-icon) {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+/* ═══════════════════════════════════════════
    DIET — Week grid: meal cards & compact rows
    ═══════════════════════════════════════════ */
 #tab-diet .day-dow { text-transform: uppercase; }

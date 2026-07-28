@@ -44,9 +44,25 @@ function renderDtTrackMeals() {
   document.getElementById('dtTrackCalTotal').textContent  = totalTots.cal;
   document.getElementById('dtTrackBar').style.width       = pct + '%';
   document.getElementById('dtTrackFoodCount').textContent = `${done.length} / ${dtTrackFoods.length} alimentos`;
-  document.getElementById('dtTrackMacros').textContent    = done.length
-    ? `${doneTots.prot}g prot · ${doneTots.carb}g carb · ${doneTots.fat}g gord`
-    : '';
+
+  // Macro progress bars
+  const macroEl = document.getElementById('dtTrackMacros');
+  if (macroEl && totalTots.cal > 0) {
+    const mkBar = (cls, lbl, doneV, totalV) => {
+      const w = totalV > 0 ? Math.min(Math.round(doneV / totalV * 100), 100) : 0;
+      return `<div class="dt-mbar-row">
+        <span class="dt-mbar-dot dt-mbar-dot--${cls}"></span>
+        <span class="dt-mbar-label">${lbl}</span>
+        <div class="dt-mbar-track"><div class="dt-mbar-fill dt-mbar-fill--${cls}" style="width:${w}%"></div></div>
+        <span class="dt-mbar-val">${doneV}/${totalV}g</span>
+      </div>`;
+    };
+    macroEl.innerHTML = mkBar('prot','Prot', doneTots.prot, totalTots.prot)
+      + mkBar('carb','Carb', doneTots.carb, totalTots.carb)
+      + mkBar('fat', 'Gord', doneTots.fat,  totalTots.fat);
+  } else if (macroEl) {
+    macroEl.innerHTML = '';
+  }
 
   // Meal sections
   const el = document.getElementById('dtTrackMeals');

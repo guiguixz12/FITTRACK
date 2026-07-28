@@ -88,19 +88,36 @@ function renderDietWeekGrid() {
         </div>`;
     }
 
-    const tots = computeTotals(tpl.foods || []);
-    const calFmt = tots.cal.toLocaleString('pt-BR');
+    const tots    = computeTotals(tpl.foods || []);
+    const calFmt  = tots.cal.toLocaleString('pt-BR');
 
-    const mealCards = MEALS.map(m => {
+    // meal tiles 2×2
+    const mealTiles = MEALS.map(m => {
       const mf   = (tpl.foods || []).filter(f => f.meal === m.id);
       const kcal = mf.length ? computeTotals(mf).cal : 0;
-      return `<div class="dt-meal-card">
-        <div class="dt-meal-card-icon">${m.icon}</div>
-        <div class="dt-meal-card-kcal">${kcal} kcal</div>
+      if (!kcal) return '';
+      return `<div class="dt-meal-tile dt-meal-tile--${m.id}">
+        <div class="dt-meal-tile-icon">${m.icon}</div>
+        <div>
+          <span class="dt-meal-tile-name">${m.label}</span>
+          <span class="dt-meal-tile-kcal">${kcal} kcal</span>
+        </div>
       </div>`;
-    }).join('');
+    }).filter(Boolean).join('');
 
     if (isToday) {
+      const RING_C    = 201.06;
+      const targetCal = dtState?.target_calories || 2000;
+      const dashOff   = (RING_C * (1 - Math.min(tots.cal / targetCal, 1))).toFixed(2);
+
+      const protKcal = tots.prot * 4;
+      const carbKcal = tots.carb * 4;
+      const fatKcal  = tots.fat  * 9;
+      const macroMax = Math.max(protKcal, carbKcal, fatKcal) || 1;
+      const protPct  = Math.round(protKcal / macroMax * 100);
+      const carbPct  = Math.round(carbKcal / macroMax * 100);
+      const fatPct   = Math.round(fatKcal  / macroMax * 100);
+
       return `${sectionLabel}
         <div class="day-card is-today">
           <div class="day-header">
@@ -110,13 +127,42 @@ function renderDietWeekGrid() {
             <button class="btn btn-ghost btn-sm dt-icon-btn" onclick="copyDtTemplate(${dow})" title="Copiar">${ICON.copy}</button>
           </div>
           <div class="day-body">
-            <div class="diet-day-macros">
-              <div class="diet-day-macro cal"><div class="diet-day-macro-val">${calFmt}</div><div class="diet-day-macro-label">kcal</div></div>
-              <div class="diet-day-macro prot"><div class="diet-day-macro-val">${tots.prot}g</div><div class="diet-day-macro-label">Prot</div></div>
-              <div class="diet-day-macro carb"><div class="diet-day-macro-val">${tots.carb}g</div><div class="diet-day-macro-label">Carb</div></div>
-              <div class="diet-day-macro fat"><div class="diet-day-macro-val">${tots.fat}g</div><div class="diet-day-macro-label">Gord</div></div>
+            <div class="dt-macro-hero">
+              <div class="dt-macro-ring-wrap">
+                <svg class="dt-macro-ring-svg" viewBox="0 0 80 80">
+                  <circle class="dt-ring-track" cx="40" cy="40" r="32"/>
+                  <circle class="dt-ring-fill" cx="40" cy="40" r="32"
+                    transform="rotate(-90 40 40)"
+                    stroke-dasharray="${RING_C}"
+                    stroke-dashoffset="${dashOff}"/>
+                </svg>
+                <div class="dt-ring-center">
+                  <span class="dt-ring-cal">${calFmt}</span>
+                  <span class="dt-ring-unit">kcal</span>
+                </div>
+              </div>
+              <div class="dt-macro-bars">
+                <div class="dt-mbar-row">
+                  <span class="dt-mbar-dot dt-mbar-dot--prot"></span>
+                  <span class="dt-mbar-label">Prot</span>
+                  <div class="dt-mbar-track"><div class="dt-mbar-fill dt-mbar-fill--prot" style="width:${protPct}%"></div></div>
+                  <span class="dt-mbar-val">${tots.prot}g</span>
+                </div>
+                <div class="dt-mbar-row">
+                  <span class="dt-mbar-dot dt-mbar-dot--carb"></span>
+                  <span class="dt-mbar-label">Carb</span>
+                  <div class="dt-mbar-track"><div class="dt-mbar-fill dt-mbar-fill--carb" style="width:${carbPct}%"></div></div>
+                  <span class="dt-mbar-val">${tots.carb}g</span>
+                </div>
+                <div class="dt-mbar-row">
+                  <span class="dt-mbar-dot dt-mbar-dot--fat"></span>
+                  <span class="dt-mbar-label">Gord</span>
+                  <div class="dt-mbar-track"><div class="dt-mbar-fill dt-mbar-fill--fat" style="width:${fatPct}%"></div></div>
+                  <span class="dt-mbar-val">${tots.fat}g</span>
+                </div>
+              </div>
             </div>
-            <div class="dt-meal-cards">${mealCards}</div>
+            ${mealTiles ? `<div class="dt-meal-grid">${mealTiles}</div>` : ''}
             <div class="day-actions">
               <button class="btn btn-primary" style="flex:1" onclick="openDtTrack(${dow})">Acompanhar hoje</button>
             </div>
