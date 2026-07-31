@@ -117,7 +117,10 @@ function toggleDtTrackFood(gi) {
 window.toggleDtTrackFood = toggleDtTrackFood;
 
 function setupDtTrack(state) {
-  document.getElementById('dtTrackBackBtn').addEventListener('click', () => switchDtView('programa'));
+  document.getElementById('dtTrackBackBtn').addEventListener('click', () => {
+    switchDtView('programa');
+    renderDietWeekGrid();  // refresh today card with latest consumed data
+  });
 
   document.getElementById('dtTrackSaveBtn').addEventListener('click', async () => {
     await saveDtTrackToDiary(state);

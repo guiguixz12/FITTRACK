@@ -106,17 +106,22 @@ function renderDietWeekGrid() {
     }).filter(Boolean).join('');
 
     if (isToday) {
-      const RING_C    = 201.06;
-      const targetCal = dtState?.target_calories || 2000;
-      const dashOff   = (RING_C * (1 - Math.min(tots.cal / targetCal, 1))).toFixed(2);
+      const RING_C = 201.06;
 
-      const protKcal = tots.prot * 4;
-      const carbKcal = tots.carb * 4;
-      const fatKcal  = tots.fat  * 9;
-      const macroMax = Math.max(protKcal, carbKcal, fatKcal) || 1;
-      const protPct  = Math.round(protKcal / macroMax * 100);
-      const carbPct  = Math.round(carbKcal / macroMax * 100);
-      const fatPct   = Math.round(fatKcal  / macroMax * 100);
+      // Load consumed totals from localStorage tracking state
+      const todayDate  = getDateForDow(dow);
+      const saved      = loadTrackState(todayDate);
+      const tracked    = (tpl.foods || []).map((f, i) => ({ ...f, done: saved.doneIdxs.includes(i) }));
+      (saved.extraFoods || []).forEach(f => tracked.push(f));
+      const cons = computeTotals(tracked.filter(f => f.done));
+      const plan = tots;  // planned totals
+
+      const ringFill = plan.cal > 0 ? Math.min(cons.cal / plan.cal, 1) : 0;
+      const dashOff  = (RING_C * (1 - ringFill)).toFixed(2);
+
+      const protPct = plan.prot > 0 ? Math.min(Math.round(cons.prot / plan.prot * 100), 100) : 0;
+      const carbPct = plan.carb > 0 ? Math.min(Math.round(cons.carb / plan.carb * 100), 100) : 0;
+      const fatPct  = plan.fat  > 0 ? Math.min(Math.round(cons.fat  / plan.fat  * 100), 100) : 0;
 
       return `${sectionLabel}
         <div class="day-card is-today">
@@ -137,7 +142,7 @@ function renderDietWeekGrid() {
                     stroke-dashoffset="${dashOff}"/>
                 </svg>
                 <div class="dt-ring-center">
-                  <span class="dt-ring-cal">${calFmt}</span>
+                  <span class="dt-ring-cal">${cons.cal}</span>
                   <span class="dt-ring-unit">kcal</span>
                 </div>
               </div>
@@ -146,20 +151,21 @@ function renderDietWeekGrid() {
                   <span class="dt-mbar-dot dt-mbar-dot--prot"></span>
                   <span class="dt-mbar-label">Prot</span>
                   <div class="dt-mbar-track"><div class="dt-mbar-fill dt-mbar-fill--prot" style="width:${protPct}%"></div></div>
-                  <span class="dt-mbar-val">${tots.prot}g</span>
+                  <span class="dt-mbar-val">${cons.prot}/${plan.prot}g</span>
                 </div>
                 <div class="dt-mbar-row">
                   <span class="dt-mbar-dot dt-mbar-dot--carb"></span>
                   <span class="dt-mbar-label">Carb</span>
                   <div class="dt-mbar-track"><div class="dt-mbar-fill dt-mbar-fill--carb" style="width:${carbPct}%"></div></div>
-                  <span class="dt-mbar-val">${tots.carb}g</span>
+                  <span class="dt-mbar-val">${cons.carb}/${plan.carb}g</span>
                 </div>
                 <div class="dt-mbar-row">
                   <span class="dt-mbar-dot dt-mbar-dot--fat"></span>
                   <span class="dt-mbar-label">Gord</span>
                   <div class="dt-mbar-track"><div class="dt-mbar-fill dt-mbar-fill--fat" style="width:${fatPct}%"></div></div>
-                  <span class="dt-mbar-val">${tots.fat}g</span>
+                  <span class="dt-mbar-val">${cons.fat}/${plan.fat}g</span>
                 </div>
+                <div style="font-size:10px;color:var(--text-3);margin-top:2px">de ${plan.cal} kcal plano</div>
               </div>
             </div>
             ${mealTiles ? `<div class="dt-meal-grid">${mealTiles}</div>` : ''}
