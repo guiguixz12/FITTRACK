@@ -183,7 +183,8 @@ async function saveDtTrackToDiary(state) {
 
     const label = mode === 'merge' ? 'somados ao diário' : 'salvos no diário';
     toast(`${tots.cal} kcal ${label}!`);
-    if (state.date === today) loadDashboard(state);
+    state.date = today;
+    loadDashboard(state);
   } catch (err) { toast(err.message, 'error'); }
 }
 
